@@ -16,7 +16,7 @@ https://127.0.0.1:8000/login
 # you will also see this url in your backend terminal
 ```
 
-# STEP3: For Administator, Sign Up An Super Account(Administrator)
+# STEP3: For Administator, Sign Up A Super Account(Administrator)
 ```bash
 python manage.py createsuperuser
 # enter your username, password, email
