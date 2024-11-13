@@ -8,6 +8,7 @@ usage:
 ```python
 # if you have mysql client in your computer
 # 取消注释myproject/settings.py 43~52行
+# 注释这一行之后代表user account相关的database处理暂时被禁用
 
 DATABASES = {
     'default': {
