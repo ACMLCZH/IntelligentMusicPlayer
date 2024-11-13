@@ -40,16 +40,16 @@ INSTALLED_APPS = [
     'myapp',
 ]
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',  # 使用 PostgreSQL 数据库
-        'NAME': 'project_user',  # 数据库名称
-        'USER': 'root',  # 数据库用户名
-        'PASSWORD': 'zyzjga1314',  # 数据库密码
-        'HOST': 'localhost',  # 数据库地址
-        'PORT': '3306',  # 数据库端口
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',  # 使用 MYSQL 数据库
+#         'NAME': 'project_user',  # 数据库名称
+#         'USER': 'root',  # 数据库用户名
+#         'PASSWORD': 'zyzjga1314',  # 数据库密码
+#         'HOST': 'localhost',  # 数据库地址
+#         'PORT': '3306',  # 数据库端口
+#     }
+# }
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/login/'
 TEMPLATES = [
