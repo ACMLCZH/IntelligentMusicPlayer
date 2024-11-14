@@ -31,7 +31,7 @@ python manage.py runserver
 # STEP2: For Normal User, Open Login URL
 ```bash
 # Open your browser with following link:
-https://127.0.0.1:8000/login
+http://127.0.0.1:8000/login
 # you will also see this url in your backend terminal
 ```
 
@@ -48,6 +48,6 @@ Password: 520project
 # STEP4: For Administator, Open Database Management URL
 ```bash
 # Open your broser with following link:
-https://127.0.0.1:8000/admin
+http://127.0.0.1:8000/admin
 # You may manage all accounts
 ```
