@@ -30,7 +30,7 @@ python manage.py runserver
 
 # STEP2: For Normal User, Open Login URL
 ```bash
-# Open your broser with following link:
+# Open your browser with following link:
 https://127.0.0.1:8000/login
 # you will also see this url in your backend terminal
 ```

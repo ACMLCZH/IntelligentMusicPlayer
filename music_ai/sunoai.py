@@ -12,13 +12,16 @@ client = Suno(
 )
 
 # Function to save audio to memory
-def save_audio_to_memory(song_url):
+def save_audio_to_local_file(song_url, local_file):
     response = requests.get(song_url)
     if response.status_code == 200:
         audio_data = response.content
         return audio_data
     else:
         raise Exception("Failed to retrieve audio data.")
+    
+def save_image_to_local_file(image_url, local_file):
+    pass
     
 def generate_songs(prompt):
     songs = client.generate(
