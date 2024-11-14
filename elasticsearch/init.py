@@ -61,7 +61,11 @@ def init_user_collection(es):
                     "index": True
                 },
                 "username": {
-                    "type": "text",
+                    "type": "keyword",
+                    "index": True
+                },
+                "collection_name": {
+                    "type": "keyword",
                     "index": True
                 },
                 "music_id": {
@@ -123,6 +127,32 @@ def add_examples(es):
     for music in music_examples:
         res = es.index(index="music", id=music["id"], document=music)
         print(f"Added music with ID: {music['id']}, Result: {res['result']}")
+
+
+    collection_examples = [
+        {
+            "id": "1",
+            "username": "user",
+            "collection_name": "fav",
+            "music_id": "1"
+        },
+        {
+            "id": "2",
+            "username": "user",
+            "collection_name": "fav",
+            "music_id": "3"
+        },
+        {
+            "id": "3",
+            "username": "user",
+            "collection_name": "col",
+            "music_id": "2"
+        }
+    ]
+
+    for collection in collection_examples:
+        res = es.index(index="collection", id=collection["id"], document=collection)
+        print(f"Added collection with ID: {collection['id']}, Result: {res['result']}")
 
 
 if __name__ == "__main__":
