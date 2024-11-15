@@ -43,12 +43,12 @@ INSTALLED_APPS = [
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'cs520_project_user',
-        'USER': 'django_user',
-        'PASSWORD': 'django',
-        'HOST': 'localhost',
-        'PORT': '3306',
+        'ENGINE': 'django.db.backends.mysql',  # 使用 MYSQL 数据库
+        'NAME': 'project_user',  # 数据库名称
+        'USER': 'root',  # 数据库用户名
+        'PASSWORD': 'zyzjga1314',  # 数据库密码
+        'HOST': 'localhost',  # 数据库地址
+        'PORT': '3306',  # 数据库端口
     }
 }
 
