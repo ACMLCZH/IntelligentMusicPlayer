@@ -1,23 +1,23 @@
 import uuid
 from elasticsearch import Elasticsearch
 es = Elasticsearch(["http://localhost:9200"])
-from myapp.models import Songs
+from myapp.models import Song
 
 
-def add_music(Song: Songs):
+def add_music(song: Song):
     '''
         add a music to Server Track Database.
     '''
 
     doc = dict(
-        id=Song.id,
-        name=Song.name,
-        author=Song.author,
-        duration=Song.duration,
-        lyrics=Song.lyrics,
-        url=Song.url
+        id=song.id,
+        name=song.name,
+        author=song.author,
+        duration=song.duration,
+        lyrics=song.lyrics,
+        url=song.url
     )
-    es.index(index='music', id=Song.id, body=doc)
+    es.index(index='music', id=song.id, body=doc)
 
     # index_name = 'music' # 使用 match_all 查询获取所有文档 
     # query = { "query": { "match_all": {} } } 
@@ -31,11 +31,11 @@ def add_music(Song: Songs):
     #     print(f"ID: {song.id}, Name: {song.name}, Author: {song.author}, Duration: {song.duration}, Lyrics: {song.lyrics}, URL: {song.url}")
 
 
-def delete_music(Song: Songs):
+def delete_music(song: Song):
     '''
         delete a music from Server Track Database.
     '''
-    es.delete(index='music', id=Song.id)
+    es.delete(index='music', id=song.id)
 
     print("!!!!delete success!!!!")
     # print("!!!!current all index:!!!!")
@@ -73,7 +73,7 @@ def search_music(keyword: str, criteria: str, from_: int, size: int):
         hit['_source']['id'] = int(hit['_source']['id'])
     return hits_total, hits
 
-def check_all_music(Song: Songs):
+def check_all_music(song: Song):
     '''
         add a music to Server Track Database.
     '''

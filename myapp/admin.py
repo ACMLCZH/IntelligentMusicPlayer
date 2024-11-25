@@ -4,7 +4,7 @@ from django.contrib import admin
 # from .models import Songs
 # admin.site.register(Songs)
 
-from .models import Songs
+from .models import Song
 from .documents import SongDocument
 from django_elasticsearch_dsl.registries import registry
 from elastic_search.methods import *
@@ -36,5 +36,5 @@ class SongAdmin(admin.ModelAdmin):
         for obj in queryset: 
             delete_music(obj)
         super().delete_model(request, obj)
-admin.site.register(Songs, SongAdmin)
+admin.site.register(Song, SongAdmin)
 
