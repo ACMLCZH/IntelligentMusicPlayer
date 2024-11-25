@@ -20,6 +20,9 @@ DATABASES = {
     }
 }
 ```
+**Your user should looks like this**
+![](./images/1.jpg)
+
 ```python
 # Makemigrations and migrate 
 python manage.py makemigrations
