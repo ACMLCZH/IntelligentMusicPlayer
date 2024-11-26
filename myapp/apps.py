@@ -7,4 +7,4 @@ class MyappConfig(AppConfig):
 
 
 class MusicDatabaseConfig(AppConfig):
-    name = 'Songs'
+    name = 'Song'

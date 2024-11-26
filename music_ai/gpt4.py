@@ -1,13 +1,22 @@
 from openai import OpenAI
+import uuid
+import os
 
 # api_key = '8ebbc0ebe146462a939dfd4589b79e10'
+data_folder = "data"
 
 class TempSong:
     def __init__(self, title, artist, album, year):
+        self.id = uuid.uuid4().hex
+        self.song_folder = os.path.join(data_folder, str(self.id))
+        self.audio_path = os.path.join(self.song_folder, "audio.mp3")
+        self.cover_path = os.path.join(self.song_folder, "cover.png")
         self.title = title
         self.artist = artist
         self.album = album
         self.year = year
+
+        os.makedirs(self.song_folder)
     
     def get_title(self):
         return self.title
@@ -20,6 +29,15 @@ class TempSong:
     
     def get_year(self):
         return self.year
+    
+    def print_info(self):
+        print(
+            f"ID: {self.id}\n"
+            f"Title: {self.title}\n"
+            f"Artist: {self.artist}\n"
+            f"Album: {self.album}\n"
+            f"Year: {self.year}\n\n"
+        )
 
 client = OpenAI()
 system_prompt = \

@@ -6,21 +6,32 @@ usage:
 
 # STEP0: (Not required)
 ```python
-# if you have mysql client in your computer
-# 取消注释myproject/settings.py 43~52行
-# 注释这一行之后代表user account相关的database处理暂时被禁用
+# Create correponding user and database in mysql.
+# This step is complicated since the created user need all access, feel free to contact me if you need any assistance.
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',  # 使用 MYSQL 数据库
-        'NAME': 'project_user',  # 数据库名称
-        'USER': 'root',  # 数据库用户名
-        'PASSWORD': 'zyzjga1314',  # 数据库密码
-        'HOST': 'localhost',  # 数据库地址
-        'PORT': '3306',  # 数据库端口
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'cs520_project_user',
+        'USER': 'django_user',
+        'PASSWORD': 'cs520_project',
+        'HOST': 'localhost',
+        'PORT': '3306',
     }
 }
+```
+**Your user should looks like this**
+![](./images/1.jpg)
 
+```python
+# Makemigrations and migrate 
+python manage.py makemigrations
+python manage.py migrate
+```
+
+```bash
+# run your elasticsearch
+.\elasticsearch.bat
 ```
 
 # STEP1: run backend server

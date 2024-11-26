@@ -9,6 +9,21 @@ from django.contrib.auth.models import User
 from django.urls import reverse
 
 import json
+
+from rest_framework import generics
+from .models import Song, Favlist, UserFav
+from .serializers import SongSerializer, SongDocumentSerializer, FavlistSerializer, UserFavSerializer
+from django_elasticsearch_dsl_drf.viewsets import DocumentViewSet
+from .documents import SongDocument
+from django_elasticsearch_dsl_drf.filter_backends import (
+    FilteringFilterBackend,
+    CompoundSearchFilterBackend,
+    OrderingFilterBackend,
+)
+from django_elasticsearch_dsl_drf.pagination import LimitOffsetPagination
+from rest_framework.permissions import IsAuthenticated
+
+
 @csrf_exempt
 def login(request):
     return render(request, 'login.html')
@@ -97,3 +112,74 @@ def backend_login_process(request):
 @login_required(login_url='login')
 def home(request):
     return render(request, 'templates/home.html')
+
+
+class SongListCreateAPIView(generics.ListCreateAPIView):
+    queryset = Song.objects.all()
+    serializer_class = SongSerializer
+
+class SongRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Song.objects.all()
+    serializer_class = SongSerializer
+
+class SongSearchView(DocumentViewSet):
+    document = SongDocument
+    serializer_class = SongDocumentSerializer
+    pagination_class = LimitOffsetPagination
+
+    filter_backends = [
+        FilteringFilterBackend,
+        OrderingFilterBackend,
+        CompoundSearchFilterBackend,
+    ]
+
+    search_fields = {
+        'name': {'boost': 2},
+        'author': None,
+        'lyrics': None,
+    }
+
+    filter_fields = {
+        'name': 'name.raw',
+        'author': 'author.raw',
+        'lyrics': 'lyrics.raw',
+    }
+
+    ordering_fields = {
+        'name': 'name.raw',
+        'author': 'author.raw',
+        'duration': 'duration',
+    }
+    ordering = ('name',)
+
+    def filter_queryset(self, queryset):
+        return super().filter_queryset(queryset)
+
+
+class FavlistListCreateView(generics.ListCreateAPIView):
+    queryset = Favlist.objects.all()
+    serializer_class = FavlistSerializer
+
+class FavlistRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Favlist.objects.all()
+    serializer_class = FavlistSerializer
+
+
+class UserFavListCreateView(ListCreateAPIView):
+    queryset = UserFav.objects.all()
+    serializer_class = UserFavSerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        # Automatically set the user to the currently authenticated user
+        serializer.save(user=self.request.user)
+
+# Retrieve/Update/Delete API View
+class UserFavDetailView(RetrieveUpdateDestroyAPIView):
+    queryset = UserFav.objects.all()
+    serializer_class = UserFavSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        # Ensure users can only access their own favorites
+        return UserFav.objects.filter(user=self.request.user)
