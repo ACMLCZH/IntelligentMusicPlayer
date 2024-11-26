@@ -165,7 +165,7 @@ class FavlistRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = FavlistSerializer
 
 
-class UserFavListCreateView(ListCreateAPIView):
+class UserFavListCreateView(generics.ListCreateAPIView):
     queryset = UserFav.objects.all()
     serializer_class = UserFavSerializer
     permission_classes = [IsAuthenticated]
@@ -175,7 +175,7 @@ class UserFavListCreateView(ListCreateAPIView):
         serializer.save(user=self.request.user)
 
 # Retrieve/Update/Delete API View
-class UserFavDetailView(RetrieveUpdateDestroyAPIView):
+class UserFavDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = UserFav.objects.all()
     serializer_class = UserFavSerializer
     permission_classes = [IsAuthenticated]
