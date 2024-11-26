@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Music Player</title>
+    <link rel="stylesheet" href="/static/index_style.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-logo">
+            <a href="/index" id="home-link">MyMusicApp</a>
+        </div>
+        <div class="nav-search">
+            <input type="text" id="search-input" placeholder="Search...">
+            <button id="search-button">S</button>
+        </div>
+        <div class="nav-user" id="nav-user">
+            <img src="https://via.placeholder.com/50" alt="User Avatar" id="user-avatar">
+            <div class="dropdown-menu" id="user-dropdown">
+                <a href="#" id="edit-profile">Edit Profile</a>
+                <a href="#" id="logout">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Content Area -->
+    <div class="content-area">
+        <!-- Left Sidebar: Playlists -->
+        <div class="sidebar">
+            <h2>Playlists</h2>
+            <ul id="playlist-list">
+                <!-- Playlists will be dynamically loaded here -->
+            </ul>
+        </div>
+
+        <!-- Main Content: Song List -->
+        <div class="main-content">
+            <!-- Current Playlist Information -->
+            <div class="playlist-info">
+                <h2 id="current-playlist-title">Playlist Title</h2>
+                <button id="add-to-playqueue">Add to Play Queue</button>
+            </div>
+
+            <!-- Song List -->
+            <div id="songs-list">
+                <!-- Songs will be dynamically loaded here -->
+            </div>
+        </div>
+
+        <!-- Right Sidebar: Play Queue -->
+        <div class="play-queue">
+            <h2>Play Queue</h2>
+            <ul id="play-queue-list">
+                <!-- Play Queue will be dynamically loaded here -->
+            </ul>
+
+            <!-- Natural Language Play Queue Management -->
+            <div class="nlp-management">
+                <h3>Manage Play Queue</h3>
+                <textarea id="nlp-input"></textarea>
+                <button id="nlp-button">Update Play Queue</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Player Area -->
+    <div class="player-area">
+        <!-- Reserved Area for Playing Songs -->
+        <h2>Player Area</h2>
+    </div>
+
+    <script src="/static/index.js"></script>
+</body>
+</html>
