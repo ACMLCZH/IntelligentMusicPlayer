@@ -1,3 +1,0 @@
-[submodule "music_ai/audiocraft"]
-	path = music_ai/audiocraft
-	url = https://github.com/facebookresearch/audiocraft.git
