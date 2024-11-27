@@ -32,10 +32,13 @@ python manage.py migrate
 ```bash
 # run your elasticsearch
 .\elasticsearch.bat
+pip install -r requirements.txt
 ```
 
 # STEP1: run backend server
+
 ```bash
+
 python manage.py runserver
 ```
 
