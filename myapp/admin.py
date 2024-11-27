@@ -10,7 +10,14 @@ from django_elasticsearch_dsl.registries import registry
 from elastic_search.methods import *
 
 class SongAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'author','duration','lyrics',  'url')
+    list_display = ('id',
+            'name',
+            'author',
+            'duration',
+            'lyrics',
+            'topics',
+            'mp3_url',
+            'cover_url',)
     search_fields = ('id', 'name', 'author')
 
     # def get_search_results(self, request, queryset, search_term):

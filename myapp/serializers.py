@@ -20,7 +20,7 @@ class SongDocumentSerializer(DocumentSerializer):
             'duration',
             'lyrics',
             'topics',
-            'mp3_url'
+            'mp3_url',
             'cover_url',
         )
 
