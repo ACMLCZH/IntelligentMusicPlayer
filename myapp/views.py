@@ -118,9 +118,11 @@ class SongListCreateAPIView(generics.ListCreateAPIView):
     queryset = Song.objects.all()
     serializer_class = SongSerializer
 
+
 class SongRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Song.objects.all()
     serializer_class = SongSerializer
+
 
 class SongSearchView(DocumentViewSet):
     document = SongDocument
@@ -160,6 +162,7 @@ class FavlistListCreateView(generics.ListCreateAPIView):
     queryset = Favlist.objects.all()
     serializer_class = FavlistSerializer
 
+
 class FavlistRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Favlist.objects.all()
     serializer_class = FavlistSerializer
@@ -168,17 +171,17 @@ class FavlistRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
 class UserFavListCreateView(generics.ListCreateAPIView):
     queryset = UserFav.objects.all()
     serializer_class = UserFavSerializer
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
         # Automatically set the user to the currently authenticated user
         serializer.save(user=self.request.user)
 
-# Retrieve/Update/Delete API View
+
 class UserFavRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = UserFav.objects.all()
     serializer_class = UserFavSerializer
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         # Ensure users can only access their own favorites

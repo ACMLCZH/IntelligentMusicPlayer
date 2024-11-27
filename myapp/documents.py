@@ -9,4 +9,4 @@ class SongDocument(Document):
         settings = { 'number_of_shards': 1, 'number_of_replicas': 0 } 
     class Django: 
         model = Song 
-        fields =  ['id', 'name', 'author','duration','lyrics',  'url']
+        fields =  ['id', 'name', 'author','duration','lyrics', 'topics', 'mp3_url', 'cover_url']

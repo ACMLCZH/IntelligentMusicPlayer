@@ -7,7 +7,9 @@ class Song(models.Model):
     author = models.CharField(max_length=100)
     duration = models.IntegerField()
     lyrics = models.CharField(max_length=2000)
-    url = models.CharField(max_length=200)
+    topics = models.CharField(max_length=100)
+    mp3_url = models.CharField(max_length=200)
+    cover_url = models.CharField(max_length=200)
 
     def __str__(self):
         return self.name
