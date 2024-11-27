@@ -12,7 +12,7 @@ headers = {
     'Content-Type': 'application/json',
 }
 
-def generate_song(prompt):
+def generate_song(prompt: str):
     lyric_data = {
         'prompt': prompt,
     }
