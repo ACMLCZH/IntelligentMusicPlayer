@@ -18,7 +18,9 @@ GET http://localhost:8000/song/
         "author": "John Lennon",
         "duration": 183,
         "lyrics": "Imagine all the people...",
-        "url": "http://example.com/song1"
+        "topics": "Peace, Unity, Hope",
+        "mp3_url": "http://example.com/song1",
+        "cover_url": "http://example.com/images/imagine_cover.jpg"
     },
     {
         "id": 2,
@@ -26,7 +28,9 @@ GET http://localhost:8000/song/
         "author": "Queen",
         "duration": 354,
         "lyrics": "Is this the real life? Is this just fantasy?",
-        "url": "http://example.com/song2"
+        "topics": "Drama, Emotion, Storytelling",
+        "mp3_url": "http://example.com/song2",
+        "cover_url": "http://example.com/images/bohemian_rhapsody_cover.jpg"
     }
 ]
 ```
@@ -39,7 +43,9 @@ GET http://localhost:8000/song/
     "author": "The Beatles",
     "duration": 430,
     "lyrics": "Hey Jude, don't make it bad...",
-    "url": "http://example.com/heyjude"
+    "topics": "Encouragement, Love, Friendship",
+    "mp3_url": "http://example.com/heyjude",
+    "cover_url": "http://example.com/images/hey_jude_cover.jpg"
 }
 ```
 
@@ -51,7 +57,9 @@ GET http://localhost:8000/song/
     "author": "The Beatles",
     "duration": 430,
     "lyrics": "Hey Jude, don't make it bad...",
-    "url": "http://example.com/heyjude"
+    "topics": "Encouragement, Love, Friendship",
+    "mp3_url": "http://example.com/heyjude",
+    "cover_url": "http://example.com/images/hey_jude_cover.jpg"
 }
 ```
 
@@ -72,7 +80,9 @@ GET http://localhost:8000/song/1/
     "author": "John Lennon",
     "duration": 183,
     "lyrics": "Imagine all the people...",
-    "url": "http://example.com/song1"
+    "topics": "Peace, Humanity, Hope",
+    "mp3_url": "http://example.com/song1",
+    "cover_url": "http://example.com/song1-cover.jpg"
 }
 ```
 
@@ -84,7 +94,9 @@ GET http://localhost:8000/song/1/
     "author": "John Lennon",
     "duration": 200,
     "lyrics": "Imagine all the people living life in peace...",
-    "url": "http://example.com/song1-updated"
+    "topics": "Peace, Humanity, Hope",
+    "mp3_url": "http://example.com/song1-updated",
+    "cover_url": "http://example.com/song1-cover-updated.jpg"
 }
 ```
 
@@ -96,7 +108,9 @@ GET http://localhost:8000/song/1/
     "author": "John Lennon",
     "duration": 200,
     "lyrics": "Imagine all the people living life in peace...",
-    "url": "http://example.com/song1-updated"
+    "topics": "Peace, Humanity, Hope",
+    "mp3_url": "http://example.com/song1-updated",
+    "cover_url": "http://example.com/song1-cover-updated.jpg"
 }
 ```
 
@@ -131,7 +145,9 @@ GET http://localhost:8000/song/search/?search=Imagine
         "author": "John Lennon",
         "duration": 183,
         "lyrics": "Imagine all the people...",
-        "url": "http://example.com/song1"
+        "topics": "Peace, Humanity, Hope",
+        "mp3_url": "http://example.com/song1",
+        "cover_url": "http://example.com/song1-cover.jpg"
     }
 ]
 ```
