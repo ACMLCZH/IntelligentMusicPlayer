@@ -1,8 +1,5 @@
 import requests
-from utils.tools import save_audio_to_local_file, save_image_to_local_file
-from gpt4 import TempSong
 from datetime import datetime
-import io
 
 # API at: https://platform.acedata.cloud/documents/4da95d9d-7722-4a72-857d-bf6be86036e9
 
@@ -57,7 +54,7 @@ import io
 
 token = '10eec3323fb7411fb5bc19198ea340a9'
 music_url = "https://api.acedata.cloud/suno/audios"
-headers = {
+music_headers = {
     'authorization': f'Bearer {token}',
     'accept': 'application/json',
     'content-type': 'application/json',
@@ -65,26 +62,40 @@ headers = {
 artist = 'SunoAI'
 album = 'SunoAI Generation'
 
-def generate_song(prompt):
+local_headers = {
+    'content-type': 'application/json',
+}
+local_url = "http://localhost:8000/song/"
+
+def generate_song(prompt: str):
     music_data = {
-        "action": "generate",
-        "prompt": prompt,
-        "model": "chirp-v3-5",
-        "custom": False,
-        "instrumental": False,
+        'action': 'generate',
+        'prompt': prompt,
+        'model': 'chirp-v3-5',
+        'custom': False,
+        'instrumental': False,
     }
-    music_response = requests.post(music_url, headers=headers, json=music_data)
+    music_response = requests.post(music_url, headers=music_headers, json=music_data)
     if music_response.status_code != 200:
         raise Exception(f'Error: {music_response.status_code}, {music_response.text}')
 
     music_jsons = music_response.json()['data']
     music_json = music_jsons[0]
-    lyric = music_json['lyric']
-    title = music_json['title']
-    duration = music_json["duration"]
-    save_image_to_local_file(music_json['image_url'], )
-    save_audio_to_local_file(music_json['audio_url'], )
 
+    while True:
+        local_data = {
+            'name': music_json['title'],
+            'author': artist,
+            'duration': music_json['duration'],
+            'lyrics': music_json['lyric'],
+            'mp3_url': music_json['audio_url'],
+            'cover_url': music_json['image_url'],
+        }
+        local_response = requests.post(local_url, headers=local_headers, json=local_data)
+        if local_response.status_code == 200:
+            break
+        else:
+            print(f"Failed to post song to local server with error: {local_response.status_code}, {local_response.text}. Retry now.")
 
 if __name__ == "__main__":
     # Play the first song in memory
