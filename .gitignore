@@ -2,3 +2,4 @@
 */downloads
 test
 **/__pycache__
+**/migrations
