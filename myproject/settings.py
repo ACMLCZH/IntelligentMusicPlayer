@@ -140,3 +140,5 @@ ELASTICSEARCH_DSL = {
         'verify_certs': False,
     },
 }
+
+LOGIN_URL = '/login/'

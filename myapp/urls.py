@@ -14,4 +14,5 @@ urlpatterns = [
     path('favlist/<int:pk>/', views.FavlistRetrieveUpdateDestroyView.as_view(), name='favlist-detail'),
     path('userfav/', views.UserFavListCreateView.as_view(), name='userfav-list-create'),
     path('userfav/<int:pk>/', views.UserFavRetrieveUpdateDestroyView.as_view(), name='userfav-detail'),
+    path('index/', views.index, name='index'),
    ]

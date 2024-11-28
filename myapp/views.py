@@ -58,7 +58,7 @@ def backend_login_process(request):
                     response = {
                     'response': 'Log In Successful!',
                     'redirect': True,
-                    'redirect_url': reverse("sign_up") #TODO:change to home url
+                    'redirect_url': reverse("index")
                     }
                     return JsonResponse(response,status=200)
                 else:
@@ -112,6 +112,12 @@ def backend_login_process(request):
 @login_required(login_url='login')
 def home(request):
     return render(request, 'templates/home.html')
+
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def index(request):
+    return render(request, 'index.html')
 
 
 class SongListCreateAPIView(generics.ListCreateAPIView):
