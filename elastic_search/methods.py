@@ -15,9 +15,11 @@ def add_music(song: Song):
         author=song.author,
         duration=song.duration,
         lyrics=song.lyrics,
-        url=song.url
+        topics=song.topics,
+        mp3_url=song.mp3_url,
+        cover_url=song.cover_url,
     )
-    es.index(index='music', id=song.id, body=doc)
+    es.index(index='music', body=doc)
 
     # index_name = 'music' # 使用 match_all 查询获取所有文档 
     # query = { "query": { "match_all": {} } } 
@@ -46,6 +48,17 @@ def delete_music(song: Song):
     # for hit in hits: 
     #     print(hit['_source'])
 
+def clear_es_database():
+    '''
+        Clear all documents from the specified Elasticsearch index.
+    '''
+
+    # Delete all documents in the index
+    es.indices.delete(index='_all')
+
+    print("!!!!index cleared!!!!")
+
+
 
 def search_music(keyword: str, criteria: str, from_: int, size: int):
     '''
@@ -69,8 +82,8 @@ def search_music(keyword: str, criteria: str, from_: int, size: int):
     hits_total = response['hits']['total']['value']
     hits = response['hits']['hits']
 
-    for hit in hits: 
-        hit['_source']['id'] = int(hit['_source']['id'])
+    # for hit in hits: 
+    #     hit['_source']['id'] = int(hit['_source']['id'])
     return hits_total, hits
 
 def check_all_music(song: Song):

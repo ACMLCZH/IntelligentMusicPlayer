@@ -30,9 +30,12 @@ class SongAdmin(admin.ModelAdmin):
     def get_search_results(self, request, queryset, search_term):
         if search_term:
             # print("!!!!!!",search_term)
+            # clear_es_database()
             hits_total, hits = search_music(search_term, 'all', 0, 10)
-            song_ids = [int(hit['_source']['id']) for hit in hits]
-            queryset = queryset.filter(id__in=song_ids)
+            for hit in hits:
+                print(hit)
+            song_names = [hit['_source']["name"] for hit in hits]
+            queryset = queryset.filter(name__in=song_names)
         return super().get_search_results(request, queryset, search_term)
 
     def save_model(self, request, obj, form, change): 
