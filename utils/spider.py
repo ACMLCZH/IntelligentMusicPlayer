@@ -32,7 +32,6 @@ def find_songs(url):
         if img_tag: 
             img_url = img_tag['src'] 
         download_links = soup.find_all('a', class_='inline-flex justify-center items-center js-download w-4 transition-colors ease-in-out duration-75 hover:text-blue')
-        data_urls = [] 
         link=download_links[0]
         data_url = link.get('data-url') 
         if data_url: 
@@ -41,8 +40,8 @@ def find_songs(url):
             soup_temp = BeautifulSoup(response.text, 'html.parser')
             download_links = soup_temp.find_all('a', class_='download')
             link =download_links[0]
-            href = link.get('href') 
-        songs.append({f'name': title, 'author': author, 'duration': duration,'topics': topics, 'img_url':img_url, 'data_url':data_url})
+            href = link.get('href')
+        songs.append({f'name': title, 'author': author, 'duration': duration,'topics': topics, 'img_url':img_url, 'data_url':href})
 
     print("!!!songs[0] ",songs[0])
 
