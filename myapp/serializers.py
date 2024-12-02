@@ -17,6 +17,7 @@ class SongDocumentSerializer(DocumentSerializer):
             'id',
             'name',
             'author',
+            'album',
             'duration',
             'lyrics',
             'topics',

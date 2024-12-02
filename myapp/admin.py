@@ -13,6 +13,7 @@ class SongAdmin(admin.ModelAdmin):
     list_display = ('id',
             'name',
             'author',
+            'album',
             'duration',
             'lyrics',
             'topics',

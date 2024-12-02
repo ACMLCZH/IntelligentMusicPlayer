@@ -13,6 +13,7 @@ def add_music(song: Song):
         id=song.id,
         name=song.name,
         author=song.author,
+        album=song.album,
         duration=song.duration,
         lyrics=song.lyrics,
         topics=song.topics,

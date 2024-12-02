@@ -5,6 +5,7 @@ class Song(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
     author = models.CharField(max_length=100)
+    album = models.CharField(max_length=100)
     duration = models.IntegerField()
     lyrics = models.CharField(max_length=2000)
     topics = models.CharField(max_length=100)
