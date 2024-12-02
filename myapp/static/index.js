@@ -116,21 +116,20 @@ function performSearch(query) {
 
 // Fetch playlists from the server
 function fetchPlaylists() {
-    // Replace this with an actual fetch call to your Django backend
-    // Example:
-    // fetch('/api/playlists/')
-    //     .then(response => response.json())
-    //     .then(data => displayPlaylists(data))
-    //     .catch(error => console.error('Error fetching playlists:', error));
-
-    // Simulated server response
-    let playlists = [
-        {"id": 1, "title": "My Favorites", "creator": "User", "image_url": ""},
-        {"id": 2, "title": "Top Hits", "creator": "Admin", "image_url": ""},
-        {"id": 3, "title": "Chill Vibes", "creator": "User", "image_url": ""}
-    ];
-
-    displayPlaylists(playlists);
+    // Make an HTTP GET request to your Django API endpoint
+    fetch('/favlist/') // Replace with the correct URL for your Favlist API
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok ' + response.statusText);
+            }
+            return response.json(); // Parse the JSON response
+        })
+        .then(data => {
+            displayPlaylists(data); // Pass the fetched data to displayPlaylists
+        })
+        .catch(error => {
+            console.error('Error fetching playlists:', error); // Log any errors
+        });
 }
 
 function displayPlaylists(playlists) {
@@ -139,7 +138,7 @@ function displayPlaylists(playlists) {
 
     playlists.forEach(function(playlist) {
         let li = document.createElement('li');
-        li.textContent = playlist.title;
+        li.textContent = playlist.name; // Use `name` from the Favlist model
         li.dataset.id = playlist.id;
         playlistList.appendChild(li);
     });
