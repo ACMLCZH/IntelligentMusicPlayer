@@ -11,6 +11,7 @@ from django.urls import reverse
 import json
 
 from rest_framework import generics
+from rest_framework.response import Response
 from .models import Song, Favlist, UserFav
 from .serializers import SongSerializer, SongDocumentSerializer, FavlistSerializer, UserFavSerializer
 from django_elasticsearch_dsl_drf.viewsets import DocumentViewSet
@@ -136,8 +137,8 @@ class SongSearchView(DocumentViewSet):
     pagination_class = LimitOffsetPagination
 
     filter_backends = [
-        FilteringFilterBackend,
-        OrderingFilterBackend,
+        # FilteringFilterBackend,
+        # OrderingFilterBackend,
         CompoundSearchFilterBackend,
     ]
 
@@ -145,19 +146,20 @@ class SongSearchView(DocumentViewSet):
         'name': {'boost': 2},
         'author': None,
         'lyrics': None,
+        'topics': None,
     }
 
-    filter_fields = {
-        'name': 'name.raw',
-        'author': 'author.raw',
-        'lyrics': 'lyrics.raw',
-    }
+    # filter_fields = {
+    #     'name': 'name',
+    #     'author': 'author',
+    #     'lyrics': 'lyrics.raw',
+    # }
 
-    ordering_fields = {
-        'name': 'name.raw',
-        'author': 'author.raw',
-        'duration': 'duration',
-    }
+    # ordering_fields = {
+    #     'name': 'name.raw',
+    #     'author': 'author.raw',
+    #     'duration': 'duration',
+    # }
     ordering = ('name',)
 
     def filter_queryset(self, queryset):
@@ -172,6 +174,18 @@ class FavlistListCreateView(generics.ListCreateAPIView):
 class FavlistRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Favlist.objects.all()
     serializer_class = FavlistSerializer
+
+    def retrieve(self, request, *args, **kwargs):
+        favlist = self.get_object()
+        serializer = self.get_serializer(favlist)
+
+        songs = favlist.songs.all()
+        song_serializer = SongSerializer(songs, many=True)
+
+        response_data = serializer.data
+        response_data['songs_detail'] = song_serializer.data
+
+        return Response(response_data)
 
 
 class UserFavListCreateView(generics.ListCreateAPIView):

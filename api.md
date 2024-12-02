@@ -204,7 +204,29 @@ GET http://localhost:8000/favlist/1/
 {
     "id": 1,
     "name": "Chill Vibes",
-    "songs": [1, 2]
+    "songs": [1, 2],
+    "songs_detail": [
+        {
+            "id": 1,
+            "name": "Imagine",
+            "author": "John Lennon",
+            "duration": 183,
+            "lyrics": "Imagine all the people...",
+            "topics": "Peace, Unity, Hope",
+            "mp3_url": "http://example.com/song1",
+            "cover_url": "http://example.com/images/imagine_cover.jpg"
+        },
+        {
+            "id": 2,
+            "name": "Bohemian Rhapsody",
+            "author": "Queen",
+            "duration": 354,
+            "lyrics": "Is this the real life? Is this just fantasy?",
+            "topics": "Drama, Emotion, Storytelling",
+            "mp3_url": "http://example.com/song2",
+            "cover_url": "http://example.com/images/bohemian_rhapsody_cover.jpg"
+        }
+    ]
 }
 ```
 
