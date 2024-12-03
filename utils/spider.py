@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 import time
+import json
 url = "https://freemusicarchive.org/genre/International/?page=2"
 
 def find_songs(url):
@@ -43,15 +44,30 @@ def find_songs(url):
             download_links = soup_temp.find_all('a', class_='download')
             link =download_links[0]
             href = link.get('href')
-        songs.append({f'name': title, 'author': author, 'album':album, 'duration': duration,'topics': topics, 'img_url':img_url, 'data_url':href})
+        songs.append({f'name': title, 'author': author, 'album':album, 'duration': duration, "lyrics": "", 'topics': topics, 'mp3_url':href, 'cover_url':img_url, })
 
-    print("!!!songs[0] ",songs[0])
+    # print("!!!songs[0] ",songs[0])
+    return songs
 
 if __name__=='__main__':
-    for i in range(1,100):
-        if i==1:
-            url = "https://freemusicarchive.org/genre/International"
-        else:
-            url = f"https://freemusicarchive.org/genre/International/?page={i}"
-        find_songs(url)
-        time.sleep(5)
+    urls = [
+        # "https://freemusicarchive.org/genre/International",
+        "https://freemusicarchive.org/genre/Blues/",
+        "https://freemusicarchive.org/genre/Jazz/",
+        "https://freemusicarchive.org/genre/novelty/",
+        "https://freemusicarchive.org/genre/Old-Time__Historic/"
+    ]
+    for url in urls:
+        for i in range(1,100):
+            if i==1:
+                url = "https://freemusicarchive.org/genre/International"
+                songs = []
+            else:
+                url = f"{url}?page={i}"
+                with open('songs.json', 'r', encoding='utf-8') as file: 
+                    songs = json.load(file)
+            songs = songs + find_songs(url)
+            with open('songs.json', 'w', encoding='utf-8') as f: 
+                json.dump(songs, f, ensure_ascii=False, indent=4)
+            if len(songs) > 200:
+                print("spider finish!!!")
