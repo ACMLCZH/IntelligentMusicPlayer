@@ -1,4 +1,5 @@
 let accessibleFavlists = [];
+let currentPlaylistData = null;
 
 document.addEventListener('DOMContentLoaded', function() {
     // Load playlists
@@ -28,8 +29,49 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Add to play queue button
     document.getElementById('add-to-playqueue').addEventListener('click', function() {
-        // Logic to add the current playlist to the play queue
-        console.log("Add to Play Queue clicked");
+        // // Logic to add the current playlist to the play queue
+        // console.log("Add to Play Queue clicked");
+
+        // Update play queue
+        const playQueue = document.getElementById('playlist-container');
+        playQueue.innerHTML = currentPlaylistData.songs_detail.map((song, index) => `
+            <li data-song-id="${song.id}" ${index === 0 ? 'class="active"' : ''}>
+                <button class="song-select"
+                    data-url="${song.mp3_url}"
+                    data-cover="${song.cover_url}"
+                    data-title="${song.name}"
+                    data-artist="${song.author}">
+                    <i class="fas fa-music"></i> ${song.name} - ${song.author}
+                </button>
+            </li>
+        `).join('');
+
+        // Update player UI if this is the first song
+        if (currentPlaylistData.songs_detail.length > 0) {
+            const firstSong = currentPlaylistData.songs_detail[0];
+            document.querySelector('.player-container').innerHTML = `
+                <img src="${firstSong.cover_url}" alt="Album Cover" class="cover-art" id="cover-art">
+                <div class="player-info">
+                    <h2 id="track-title">${firstSong.name}</h2>
+                    <h3 id="track-artist">${firstSong.author}</h3>
+                </div>
+                <audio id="audio-player" controls>
+                    <source src="${firstSong.mp3_url}" type="audio/mpeg">
+                    Your browser does not support the audio element.
+                </audio>
+                <div class="controls">
+                    <button id="prev-btn">
+                        <i class="fas fa-step-backward"></i> Previous
+                    </button>
+                    <button id="next-btn">
+                        Next <i class="fas fa-step-forward"></i>
+                    </button>
+                </div>
+            `;
+
+            // Initialize new player instance
+            const player = new MusicPlayer();
+        }
     });
 
     // Natural language play queue management
@@ -169,14 +211,6 @@ function displayPlaylists(playlists) {
 
 // Fetch songs from a specific playlist
 function fetchSongs(playlistId) {
-    // Replace this with an actual fetch call to your Django backend
-    // Example:
-    // fetch(`/api/playlists/${playlistId}/songs/`)
-    //     .then(response => response.json())
-    //     .then(data => displaySongs(data))
-    //     .catch(error => console.error('Error fetching songs:', error));
-
-    // Simulated server response based on playlistId
     fetch(`/favlist/${playlistId}`) // 根据 ID 获取收藏列表
     .then(response => {
         if (!response.ok) {
@@ -185,55 +219,8 @@ function fetchSongs(playlistId) {
         return response.json(); // 解析为 JSON
     })
     .then(data => {
+        currentPlaylistData = data; // Store the data
         displaySongs(data); // 调用 displaySongs，传入完整的响应数据
-        // Update play queue
-        if (data.songs_detail && data.songs_detail.length > 0) {
-            const firstSong = data.songs_detail[0];
-            
-            // Update play queue
-            const playQueue = document.getElementById('playlist-container');
-            playQueue.innerHTML = data.songs_detail.map((song, index) => `
-                <li data-song-id="${song.id}" ${index === 0 ? 'class="active"' : ''}>
-                    <button class="song-select"
-                        data-url="${song.mp3_url}"
-                        data-cover="${song.cover_url}"
-                        data-title="${song.name}"
-                        data-artist="${song.author}">
-                        <i class="fas fa-music"></i> ${song.name} - ${song.author}
-                    </button>
-                </li>
-            `).join('');
-
-            // Update player area
-            document.querySelector('.player-container').innerHTML = `
-                <img src="${firstSong.cover_url}" alt="Album Cover" class="cover-art" id="cover-art">
-                <div class="player-info">
-                    <h2 id="track-title">${firstSong.name}</h2>
-                    <h3 id="track-artist">${firstSong.author}</h3>
-                </div>
-                <audio id="audio-player" controls>
-                    <source src="${firstSong.mp3_url}" type="audio/mpeg">
-                    Your browser does not support the audio element.
-                </audio>
-                <div class="controls">
-                    <button id="prev-btn">
-                        <i class="fas fa-step-backward"></i> Previous
-                    </button>
-                    <button id="next-btn">
-                        Next <i class="fas fa-step-forward"></i>
-                    </button>
-                </div>
-            `;
-
-            // Initialize player after updating DOM
-            const player = new MusicPlayer();
-            
-            // // Start playing first song
-            // const firstButton = playQueue.querySelector('.song-select');
-            // if (firstButton) {
-            //     player.loadTrack(firstButton, 0);
-            // }
-        }
     })
     .catch(error => {
         console.error('Error fetching playlists:', error); // 打印错误信息
