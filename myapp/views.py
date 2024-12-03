@@ -198,6 +198,12 @@ class UserFavView(generics.GenericAPIView):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
 
+        if not instance.favlists.exists():
+            # Create a new Favlist with default name
+            default_favlist = Favlist.objects.create(name="My favorites")
+            # Add the new Favlist to user's favlists
+            instance.favlists.add(default_favlist)
+
         favlists = instance.favlists.all()
         favlist_serializer = FavlistBasicSerializer(favlists, many=True)
 
