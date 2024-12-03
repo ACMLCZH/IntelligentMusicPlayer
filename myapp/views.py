@@ -205,7 +205,7 @@ class UserFavRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = UserFavSerializer
     # permission_classes = [IsAuthenticated]
 
-     def get_object(self):
+    def get_object(self):
         try:
             return UserFav.objects.get(user=self.request.user)
         except UserFav.DoesNotExist:
