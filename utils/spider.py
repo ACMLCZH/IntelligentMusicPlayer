@@ -9,6 +9,7 @@ def find_songs(url):
     soup = BeautifulSoup(response.text, 'html.parser')
     tracks = soup.find_all('span', class_='ptxt-track')
     authors = soup.find_all('span', class_='ptxt-artist')
+    albums = soup.find_all('span', class_="!hidden md:!flex ptxt-album col-span-2 truncate text-ellipsis overflow-hidden pr-8")
     durations = soup.find_all('span', class_='inline-flex items-center col-span-1 align-self-end pl-6')
     assert len(tracks)==len(authors)
 
@@ -17,6 +18,7 @@ def find_songs(url):
         title = track.find('a').text.strip()
         link = track.find('a')['href']
         author = authors[i].find('a').text.strip()
+        album = albums[i].find('a').text.strip()
         duration = durations[i].text.strip()
         url = link
         response = requests.get(url)
@@ -41,7 +43,7 @@ def find_songs(url):
             download_links = soup_temp.find_all('a', class_='download')
             link =download_links[0]
             href = link.get('href')
-        songs.append({f'name': title, 'author': author, 'duration': duration,'topics': topics, 'img_url':img_url, 'data_url':href})
+        songs.append({f'name': title, 'author': author, 'album':album, 'duration': duration,'topics': topics, 'img_url':img_url, 'data_url':href})
 
     print("!!!songs[0] ",songs[0])
 
