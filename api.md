@@ -328,7 +328,7 @@ Authorization: Bearer <JWT_TOKEN>
 ]
 ```
 
-#### Endpoint: `POST /userfav/`
+#### Endpoint: `POST /userfav/` (Deprecated)
 ##### Example Request:
 ```json
 {

@@ -185,10 +185,13 @@ class UserFavView(generics.GenericAPIView):
     queryset = UserFav.objects.all()
 
     def get_object(self):
-        try:
-            return UserFav.objects.get(user=self.request.user)
-        except UserFav.DoesNotExist:
-            raise Http404("UserFav object does not exist for this user.")
+        user = self.request.user
+        user_fav, created = UserFav.objects.get_or_create(user=user)
+        return user_fav
+        # try:
+        #     return UserFav.objects.get(user=self.request.user)
+        # except UserFav.DoesNotExist:
+        #     raise Http404("UserFav object does not exist for this user.")
 
     def get(self, request, *args, **kwargs):
         # Retrieve the UserFav object for the current user
