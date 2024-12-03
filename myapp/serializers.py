@@ -35,7 +35,7 @@ class FavlistSerializer(serializers.ModelSerializer):
 
 
 class UserFavSerializer(serializers.ModelSerializer):
-    favlists = FavlistSerializer(many=True, read_only=True)
+    favlists = serializers.PrimaryKeyRelatedField(queryset=Favlist.objects.all(), many=True)
     user = serializers.PrimaryKeyRelatedField(read_only=True)
 
     class Meta:

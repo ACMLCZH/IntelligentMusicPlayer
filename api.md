@@ -258,6 +258,40 @@ GET http://localhost:8000/favlist/1/
 }
 ```
 
+partially modify:
+#### Endpoint: `PATCH /favlist/<int:pk>/`
+##### Example Request:
+```json
+{
+    "name": "PATCH",
+}
+```
+
+##### Example Response:
+```json
+{
+    "id": 1,
+    "name": "PATCH",
+    "songs": [1]
+}
+```
+
+##### Example Request:
+```json
+{
+    "songs": [1, 2],
+}
+```
+
+##### Example Response:
+```json
+{
+    "id": 1,
+    "name": "PATCH",
+    "songs": [1, 2]
+}
+```
+
 #### Endpoint: `DELETE /favlist/<int:pk>/`
 ##### Example Request:
 ```http
@@ -285,7 +319,6 @@ Authorization: Bearer <JWT_TOKEN>
 ```json
 [
     {
-        "id": 1,
         "user": 1,
         "favlists": [1, 2]
     }
@@ -303,7 +336,6 @@ Authorization: Bearer <JWT_TOKEN>
 ##### Example Response:
 ```json
 {
-    "id": 2,
     "user": 1,
     "favlists": [1]
 }
@@ -312,23 +344,9 @@ Authorization: Bearer <JWT_TOKEN>
 ---
 
 ### 7. **User Favorites Retrieve/Update/Delete API**
-#### Endpoint: `GET /userfav/<int:pk>/`
-##### Example Request:
-```http
-GET http://localhost:8000/userfav/1/
-Authorization: Bearer <JWT_TOKEN>
-```
 
-##### Example Response:
-```json
-{
-    "id": 1,
-    "user": 1,
-    "favlists": [1, 2]
-}
-```
-
-#### Endpoint: `PUT /userfav/<int:pk>/`
+partially modify:
+#### Endpoint: `PATCH /userfav/`
 ##### Example Request:
 ```json
 {
@@ -339,13 +357,12 @@ Authorization: Bearer <JWT_TOKEN>
 ##### Example Response:
 ```json
 {
-    "id": 1,
     "user": 1,
     "favlists": [2]
 }
 ```
 
-#### Endpoint: `DELETE /userfav/<int:pk>/`
+#### Endpoint: `DELETE /userfav/`
 ##### Example Request:
 ```http
 DELETE http://localhost:8000/userfav/1/
@@ -360,16 +377,18 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 
+#### test
+
 ```
 curl -X POST http://localhost:8000/userfav/ ^
 -H "Content-Type: application/json" ^
 -d "{\"favlists\": [2, 3]}" ^
---user "test_user"
+--user "heaplax"
 ```
 
 ```
 curl -X PUT http://localhost:8000/userfav/ ^
 -H "Content-Type: application/json" ^
 -d "{\"favlists\": [2]}" ^
---user "test_user"
+--user "heaplax"
 ```

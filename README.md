@@ -24,7 +24,7 @@ DATABASES = {
 ![](./images/1.jpg)
 
 ```python
-# Makemigrations and migrate 
+# Makemigrations and migrate
 python manage.py makemigrations
 python manage.py migrate
 python manage.py migrate --run-syncdb
