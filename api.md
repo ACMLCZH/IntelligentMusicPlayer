@@ -137,10 +137,13 @@ DELETE http://localhost:8000/song/1/
 ---
 
 ### 3. **Song Search API**
-#### Endpoint: `GET /song/search/`  
+#### Endpoint: `GET /song/search/`
+
+search=keyword
+limit=X
 ##### Example Request:
 ```http
-GET http://localhost:8000/song/search/?search=Imagine
+GET http://localhost:8000/song/search/?search=Imagine&limit=20
 ```
 
 ##### Example Response:
