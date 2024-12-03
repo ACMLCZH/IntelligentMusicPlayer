@@ -14,6 +14,7 @@ import json
 from django.http import Http404
 from rest_framework import status, generics
 from rest_framework.response import Response
+from rest_framework.exceptions import ValidationError
 from .models import Song, Favlist, UserFav
 from .serializers import SongSerializer, SongDocumentSerializer, FavlistSerializer, UserFavSerializer
 from django_elasticsearch_dsl_drf.viewsets import DocumentViewSet
@@ -178,35 +179,10 @@ class FavlistRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
 
         return Response(response_data)
 
-'''
-class UserFavListCreateView(generics.ListCreateAPIView):
-    queryset = UserFav.objects.all()
-    serializer_class = UserFavSerializer
-    # permission_classes = [IsAuthenticated]
-
-    def perform_create(self, serializer):
-        # Automatically set the user to the currently authenticated user
-        serializer.save(user=self.request.user)
-
-
-class UserFavRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
-    # queryset = UserFav.objects.all()
-    serializer_class = UserFavSerializer
-    # permission_classes = [IsAuthenticated]
-
-    def get_object(self):
-        try:
-            return UserFav.objects.get(user=self.request.user)
-        except UserFav.DoesNotExist:
-            raise Http404("UserFav object does not exist for this user.")
-
-    # def get_queryset(self):
-    #     # Ensure users can only access their own favorites
-    #     return UserFav.objects.filter(user=self.request.user)
-'''
 
 class UserFavView(generics.GenericAPIView):
     serializer_class = UserFavSerializer
+    queryset = UserFav.objects.all()
 
     def get_object(self):
         try:
@@ -221,6 +197,9 @@ class UserFavView(generics.GenericAPIView):
         return Response(serializer.data)
 
     def post(self, request, *args, **kwargs):
+        # Check if UserFav already exists for this user
+        if UserFav.objects.filter(user=request.user).exists():
+            raise ValidationError("UserFav already exists for this user.")
         # Create a new UserFav object
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
