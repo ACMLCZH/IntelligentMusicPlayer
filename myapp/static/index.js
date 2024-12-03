@@ -1,3 +1,5 @@
+let accessibleFavlists = [];
+
 document.addEventListener('DOMContentLoaded', function() {
     // Load playlists
     fetchPlaylists();
@@ -118,19 +120,19 @@ function performSearch(query) {
 
 // Fetch playlists from the server
 function fetchPlaylists() {
-    // Make an HTTP GET request to your Django API endpoint
-    fetch('/favlist/') // Replace with the correct URL for your Favlist API
+    fetch('/favlist/')
         .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok ' + response.statusText);
             }
-            return response.json(); // Parse the JSON response
+            return response.json();
         })
         .then(data => {
-            displayPlaylists(data); // Pass the fetched data to displayPlaylists
+            accessibleFavlists = data; // Store the playlists data
+            displayPlaylists(data);
         })
         .catch(error => {
-            console.error('Error fetching playlists:', error); // Log any errors
+            console.error('Error fetching playlists:', error);
         });
 }
 
@@ -196,7 +198,7 @@ function displaySongs(favListData) {
             <div class="song-album">${song.album}</div>
             <div class="song-duration">${song.duration}s</div>
             <div class="song-actions">
-                <button class="collection-button">F</button>
+                <img class="add-to-favlist-button" src="/static/add.webp" alt="Add to Favlist">
             </div>
         `;
 
@@ -206,9 +208,10 @@ function displaySongs(favListData) {
         });
 
         // 收藏按钮事件
-        songItem.querySelector('.collection-button').addEventListener('click', (e) => {
-            e.stopPropagation(); // 防止触发 dblclick 事件
-            toggleCollection(song.id, e.target);
+        const addButton = songItem.querySelector('.add-to-favlist-button');
+        addButton.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevent triggering parent events
+            showFavlistDropdown(song.id, addButton);
         });
 
         songsList.appendChild(songItem);
@@ -262,3 +265,60 @@ function displayPlayQueue(queue) {
 }
 
 
+function showFavlistDropdown(songId, addButtonElement) {
+    // Remove any existing dropdowns
+    const existingDropdown = document.querySelector('.favlist-dropdown');
+    if (existingDropdown) {
+        existingDropdown.parentNode.removeChild(existingDropdown);
+    }
+
+    // Create a dropdown menu element
+    const dropdown = document.createElement('div');
+    dropdown.classList.add('favlist-dropdown');
+
+    // Get the position of the addButtonElement
+    const rect = addButtonElement.getBoundingClientRect();
+    dropdown.style.position = 'absolute';
+    dropdown.style.left = `${rect.left + window.scrollX}px`;
+    dropdown.style.top = `${rect.bottom + window.scrollY}px`;
+    dropdown.style.zIndex = 9999;
+    dropdown.style.backgroundColor = 'white';
+    dropdown.style.border = '1px solid #ccc';
+    dropdown.style.borderRadius = '4px';
+    dropdown.style.boxShadow = '0 2px 5px rgba(0,0,0,0.3)';
+    dropdown.style.maxHeight = '200px';
+    dropdown.style.overflowY = 'auto';
+    dropdown.style.width = '150px';
+
+    // Create list items for each favlist
+    accessibleFavlists.forEach(favlist => {
+        const item = document.createElement('div');
+        item.textContent = favlist.name;
+        item.style.padding = '10px';
+        item.style.cursor = 'pointer';
+        item.addEventListener('click', () => {
+            addSongToFavlist(favlist.id, songId);
+            if (dropdown.parentNode) {
+                dropdown.parentNode.removeChild(dropdown);
+            }
+        });
+        dropdown.appendChild(item);
+    });
+
+    // Append the dropdown to the body
+    document.body.appendChild(dropdown);
+
+    // Close the dropdown when clicking outside
+    document.addEventListener('click', function onClickOutside(event) {
+        if (!dropdown.contains(event.target) && event.target !== addButtonElement) {
+            if (dropdown.parentNode) {
+                dropdown.parentNode.removeChild(dropdown);
+            }
+            document.removeEventListener('click', onClickOutside);
+        }
+    });
+}
+
+function addSongToFavlist(favlistId, songId) {
+    console.log(`Adding song ID ${songId} to favlist ID ${favlistId}`);
+}

@@ -299,3 +299,33 @@ body {
     text-align: center;
     padding: 20px;
 }
+
+.song-actions img.add-to-favlist-button {
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+}
+
+.favlist-dropdown {
+    position: absolute;
+    left: 0;
+    top: 100%;
+    z-index: 9999;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    max-height: 200px;
+    overflow-y: auto;
+    width: 150px;
+    
+}
+
+.favlist-dropdown div {
+    padding: 10px;
+    cursor: pointer;
+}
+
+.favlist-dropdown div:hover {
+    background-color: #f1f1f1;
+}
