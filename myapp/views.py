@@ -27,6 +27,13 @@ from django_elasticsearch_dsl_drf.filter_backends import (
 from django_elasticsearch_dsl_drf.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticated
 
+import requests
+from asgiref.sync import sync_to_async
+from django.utils.decorators import method_decorator
+from typing import List, Dict
+import re
+from openai import OpenAI
+import os
 
 @csrf_exempt
 def login(request):
@@ -121,8 +128,184 @@ from django.contrib.auth.decorators import login_required
 
 @login_required
 def index(request):
-    return render(request, 'index.html')
+    # Set empty initial state
+    context = {
+        'playlist': [],
+        'current_track': {
+            'id': 0,
+            'title': 'Select a track to play',
+            'artist': 'No track playing',
+            'cover': '/static/default-cover.jpg',
+            'url': ''
+        },
+        'current_index': -1
+    }
+    return render(request, 'index.html', context)
 
+def get_playlist_from_api():
+    """Fetch playlist data from API"""
+    try:
+        response = requests.get('http://127.0.0.1:8000/favlist/1/')
+        if response.status_code == 200:
+            data = response.json()
+            # Transform API data to player format
+            playlist = []
+            for song in data.get('songs_detail', []):
+                playlist.append({
+                    'id': song['id'],
+                    'title': song['name'],
+                    'artist': song['author'],
+                    'cover': song['cover_url'],
+                    'url': song['mp3_url']
+                })
+            return playlist
+        else:
+            return []
+    except Exception as e:
+        print(f"Error fetching playlist: {e}")
+        return []
+    
+@csrf_exempt
+async def play_music(request):
+    # Get playlist from API
+    playlist = await sync_to_async(get_playlist_from_api)()
+    if not playlist:
+        return JsonResponse({'error': 'Failed to load playlist'}, status=500)
+    
+    # Get current track index from session
+    current_index = request.session.get('current_track', 0)
+    current_track = playlist[current_index].copy()
+    
+    context = {
+        'playlist': playlist,
+        'current_track': current_track,
+        'current_index': current_index
+    }
+    return render(request, 'index.html', context)
+
+# token = os.environ["GITHUB_TOKEN"]
+token = "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" # a temporary token for testing
+endpoint = "https://models.inference.ai.azure.com"
+model_name = "gpt-4o-mini"
+class PlaylistOrganizer:
+    def __init__(self):
+        self.client = OpenAI(
+            base_url=endpoint,
+            api_key=token,
+        )
+        self.playlists = []
+        
+    async def search_songs_by_name(self, name: str) -> List[Dict]:
+        # Stub - will be replaced with actual API call
+        return [song for song in self.playlists if song['title'].lower() == name.lower()]
+    
+    async def search_songs_by_genre(self, genre: str) -> List[Dict]:
+        # Stub - will be replaced with actual API call 
+        return [song for song in self.playlists if song.get('genre','').lower() == genre.lower()]
+
+    def parse_instruction(self, instruction: str) -> Dict:
+        """Use GPT to parse the natural language instruction"""
+        response = self.client.chat.completions.create(
+            model=model_name,
+            messages=[
+                {"role": "system", "content": """
+                You are a music playlist organizer. Parse the user's instruction into a structured format.
+                Return a JSON object with:
+                - type: "pattern" or "genre"
+                - song_name: (if pattern type)
+                - interval: (if pattern type, integer) 
+                - genre: (if genre type)
+                """},
+                {"role": "user", "content": instruction}
+            ]
+        )
+        # Convert string response to Dict
+        content = response.choices[0].message.content
+        return json.loads(content)
+
+    async def reorganize_playlist(self, instruction: str) -> List[Dict]:
+        """Main method to reorganize playlist based on instruction"""
+        print(f"Received instruction: {instruction}")
+        parsed = self.parse_instruction(instruction)
+        print(f"Parsed instruction: {parsed}")
+        
+        if parsed['type'] == 'pattern':
+            print(f"Pattern-based reorganization: {parsed['song_name']} every {parsed['interval']} songs")
+            # Handle pattern-based organization (e.g. "OMG every 2 songs")
+            song = await self.search_songs_by_name(parsed['song_name'])
+            if not song:
+                raise ValueError(f"Song {parsed['song_name']} not found")
+                
+            interval = int(parsed['interval'])
+            new_playlist = []
+            other_songs = [s for s in self.playlists if s['title'] != song[0]['title']]
+            
+            # Insert requested song at every interval position
+            j = 0  # Counter for other songs
+            for i in range(len(self.playlists) + len(self.playlists)//interval):  # Extended length
+                if i % (interval + 1) == 0:  # +1 because we want song after every N songs
+                    new_playlist.append(song[0])
+                else:
+                    if j < len(other_songs):
+                        new_playlist.append(other_songs[j])
+                        j += 1
+                        
+        print(f"New playlist: {[s['title'] for s in new_playlist]}")
+        return new_playlist
+
+def _create_json_response(data, status=200):
+    """Synchronous helper to create JsonResponse"""
+    return JsonResponse(data, status=status)
+
+def _update_session_and_respond(request, playlist):
+    """Synchronous helper to update session and return response"""
+    print("=== New Playlist ===")
+    for song in playlist:
+        print(f"Title: {song['title']}, Artist: {song['artist']}")
+    print("=================")
+    
+    request.session['playlist'] = playlist
+    request.session['current_track'] = 0  # Reset to first track
+    return JsonResponse({
+        'status': 'success',
+        'playlist': playlist,
+        'current_track': playlist[0] if playlist else None
+    })
+
+@csrf_exempt
+async def reorganize_playlist(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            instruction = data.get('instruction')
+            
+            # Get playlist from API
+            playlist = await sync_to_async(get_playlist_from_api)()
+            
+            organizer = PlaylistOrganizer()
+            organizer.playlists = playlist
+            
+            new_playlist = await organizer.reorganize_playlist(instruction)
+            
+            # Wrap the entire session update and response in sync_to_async            
+            return await sync_to_async(_update_session_and_respond)(request, new_playlist)
+            
+        except json.JSONDecodeError:
+            return await sync_to_async(_create_json_response)(
+                {'status': 'error', 'message': 'Invalid JSON data'}, 
+                400
+            )
+            
+        except Exception as e:
+            return await sync_to_async(_create_json_response)(
+                {'status': 'error', 'message': str(e)}, 
+                500
+            )
+    
+    return await sync_to_async(_create_json_response)(
+        {'status': 'error', 'message': 'Method not allowed'},
+        405
+    )
 
 class SongListCreateAPIView(generics.ListCreateAPIView):
     queryset = Song.objects.all()
