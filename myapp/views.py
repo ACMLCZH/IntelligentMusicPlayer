@@ -16,7 +16,7 @@ from rest_framework import status, generics
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
 from .models import Song, Favlist, UserFav
-from .serializers import SongSerializer, SongDocumentSerializer, FavlistSerializer, UserFavSerializer
+from .serializers import SongSerializer, SongDocumentSerializer, FavlistSerializer, UserFavSerializer, FavlistBasicSerializer
 from django_elasticsearch_dsl_drf.viewsets import DocumentViewSet
 from .documents import SongDocument
 from django_elasticsearch_dsl_drf.filter_backends import (
@@ -197,7 +197,15 @@ class UserFavView(generics.GenericAPIView):
         # Retrieve the UserFav object for the current user
         instance = self.get_object()
         serializer = self.get_serializer(instance)
-        return Response(serializer.data)
+
+        favlists = instance.favlists.all()
+        favlist_serializer = FavlistBasicSerializer(favlists, many=True)
+
+        response_data = serializer.data
+        response_data['favlists_detail'] = favlist_serializer.data
+
+        return Response(response_data)
+
 
     def post(self, request, *args, **kwargs):
         # Check if UserFav already exists for this user
