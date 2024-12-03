@@ -42,12 +42,12 @@ INSTALLED_APPS = [
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',  # 使用 PostgreSQL 数据库
-        'NAME': 'project_user',  # 数据库名称
-        'USER': 'root',  # 数据库用户名
-        'PASSWORD': 'zyzjga1314',  # 数据库密码
-        'HOST': 'localhost',  # 数据库地址
-        'PORT': '3306',  # 数据库端口
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'cs520_project_user',
+        'USER': 'django_user',
+        'PASSWORD': 'django',
+        'HOST': 'localhost',
+        'PORT': '3306',
     }
 }
 LOGIN_REDIRECT_URL = '/'
@@ -71,6 +71,11 @@ STATIC_URL = '/static/'              # 静态文件的 URL 前缀
 STATICFILES_DIRS = [                 # 如果项目根目录下有 static 目录，可以在此添加
     BASE_DIR / "static",
 ]
+
+# Media files
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -121,7 +126,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
+# STATIC_URL = 'static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

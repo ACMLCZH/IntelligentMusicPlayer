@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Music Player</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/static/js/service-worker.js')
+                    .then(reg => console.log('Service worker registered'))
+                    .catch(err => console.error('Service worker error:', err));
+            });
+        }
+    </script>
+    <script src="/static/js/player.js" defer></script>
+</head>
+<body>
+    <div class="player-container">
+        <!-- Cover Art -->
+        <img src="{{ current_track.cover }}" alt="Album Cover" class="cover-art" id="cover-art">
+        
+        <!-- Player Info -->
+        <div class="player-info">
+            <h2 id="track-title">{{ current_track.title }}</h2>
+            <h3 id="track-artist">{{ current_track.artist }}</h3>
+        </div>
+
+        <!-- Audio Player -->
+        <audio id="audio-player" controls>
+            <source src="{{ current_track.url }}" type="audio/mpeg">
+            Your browser does not support the audio element.
+        </audio>
+
+        <!-- Navigation Controls -->
+        <div class="controls">
+            <button id="prev-btn">
+                <i class="fas fa-step-backward"></i> Previous
+            </button>
+            <button id="next-btn">
+                Next <i class="fas fa-step-forward"></i>
+            </button>
+        </div>
+
+        <!-- Playlist -->
+        <div class="playlist">
+            <h3>Playlist</h3>
+            <ul id="playlist-container" data-current-index="{{ current_index }}">
+                {% for song in playlist %}
+                <li data-song-id="{{ song.id }}" {% if song.id == current_track.id %}class="active"{% endif %}>
+                    <button class="song-select"
+                        data-url="{{ song.url }}"
+                        data-cover="{{ song.cover }}"
+                        data-title="{{ song.title }}"
+                        data-artist="{{ song.artist }}">
+                        <i class="fas fa-music"></i> {{ song.title }} - {{ song.artist }}
+                    </button>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- Playlist Organizer -->
+        <div class="playlist-organizer">
+            <form id="playlist-form">
+                {% csrf_token %}
+                <input type="text" 
+                       name="instruction" 
+                       placeholder="Enter your playlist instruction..."
+                       required>
+                <button type="submit">Reorganize</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

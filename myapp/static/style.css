@@ -402,4 +402,151 @@ form.sign-in-form {
     bottom: 28%;
     left: 50%;
   }
+
+  /* play_music styles */
+
+  .player-container {
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 30px;
+      background: #fff;
+      border-radius: 15px;
+      box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+  }
+
+  .cover-art {
+      width: 200px;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 10px;
+      margin: 0 auto;
+      display: block;
+      transition: transform 0.3s ease;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  }
+
+  .cover-art:hover {
+      transform: scale(1.05);
+  }
+
+  .player-info {
+      text-align: center;
+      margin: 20px 0;
+  }
+
+  .player-info h2 {
+      color: #333;
+      margin: 10px 0;
+      font-size: 24px;
+  }
+
+  .player-info h3 {
+      color: #666;
+      font-size: 18px;
+      font-weight: normal;
+  }
+
+  /* Custom audio player */
+  audio {
+      width: 100%;
+      margin: 20px 0;
+  }
+
+  .controls {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin: 20px 0;
+  }
+
+  .controls button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 20px;
+      background: #5995fd;
+      color: white;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.3s ease;
+  }
+
+  .controls button:hover:not([disabled]) {
+      background: #4d84e2;
+  }
+
+  .controls button[disabled] {
+      background: #ccc;
+      cursor: not-allowed;
+  }
+
+  /* Playlist styling */
+  .playlist {
+      margin-top: 30px;
+      border-top: 1px solid #eee;
+      padding-top: 20px;
+  }
+
+  .playlist h3 {
+      color: #333;
+      margin-bottom: 15px;
+      font-size: 20px;
+  }
+
+  .playlist ul {
+      list-style: none;
+      padding: 0;
+      max-height: 300px;
+      overflow-y: auto;
+  }
+
+  .playlist li {
+      padding: 12px 15px;
+      margin: 5px 0;
+      border-radius: 8px;
+      transition: background 0.3s ease;
+  }
+
+  .playlist li:hover {
+      background: #f5f5f5;
+  }
+
+  .playlist li.active {
+      background: #e8f0fe;
+      border-left: 4px solid #5995fd;
+  }
+
+  .song-select {
+      background: none;
+      border: none;
+      width: 100%;
+      text-align: left;
+      padding: 0;
+      color: #333;
+      font-size: 16px;
+      cursor: pointer;
+      transition: color 0.3s ease;
+  }
+
+  .song-select:hover {
+      color: #5995fd;
+  }
+
+  /* Scrollbar styling */
+  .playlist ul::-webkit-scrollbar {
+      width: 8px;
+  }
+
+  .playlist ul::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 4px;
+  }
+
+  .playlist ul::-webkit-scrollbar-thumb {
+      background: #888;
+      border-radius: 4px;
+  }
+
+  .playlist ul::-webkit-scrollbar-thumb:hover {
+      background: #555;
+  }
 }
