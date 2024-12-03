@@ -10,7 +10,7 @@ body {
     display: grid;
     grid-template-columns: 1fr 2fr 1fr;
     align-items: center;
-    background-color: #333;
+    background-color: #3d5a80;
     padding: 10px 20px;
     color: white;
 }
@@ -109,7 +109,7 @@ body {
 /* Left Sidebar Styles */
 .sidebar {
     width: 20%;
-    background-color: #e0e0e0;
+    background-color: #e0fbfc;
     padding: 20px;
     overflow-y: auto;
     border-radius: 15px;
@@ -244,7 +244,7 @@ body {
 /* Right Sidebar Styles */
 .play-queue {
     width: 20%;
-    background-color: #e0e0e0;
+    background-color: #e0fbfc;
     padding: 20px;
     overflow-y: auto;
 
@@ -294,7 +294,7 @@ body {
 
 /* Player Area Styles */
 .player-area {
-    background-color: #c0c0c0;
+    background-color: #98c1d9;
     text-align: center;
     padding: 20px;
 }
