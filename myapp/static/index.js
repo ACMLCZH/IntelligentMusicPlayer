@@ -42,6 +42,24 @@ document.addEventListener('DOMContentLoaded', function() {
         this.style.height = 'auto'; 
         this.style.height = this.scrollHeight + 'px';
     });
+
+    document.getElementById('add-playlist-button').addEventListener('click', function() {
+        toggleAddPlaylistDropdown();
+    });
+
+    // Add event listener to the create playlist button
+    document.getElementById('create-playlist-button').addEventListener('click', function() {
+        createNewPlaylist();
+    });
+
+    // Close the dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+        const dropdown = document.getElementById('add-playlist-dropdown');
+        const addButton = document.getElementById('add-playlist-button');
+        if (!dropdown.contains(e.target) && e.target !== addButton) {
+            dropdown.style.display = 'none';
+        }
+    });
     
 });
 
@@ -407,5 +425,165 @@ function showFavlistDropdown(songId, addButtonElement) {
 }
 
 function addSongToFavlist(favlistId, songId) {
-    console.log(`Adding song ID ${songId} to favlist ID ${favlistId}`);
+    // Fetch the existing songs in the favlist
+    fetch(`/favlist/${favlistId}/`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok ' + response.statusText);
+            }
+            return response.json();
+        })
+        .then(favlistData => {
+            // Get existing song IDs
+            let existingSongs = favlistData.songs; // Assuming 'songs' is an array of song IDs
+
+            // Add the new song ID if not already in the list
+            if (!existingSongs.includes(songId)) {
+                existingSongs.push(songId);
+            } else {
+                console.log('Song already in the favlist');
+                return;
+            }
+
+            // Send PATCH request to update the favlist
+            fetch(`/favlist/${favlistId}/`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCSRFToken() // Include CSRF token
+                },
+                body: JSON.stringify({ songs: existingSongs })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error updating favlist: ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(updatedFavlist => {
+                console.log('Song added to favlist:', updatedFavlist);
+                // Optionally, show a success message to the user
+            })
+            .catch(error => {
+                console.error('Error adding song to favlist:', error);
+                // Optionally, show an error message to the user
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching favlist data:', error);
+        });
+}
+
+
+function toggleAddPlaylistDropdown() {
+    const dropdown = document.getElementById('add-playlist-dropdown');
+    dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+}
+
+function createNewPlaylist() {
+    const playlistNameInput = document.getElementById('new-playlist-name');
+    const playlistName = playlistNameInput.value.trim();
+    if (playlistName === '') {
+        alert('Please enter a playlist name.');
+        return;
+    }
+
+    // Call function to create the playlist
+    postNewFavlist(playlistName);
+}
+
+function postNewFavlist(playlistName) {
+    fetch('/favlist/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCSRFToken() // Include CSRF token
+        },
+        body: JSON.stringify({
+            name: playlistName,
+            songs: [] // Start with an empty list of songs
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Error creating playlist: ' + response.statusText);
+        }
+        return response.json();
+    })
+    .then(newFavlist => {
+        console.log('New favlist created:', newFavlist);
+        // Update the user's favlists
+        updateUserFavlists(newFavlist.id);
+        // Clear the input field and hide the dropdown
+        document.getElementById('new-playlist-name').value = '';
+        document.getElementById('add-playlist-dropdown').style.display = 'none';
+    })
+    .catch(error => {
+        console.error('Error creating new favlist:', error);
+        alert('Error creating playlist. Please try again.');
+    });
+}
+
+function updateUserFavlists(newFavlistId) {
+    // First, fetch the current favlists of the user
+    fetch('/userfav/')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error fetching user favlists: ' + response.statusText);
+            }
+            return response.json();
+        })
+        .then(userFavData => {
+            // Get existing favlist IDs
+            let existingFavlists = userFavData.favlists;
+
+            // Add the new favlist ID if not already in the list
+            if (!existingFavlists.includes(newFavlistId)) {
+                existingFavlists.push(newFavlistId);
+            }
+
+            // Send PATCH request to update the user's favlists
+            fetch('/userfav/', {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCSRFToken()
+                },
+                body: JSON.stringify({ favlists: existingFavlists })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error updating user favlists: ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(updatedUserFav => {
+                console.log('User favlists updated:', updatedUserFav);
+                // Refresh the playlists display
+                fetchPlaylists();
+            })
+            .catch(error => {
+                console.error('Error updating user favlists:', error);
+                alert('Error updating your playlists. Please try again.');
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching user favlists:', error);
+            alert('Error fetching your playlists. Please try again.');
+        });
+}
+
+function getCSRFToken() {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i=0; i<cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, 10) === 'csrftoken=') {
+                cookieValue = decodeURIComponent(cookie.substring(10));
+                break;
+            }
+        }
+    }
+    return cookieValue;
 }

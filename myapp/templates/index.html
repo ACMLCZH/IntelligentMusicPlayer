@@ -41,10 +41,19 @@
     <div class="content-area">
         <!-- Left Sidebar: Playlists -->
         <div class="sidebar">
-            <h2>Playlists</h2>
+            <div class="playlist-header">
+                <h2>Playlists</h2>
+                <img src="/static/add.webp" alt="Add Playlist" id="add-playlist-button">
+            </div>
+            <!-- Container for the add playlist dropdown -->
+            <div id="add-playlist-dropdown" class="add-playlist-dropdown" style="display: none;">
+                <input type="text" id="new-playlist-name" placeholder="Playlist Name">
+                <button id="create-playlist-button">Add</button>
+            </div>
             <ul id="playlist-list">
                 <!-- Playlists will be dynamically loaded here -->
             </ul>
+            
         </div>
 
         <!-- Main Content: Song List -->
