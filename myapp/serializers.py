@@ -40,4 +40,4 @@ class UserFavSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserFav
-        fields = ['id', 'user', 'favlists']
+        fields = ['user', 'favlists']
