@@ -1,10 +1,11 @@
 from openai import OpenAI
-import uuid
-import os
+import requests
 
 # api_key = '8ebbc0ebe146462a939dfd4589b79e10'
 data_folder = "data"
 
+import uuid
+import os
 class TempSong:
     def __init__(self, title, artist, album, year):
         self.id = uuid.uuid4().hex
@@ -44,10 +45,23 @@ system_prompt = \
     "You are an expert music analyst. Your task is to evaluate a list of songs provided by the user "\
     "and summarize the music styles and properties that the user probably enjoys."
 
-def make_song_prompt(songs):
+local_url = "http://localhost:8000/favlist/"
+local_headers = {
+    'content-type': 'application/json',
+}
+
+def make_song_prompt(fav_id):
+    while True:
+        local_response = requests.get(f"{local_url}{fav_id}", headers=local_headers)
+        if local_response.status_code == 200:
+            break
+        else:
+            print(f"Failed to get favorite list from local server with error: {local_response.status_code}, {local_response.text}. Retry now.")
+
+    music_jsons = local_response.json()['songs_detail']
     songs_info = "\n".join([
-        f"Title: {song.get_title()}, Artist: {song.get_artist()}, Album: {song.get_album()}, Year: {song.get_year()}"
-        for song in songs
+        f"Title: {music_json['name']}, Artist: {music_json['author']}, Album: {music_json['album']}"
+        for music_json in music_jsons
     ])
     user_prompt = \
         "Here is a list of songs:\n"\
@@ -76,9 +90,9 @@ def make_song_prompt(songs):
     return "Make a song of " + answer[23:]
 
 if __name__ == "__main__":
-    print(make_song_prompt([
+    song_list = [
         TempSong("Juicy", "The Notorious B.I.G.", "Ready to Die", 1994),
         TempSong("Lose Yourself", "Eminem", "8 Mile Soundtrack", 2002),
         TempSong("Sicko Mode", "Travis Scott", "Astroworld", 2018),
         TempSong("HUMBLE.", "Kendrick Lamar", "DAMN.", 2017),
-    ]))
+    ]
