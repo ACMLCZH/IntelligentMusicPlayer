@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', function() {
         let target = e.target.closest('li');
         if (target) {
             let playlistId = target.dataset.id;
+            console.log(`Fetching details for playlist ID: ${playlistId}`);
             fetchSongs(playlistId);
 
             let playlistItems = document.querySelectorAll('#playlist-list li');
@@ -19,6 +20,7 @@ document.addEventListener('DOMContentLoaded', function() {
             target.classList.add('active');
 
             document.getElementById('current-playlist-title').textContent = target.textContent;
+            
         }
     });
 
@@ -154,173 +156,59 @@ function fetchSongs(playlistId) {
     //     .catch(error => console.error('Error fetching songs:', error));
 
     // Simulated server response based on playlistId
-    let songs = [];
-    if (playlistId == 1) {
-        songs = [
-            {
-                "id": 1,
-                "title": "Song A",
-                "artist": "Artist A",
-                "album": "Album A",
-                "time": "3:45",
-                "is_in_collection": false,
-                "image_url": "https://via.placeholder.com/50",
-                "song_url": ""
-            },
-            {
-                "id": 2,
-                "title": "Song B",
-                "artist": "Artist B",
-                "album": "Album B",
-                "time": "4:15",
-                "is_in_collection": true,
-                "image_url": "https://via.placeholder.com/50",
-                "song_url": ""
-            },
-            {
-                "id": 3,
-                "title": "Song C",
-                "artist": "Artist C",
-                "album": "Album C",
-                "time": "2:50",
-                "is_in_collection": false,
-                "image_url": "https://via.placeholder.com/50",
-                "song_url": ""
-            }
-        ];
-    } else if (playlistId == 2) {
-        songs = [
-            {
-                "id": 4,
-                "title": "Hit Song 1",
-                "artist": "Hit Artist 1",
-                "album": "Hit Album 1",
-                "time": "3:30",
-                "is_in_collection": true,
-                "image_url": "https://via.placeholder.com/50",
-                "song_url": ""
-            },
-            {
-                "id": 5,
-                "title": "Hit Song 2",
-                "artist": "Hit Artist 2",
-                "album": "Long Long Long Long Album Title Test",
-                "time": "4:00",
-                "is_in_collection": false,
-                "image_url": "https://via.placeholder.com/50",
-                "song_url": ""
-            }
-        ];
-    } else if (playlistId == 3) {
-        songs = [
-            {
-                "id": 6,
-                "title": "Chill Song 1",
-                "artist": "Chill Artist 1",
-                "album": "Chill Album 1",
-                "time": "5:00",
-                "is_in_collection": true,
-                "image_url": "https://via.placeholder.com/50",
-                "song_url": ""
-            },
-            {
-                "id": 7,
-                "title": "Chill Song 2",
-                "artist": "Chill Artist 2",
-                "album": "Chill Album 2",
-                "time": "4:45",
-                "is_in_collection": false,
-                "image_url": "https://via.placeholder.com/50",
-                "song_url": ""
-            },
-            {
-                "id": 8,
-                "title": "Chill Song 3",
-                "artist": "Chill Artist 3",
-                "album": "Chill Album 3",
-                "time": "3:15",
-                "is_in_collection": false,
-                "image_url": "https://via.placeholder.com/50",
-                "song_url": ""
-            },
-            {
-                "id": 9,
-                "title": "Chill Song 4",
-                "artist": "Chill Artist 4",
-                "album": "Chill Album 4",
-                "time": "4:30",
-                "is_in_collection": true,
-                "image_url": "https://via.placeholder.com/50",
-                "song_url": ""
-            },
-            {
-                "id": 10,
-                "title": "Chill Song 5",
-                "artist": "Chill Artist 5",
-                "album": "Chill Album 5",
-                "time": "3:00",
-                "is_in_collection": false,
-                "image_url": "https://via.placeholder.com/50",
-                "song_url": ""
-            },
-            {
-                "id": 11,
-                "title": "Chill Song 6",
-                "artist": "Chill Artist 6",
-                "album": "Chill Album 6",
-                "time": "3:45",
-                "is_in_collection": true,
-                "image_url": "https://via.placeholder.com/50",
-                "song_url": ""
-            },
-            {
-                "id": 12,
-                "title": "Chill Song 7",
-                "artist": "Chill Artist 7",
-                "album": "Chill Album 7",
-                "time": "4:15",
-                "is_in_collection": false,
-                "image_url": "https://via.placeholder.com/50",
-                "song_url": ""
-            }
-        ];
-    }
+    fetch(`/favlist/${playlistId}`) // 根据 ID 获取收藏列表
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok ' + response.statusText);
+        }
+        return response.json(); // 解析为 JSON
+    })
+    .then(data => {
+        displaySongs(data); // 调用 displaySongs，传入完整的响应数据
+    })
+    .catch(error => {
+        console.error('Error fetching playlists:', error); // 打印错误信息
+    });
 
-    displaySongs(songs);
+    
 }
 
-function displaySongs(songs) {
-    let songsList = document.getElementById('songs-list');
-    songsList.innerHTML = ''; // Clear previous songs
+function displaySongs(favListData) {
+    const songsList = document.getElementById('songs-list');
+    console.log(favListData);
 
-    songs.forEach(function(song, index) {
-        let songItem = document.createElement('div');
+    songsList.innerHTML = ''; // 清空之前的内容
+
+    const songsDetail = favListData.songs_detail; // 提取 songs_detail 数据
+
+    songsDetail.forEach((song, index) => {
+        const songItem = document.createElement('div');
         songItem.classList.add('song-item');
         songItem.dataset.songId = song.id;
 
         songItem.innerHTML = `
             <div class="song-rank">${index + 1}</div>
-            <img class="song-image" src="${song.image_url}" alt="Song Image">
+            <img class="song-image" src="${song.cover_url}" alt="Song Cover">
             <div class="song-details">
-                <p class="song-title">${song.title}</p>
-                <p class="song-artist">${song.artist}</p>
+                <p class="song-title">${song.name}</p>
+                <p class="song-artist">${song.author}</p>
             </div>
             <div class="song-album">${song.album}</div>
+            <div class="song-duration">${song.duration}s</div>
             <div class="song-actions">
-                <button class="collection-button">${song.is_in_collection ? 'U' : 'F'}</button>
+                <button class="collection-button">F</button>
             </div>
-            <div class="song-duration">${song.time}</div>
         `;
 
-        // Double-click
-        songItem.addEventListener('dblclick', function() {
+        // 双击播放
+        songItem.addEventListener('dblclick', () => {
             playSong(song);
         });
 
-        // Favorite button
-        songItem.querySelector('.collection-button').addEventListener('click', function(e) {
-            e.stopPropagation(); // Prevent triggering the songItem's dblclick
-            toggleCollection(song.id, this);
+        // 收藏按钮事件
+        songItem.querySelector('.collection-button').addEventListener('click', (e) => {
+            e.stopPropagation(); // 防止触发 dblclick 事件
+            toggleCollection(song.id, e.target);
         });
 
         songsList.appendChild(songItem);
