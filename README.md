@@ -66,3 +66,14 @@ Password: 520project
 http://127.0.0.1:8000/admin
 # You may manage all accounts
 ```
+
+# Add Song Source data to database
+```bash
+
+# Scraping Song Information from Web Pages, save it to ./utils/songs.json
+python ./utils/spider.py
+
+# Add all songs in ./utils/songs.json to database
+python ./utils/script.py
+
+```
