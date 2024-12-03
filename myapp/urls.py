@@ -16,4 +16,5 @@ urlpatterns = [
     # path('userfav/', views.UserFavListCreateView.as_view(), name='userfav-list-create'),
     # path('userfav/', views.UserFavRetrieveUpdateDestroyView.as_view(), name='userfav-detail'),
     path('index/', views.index, name='index'),
+    path('reorganize-playlist/', views.reorganize_playlist, name='reorganize-playlist'),
    ]

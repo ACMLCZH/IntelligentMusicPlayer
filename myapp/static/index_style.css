@@ -295,9 +295,14 @@ body {
 
 /* Player Area Styles */
 .player-area {
-    background-color: #c0c0c0;
-    text-align: center;
-    padding: 20px;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to right, #1a1a1a, #2a2a2a);
+    padding: 10px 20px;
+    z-index: 1000;
+    border-top: 1px solid #333;
 }
 
 .song-actions img.add-to-favlist-button {
@@ -328,4 +333,113 @@ body {
 
 .favlist-dropdown div:hover {
     background-color: #f1f1f1;
+}
+
+.player-container {
+    display: flex;
+    align-items: center;
+    max-width: 1400px;
+    margin: 0 auto;
+    gap: 20px;
+}
+
+.player-left {
+    flex-shrink: 0;
+}
+
+.cover-art {
+    width: 60px;
+    height: 60px;
+    border-radius: 8px;
+    object-fit: cover;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.player-center {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.player-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.player-info h2 {
+    color: #fff;
+    font-size: 14px;
+    margin: 0;
+}
+
+.player-info h3 {
+    color: #aaa;
+    font-size: 12px;
+    margin: 0;
+}
+
+.controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.controls button {
+    background: transparent;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+}
+
+.controls button:hover {
+    background-color: rgba(255,255,255,0.1);
+}
+
+#audio-player {
+    flex-grow: 1;
+    height: 32px;
+    border-radius: 16px;
+}
+
+/* Add margin to main content to prevent player overlap */
+.content-area {
+    margin-bottom: 100px;
+}
+
+
+
+.empty-queue p {
+    margin: 0;
+}
+
+.empty-queue-subtitle {
+    font-size: 0.9em;
+    color: #999;
+    margin-top: 5px !important;
+}
+
+/* Default cover art */
+.cover-art.empty {
+    opacity: 0.5;
+    background-color: #2a2a2a;
+}
+
+/* Disabled controls */
+.controls button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+#audio-player:not([src]) {
+    opacity: 0.5;
+}
+
+.player-info h2.empty, 
+.player-info h3.empty {
+    color: #666;
+    font-style: italic;
 }

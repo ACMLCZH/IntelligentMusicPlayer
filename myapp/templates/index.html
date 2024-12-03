@@ -4,6 +4,19 @@
     <meta charset="UTF-8">
     <title>Music Player</title>
     <link rel="stylesheet" href="/static/index_style.css">
+
+    <!-- Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/static/service-worker.js')
+                    .then(reg => console.log('Service worker registered'))
+                    .catch(err => console.error('Service worker error:', err));
+            });
+        }
+    </script>
+    <script src="/static/player.js" defer></script>
+    <script src="/static/index.js" defer></script>
 </head>
 <body>
     <!-- Navigation Bar -->
@@ -50,24 +63,56 @@
 
         <!-- Right Sidebar: Play Queue -->
         <div class="play-queue">
-            <h2>Play Queue</h2>
-            <ul id="play-queue-list">
-                <!-- Play Queue will be dynamically loaded here -->
-            </ul>
+            <!-- Current Playing Playlist -->
+            <div class="playlist">
+                <h3>Play Queue</h3>
+                <ul id="playlist-container" data-current-index="-1">
+                    <li class="empty-queue">
+                        <p>No tracks in queue</p>
+                        <p class="empty-queue-subtitle">Select a playlist to get started</p>
+                    </li>
+                </ul>
+            </div>
 
             <!-- Natural Language Play Queue Management -->
             <div class="nlp-management">
                 <h3>Manage Play Queue</h3>
-                <textarea id="nlp-input"></textarea>
-                <button id="nlp-button">Update Play Queue</button>
+                <form id="playlist-form">
+                    {% csrf_token %}
+                    <textarea id="nlp-input" name="instruction" placeholder="Enter your playlist instruction..." required></textarea>
+                    <button id="nlp-button" type="submit">Update Play Queue</button>
+                </form>
             </div>
         </div>
     </div>
 
     <!-- Player Area -->
     <div class="player-area">
-        <!-- Reserved Area for Playing Songs -->
-        <h2>Player Area</h2>
+        <div class="player-container">
+            <!-- Left section: Cover art -->
+            <div class="player-left">
+                <img src="/static/default-cover.jpg" alt="No track selected" class="cover-art" id="cover-art">
+            </div>
+            
+            <!-- Center section: Controls and track info -->
+            <div class="player-center">
+                <div class="player-info">
+                    <h2 id="track-title">Select a track to play</h2>
+                    <h3 id="track-artist">No track playing</h3>
+                </div>
+                <div class="controls">
+                    <button id="prev-btn" disabled>
+                        <i class="fas fa-step-backward"></i>
+                    </button>
+                    <audio id="audio-player" controls>
+                        <source src="" type="audio/mpeg">
+                    </audio>
+                    <button id="next-btn" disabled>
+                        <i class="fas fa-step-forward"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="/static/index.js"></script>
