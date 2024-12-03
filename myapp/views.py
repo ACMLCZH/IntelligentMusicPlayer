@@ -145,24 +145,13 @@ class SongSearchView(DocumentViewSet):
     ]
 
     search_fields = {
-        'name': {'boost': 2},
-        'author': None,
-        'lyrics': None,
-        'topics': None,
+        'name': {'boost': 5},
+        'author': {'boost': 4},
+        'album': {'boost': 3},
+        'topics': {'boost': 2},
+        'lyrics': {'boost': 1},
     }
-
-    # filter_fields = {
-    #     'name': 'name',
-    #     'author': 'author',
-    #     'lyrics': 'lyrics.raw',
-    # }
-
-    # ordering_fields = {
-    #     'name': 'name.raw',
-    #     'author': 'author.raw',
-    #     'duration': 'duration',
-    # }
-    ordering = ('name',)
+    ordering = ('_score',)
 
     def filter_queryset(self, queryset):
         return super().filter_queryset(queryset)
