@@ -358,3 +358,18 @@ Authorization: Bearer <JWT_TOKEN>
     "detail": "User favorites deleted successfully."
 }
 ```
+
+
+```
+curl -X POST http://localhost:8000/userfav/ ^
+-H "Content-Type: application/json" ^
+-d "{\"favlists\": [2, 3]}" ^
+--user "test_user"
+```
+
+```
+curl -X PUT http://localhost:8000/userfav/ ^
+-H "Content-Type: application/json" ^
+-d "{\"favlists\": [2]}" ^
+--user "test_user"
+```
