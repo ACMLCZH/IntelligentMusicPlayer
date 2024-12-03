@@ -38,7 +38,20 @@ def delete_music(song: Song):
     '''
         delete a music from Server Track Database.
     '''
-    es.delete(index='music', id=song.id)
+
+    # 查找文档ID
+    query = {
+        "query": {
+            "match": {
+                "name": song.name
+            }
+        }
+    }
+    response = es.search(index='music', body=query)
+    doc_id = response['hits']['hits'][0]['_id']
+
+    # 删除文档
+    es.delete(index='music', id=doc_id)
 
     print("!!!!delete success!!!!")
     # print("!!!!current all index:!!!!")

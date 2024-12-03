@@ -47,6 +47,7 @@ class SongAdmin(admin.ModelAdmin):
 
     def delete_queryset(self, request, queryset): 
         for obj in queryset: 
+            print("music_obj:",obj)
             delete_music(obj)
         super().delete_model(request, obj)
 admin.site.register(Song, SongAdmin)
