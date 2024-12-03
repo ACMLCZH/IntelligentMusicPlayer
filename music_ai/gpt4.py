@@ -4,7 +4,7 @@ import requests
 # api_key = '8ebbc0ebe146462a939dfd4589b79e10'
 api_key = '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'
 data_folder = "data"
-openai.api_key = 'your-api-key-here'
+openai.api_key = api_key
 
 import uuid
 import os
