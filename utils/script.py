@@ -1,13 +1,10 @@
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
 import json
 import time
 import requests
 
 # driver = webdriver.Edge()
 
-with open('songs.json', 'r', encoding='utf-8') as f: 
+with open('./utils/songs.json', 'r', encoding='utf-8') as f: 
     songs = json.load(f)
 
 def convert_duration_to_minutes(duration_str): 

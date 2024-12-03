@@ -60,14 +60,14 @@ if __name__=='__main__':
     for url in urls:
         for i in range(1,100):
             if i==1:
-                url = "https://freemusicarchive.org/genre/International"
+                url = url
                 songs = []
             else:
                 url = f"{url}?page={i}"
-                with open('songs.json', 'r', encoding='utf-8') as file: 
+                with open('./utils/songs.json', 'r', encoding='utf-8') as file: 
                     songs = json.load(file)
             songs = songs + find_songs(url)
-            with open('songs.json', 'w', encoding='utf-8') as f: 
+            with open('./utils/songs.json', 'w', encoding='utf-8') as f: 
                 json.dump(songs, f, ensure_ascii=False, indent=4)
             if len(songs) > 200:
                 print("spider finish!!!")
