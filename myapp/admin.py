@@ -8,17 +8,19 @@ from .models import Song
 from .documents import SongDocument
 from django_elasticsearch_dsl.registries import registry
 from elastic_search.methods import *
+from music_ai.gpt4 import make_song_prompt
 
 class SongAdmin(admin.ModelAdmin):
-    list_display = ('id',
-            'name',
-            'author',
-            'album',
-            'duration',
-            'lyrics',
-            'topics',
-            'mp3_url',
-            'cover_url',)
+    list_display = (
+        'id',
+        'name',
+        'author',
+        'album',
+        'duration',
+        'lyrics',
+        'topics',
+        'mp3_url',
+        'cover_url',)
     search_fields = ('id', 'name', 'author')
 
     # def get_search_results(self, request, queryset, search_term):
@@ -38,7 +40,7 @@ class SongAdmin(admin.ModelAdmin):
             song_names = [hit['_source']["name"] for hit in hits]
             queryset = queryset.filter(name__in=song_names)
         return super().get_search_results(request, queryset, search_term)
-
+    
     def save_model(self, request, obj, form, change): 
         super().save_model(request, obj, form, change) 
         add_music(obj)

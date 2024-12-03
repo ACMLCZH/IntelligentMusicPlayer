@@ -62,10 +62,10 @@ music_headers = {
 artist = 'SunoAI'
 album = 'SunoAI Generation'
 
+local_url = "http://localhost:8000/song/"
 local_headers = {
     'content-type': 'application/json',
 }
-local_url = "http://localhost:8000/song/"
 
 def generate_song(prompt: str):
     music_data = {
@@ -86,6 +86,7 @@ def generate_song(prompt: str):
         local_data = {
             'name': music_json['title'],
             'author': artist,
+            'album': album,
             'duration': music_json['duration'],
             'lyrics': music_json['lyric'],
             'mp3_url': music_json['audio_url'],
