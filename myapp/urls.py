@@ -12,7 +12,8 @@ urlpatterns = [
     path('song/search/', views.SongSearchView.as_view({'get': 'list'}), name='song-search'),
     path('favlist/', views.FavlistListCreateView.as_view(), name='favlist-list-create'),
     path('favlist/<int:pk>/', views.FavlistRetrieveUpdateDestroyView.as_view(), name='favlist-detail'),
-    path('userfav/', views.UserFavListCreateView.as_view(), name='userfav-list-create'),
-    path('userfav/', views.UserFavRetrieveUpdateDestroyView.as_view(), name='userfav-detail'),
+    path('userfav/', views.UserFavView.as_view(), name='userfav'),
+    # path('userfav/', views.UserFavListCreateView.as_view(), name='userfav-list-create'),
+    # path('userfav/', views.UserFavRetrieveUpdateDestroyView.as_view(), name='userfav-detail'),
     path('index/', views.index, name='index'),
    ]

@@ -28,8 +28,8 @@ class Favlist(models.Model):
 
 class UserFav(models.Model):
     user = models.OneToOneField(
-        User, 
-        on_delete=models.CASCADE, 
+        User,
+        on_delete=models.CASCADE,
         primary_key=True,  # 设置 user 为主键
         related_name='user_favs'
     )

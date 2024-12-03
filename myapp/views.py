@@ -12,7 +12,7 @@ import json
 
 
 from django.http import Http404
-from rest_framework import generics
+from rest_framework import status, generics
 from rest_framework.response import Response
 from .models import Song, Favlist, UserFav
 from .serializers import SongSerializer, SongDocumentSerializer, FavlistSerializer, UserFavSerializer
@@ -189,7 +189,7 @@ class FavlistRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
 
         return Response(response_data)
 
-
+'''
 class UserFavListCreateView(generics.ListCreateAPIView):
     queryset = UserFav.objects.all()
     serializer_class = UserFavSerializer
@@ -214,3 +214,48 @@ class UserFavRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     # def get_queryset(self):
     #     # Ensure users can only access their own favorites
     #     return UserFav.objects.filter(user=self.request.user)
+'''
+
+class UserFavView(generics.GenericAPIView):
+    serializer_class = UserFavSerializer
+
+    def get_object(self):
+        try:
+            return UserFav.objects.get(user=self.request.user)
+        except UserFav.DoesNotExist:
+            raise Http404("UserFav object does not exist for this user.")
+
+    def get(self, request, *args, **kwargs):
+        # Retrieve the UserFav object for the current user
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
+    def post(self, request, *args, **kwargs):
+        # Create a new UserFav object
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(user=request.user)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def put(self, request, *args, **kwargs):
+        # Update the UserFav object
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=False)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
+    def patch(self, request, *args, **kwargs):
+        # Partially update the UserFav object
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
+    def delete(self, request, *args, **kwargs):
+        # Delete the UserFav object
+        instance = self.get_object()
+        instance.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
