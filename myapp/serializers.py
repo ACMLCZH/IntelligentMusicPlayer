@@ -33,6 +33,11 @@ class FavlistSerializer(serializers.ModelSerializer):
         model = Favlist
         fields = ['id', 'name', 'songs']
 
+class FavlistBasicSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Favlist
+        fields = ['id', 'name']
+
 
 class UserFavSerializer(serializers.ModelSerializer):
     favlists = serializers.PrimaryKeyRelatedField(queryset=Favlist.objects.all(), many=True)
