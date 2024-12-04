@@ -153,17 +153,77 @@ function setupNavbar() {
 // Function to perform search
 function performSearch(query) {
     console.log('Searching for:', query);
-    // Implement your search logic here
-    // For example, make an API call to your server to fetch search results
-    // fetch(`/api/search?q=${encodeURIComponent(query)}`)
-    //     .then(response => response.json())
-    //     .then(data => {
-    //         // Display search results
-    //     })
-    //     .catch(error => {
-    //         console.error('Error during search:', error);
-    //     });
+
+    // Hide the playlist-info section
+    document.querySelector('.playlist-info').style.display = 'none';
+
+    fetch(`/song/search/?search=${encodeURIComponent(query)}&limit=20`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error during search: ' + response.statusText);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Search API response data:', data);
+            if (Array.isArray(data.results)) {
+                displaySearchResults(data.results);
+            } else {
+                console.error('Unexpected API response:', data);
+                // Optionally display an error message to the user
+                displayNoResults();
+            }
+        })
+        .catch(error => {
+            console.error('Error during search:', error);
+        });
 }
+
+
+// Function to display search results
+function displaySearchResults(songs) {
+    const songsList = document.getElementById('songs-list');
+    console.log(songs);
+
+    songsList.innerHTML = ''; // Clear previous content
+
+    songs.forEach((song, index) => {
+        const songItem = document.createElement('div');
+        songItem.classList.add('song-item');
+        songItem.dataset.songId = song.id;
+
+        songItem.innerHTML = `
+            <div class="song-rank">${index + 1}</div>
+            <img class="song-image" src="${song.cover_url}" alt="Song Cover">
+            <div class="song-details">
+                <p class="song-title">${song.name}</p>
+                <p class="song-artist">${song.author}</p>
+            </div>
+            <div class="song-album">${song.album}</div>
+            <div class="song-duration">${song.duration}s</div>
+            <div class="song-actions">
+                <img class="add-to-favlist-button" src="/static/add.webp" alt="Add to Favlist">
+            </div>
+        `;
+
+        songItem.style.userSelect = 'none';
+
+        // Double-click to play
+        songItem.addEventListener('dblclick', () => {
+            playSong(song);
+        });
+
+        // Add to favlist button event
+        const addButton = songItem.querySelector('.add-to-favlist-button');
+        addButton.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevent triggering parent events
+            showFavlistDropdown(song.id, addButton);
+        });
+
+        songsList.appendChild(songItem);
+    });
+}
+
 
 // Fetch playlists from the server
 function fetchPlaylists() {
@@ -193,27 +253,31 @@ function displayPlaylists(playlists) {
         li.textContent = playlist.name; // Use `name` from the Favlist model
         li.dataset.id = playlist.id;
         playlistList.appendChild(li);
+
+        playlistList.style.userSelect = 'none';
     });
+
 }
 
 // Fetch songs from a specific playlist
 function fetchSongs(playlistId) {
-    fetch(`/favlist/${playlistId}`) // 根据 ID 获取收藏列表
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok ' + response.statusText);
-        }
-        return response.json(); // 解析为 JSON
-    })
-    .then(data => {
-        currentPlaylistData = data; // Store the data
-        displaySongs(data); // 调用 displaySongs，传入完整的响应数据
-    })
-    .catch(error => {
-        console.error('Error fetching playlists:', error); // 打印错误信息
-    });
+    // Show the playlist-info section
+    document.querySelector('.playlist-info').style.display = 'flex';
 
-    
+    fetch(`/favlist/${playlistId}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok ' + response.statusText);
+            }
+            return response.json();
+        })
+        .then(data => {
+            currentPlaylistData = data; // Store the data
+            displaySongs(data);
+        })
+        .catch(error => {
+            console.error('Error fetching playlists:', error);
+        });
 }
 
 function displaySongs(favListData) {
