@@ -92,6 +92,7 @@ def generate_songs(songs_jsons: List[Dict]) -> List[Dict]:
         # raise requests.exceptions.RequestException
         suno_response = suno_client.request(suno_data)
     except requests.exceptions.RequestException as e:
+        print("Failed to generate songs. Just enjoy the default AI music!")
         suno_response = default_response
     except:
         raise
@@ -106,10 +107,10 @@ def generate_songs(songs_jsons: List[Dict]) -> List[Dict]:
     #         print(response.text)
 
     music_jsons = suno_response['data']
-    print(music_jsons)
+    # print(music_jsons)
     music_list = list()
     for music_json in music_jsons:
-        local_data = {
+        music_data = {
             'name': music_json['title'],
             'author': suno_artist,
             'album': suno_album,
@@ -119,11 +120,7 @@ def generate_songs(songs_jsons: List[Dict]) -> List[Dict]:
             'mp3_url': music_json['audio_url'],
             'cover_url': music_json['image_url'],
         }
-        local_response = requests.post(local_song_url, headers=local_headers, json=local_data)
-        if local_response.status_code >= 300:
-            raise Exception(f"Failed to post song to local server with error: {local_response.status_code}, {local_response.text}.")
-        else:
-            music_list.append(local_response.json())
+        music_list.append(music_data)
 
     return music_list
 
