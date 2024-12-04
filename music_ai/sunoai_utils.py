@@ -1,5 +1,6 @@
 import requests
 from datetime import datetime
+from typing import List, Dict
 
 # API at: https://platform.acedata.cloud/documents/4da95d9d-7722-4a72-857d-bf6be86036e9
 
@@ -67,7 +68,7 @@ local_headers = {
     'content-type': 'application/json',
 }
 
-def generate_song(prompt: str):
+async def generate_song(prompt: str) -> List[Dict]:
     music_data = {
         'action': 'generate',
         'prompt': prompt,
@@ -80,23 +81,26 @@ def generate_song(prompt: str):
         raise Exception(f'Error: {music_response.status_code}, {music_response.text}')
 
     music_jsons = music_response.json()['data']
-    music_json = music_jsons[0]
+    music_list = list()
+    for music_json in music_jsons:
+        while True:
+            local_data = {
+                'name': music_json['title'],
+                'author': artist,
+                'album': album,
+                'duration': music_json['duration'],
+                'lyrics': music_json['lyric'],
+                'mp3_url': music_json['audio_url'],
+                'cover_url': music_json['image_url'],
+            }
+            local_response = requests.post(local_url, headers=local_headers, json=local_data)
+            if local_response.status_code == 200:
+                music_list.append(local_response.json())
+                break
+            else:
+                print(f"Failed to post song to local server with error: {local_response.status_code}, {local_response.text}. Retry now.")
 
-    while True:
-        local_data = {
-            'name': music_json['title'],
-            'author': artist,
-            'album': album,
-            'duration': music_json['duration'],
-            'lyrics': music_json['lyric'],
-            'mp3_url': music_json['audio_url'],
-            'cover_url': music_json['image_url'],
-        }
-        local_response = requests.post(local_url, headers=local_headers, json=local_data)
-        if local_response.status_code == 200:
-            break
-        else:
-            print(f"Failed to post song to local server with error: {local_response.status_code}, {local_response.text}. Retry now.")
+    return music_list
 
 if __name__ == "__main__":
     # Play the first song in memory

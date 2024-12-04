@@ -1,39 +1,35 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate,login as auth_login
-from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from django.views.decorators.csrf import csrf_exempt
-from django.http import JsonResponse,HttpResponseRedirect
-from django.contrib.auth.models import User
-from django.urls import reverse
-
 import json
-
-
-from django.http import Http404
+import requests
+from asgiref.sync import sync_to_async
 from rest_framework import status, generics
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
-from .models import Song, Favlist, UserFav
-from .serializers import SongSerializer, SongDocumentSerializer, FavlistSerializer, UserFavSerializer, FavlistBasicSerializer
+from rest_framework.permissions import IsAuthenticated
+
+from django.shortcuts import render, redirect
+from django.shortcuts import render
+from django.contrib import messages
+from django.contrib.auth import authenticate,login as auth_login
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse, HttpResponseRedirect
+from django.http import Http404
+from django.urls import reverse
+from django.utils.decorators import method_decorator
 from django_elasticsearch_dsl_drf.viewsets import DocumentViewSet
-from .documents import SongDocument
 from django_elasticsearch_dsl_drf.filter_backends import (
     FilteringFilterBackend,
     CompoundSearchFilterBackend,
     OrderingFilterBackend,
 )
 from django_elasticsearch_dsl_drf.pagination import LimitOffsetPagination
-from rest_framework.permissions import IsAuthenticated
 
-import requests
-from asgiref.sync import sync_to_async
-from django.utils.decorators import method_decorator
-from typing import List, Dict
-import re
-from openai import OpenAI
-import os
+from .models import Song, Favlist, UserFav
+from .serializers import SongSerializer, SongDocumentSerializer, FavlistSerializer, UserFavSerializer, FavlistBasicSerializer
+from .documents import SongDocument
+from music_ai.openai_utils import make_song_prompt, PlaylistOrganizer
+from music_ai.sunoai_utils import generate_song
 
 @csrf_exempt
 def login(request):
@@ -182,76 +178,6 @@ async def play_music(request):
         'current_index': current_index
     }
     return render(request, 'index.html', context)
-
-# token = os.environ["GITHUB_TOKEN"]
-token = "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" # a temporary token for testing
-endpoint = "https://models.inference.ai.azure.com"
-model_name = "gpt-4o-mini"
-class PlaylistOrganizer:
-    def __init__(self):
-        self.client = OpenAI(
-            base_url=endpoint,
-            api_key=token,
-        )
-        self.playlists = []
-        
-    async def search_songs_by_name(self, name: str) -> List[Dict]:
-        # Stub - will be replaced with actual API call
-        return [song for song in self.playlists if song['title'].lower() == name.lower()]
-    
-    async def search_songs_by_genre(self, genre: str) -> List[Dict]:
-        # Stub - will be replaced with actual API call 
-        return [song for song in self.playlists if song.get('genre','').lower() == genre.lower()]
-
-    def parse_instruction(self, instruction: str) -> Dict:
-        """Use GPT to parse the natural language instruction"""
-        response = self.client.chat.completions.create(
-            model=model_name,
-            messages=[
-                {"role": "system", "content": """
-                You are a music playlist organizer. Parse the user's instruction into a structured format.
-                Return a JSON object with:
-                - type: "pattern" or "genre"
-                - song_name: (if pattern type)
-                - interval: (if pattern type, integer) 
-                - genre: (if genre type)
-                """},
-                {"role": "user", "content": instruction}
-            ]
-        )
-        # Convert string response to Dict
-        content = response.choices[0].message.content
-        return json.loads(content)
-
-    async def reorganize_playlist(self, instruction: str) -> List[Dict]:
-        """Main method to reorganize playlist based on instruction"""
-        print(f"Received instruction: {instruction}")
-        parsed = self.parse_instruction(instruction)
-        print(f"Parsed instruction: {parsed}")
-        
-        if parsed['type'] == 'pattern':
-            print(f"Pattern-based reorganization: {parsed['song_name']} every {parsed['interval']} songs")
-            # Handle pattern-based organization (e.g. "OMG every 2 songs")
-            song = await self.search_songs_by_name(parsed['song_name'])
-            if not song:
-                raise ValueError(f"Song {parsed['song_name']} not found")
-                
-            interval = int(parsed['interval'])
-            new_playlist = []
-            other_songs = [s for s in self.playlists if s['title'] != song[0]['title']]
-            
-            # Insert requested song at every interval position
-            j = 0  # Counter for other songs
-            for i in range(len(self.playlists) + len(self.playlists)//interval):  # Extended length
-                if i % (interval + 1) == 0:  # +1 because we want song after every N songs
-                    new_playlist.append(song[0])
-                else:
-                    if j < len(other_songs):
-                        new_playlist.append(other_songs[j])
-                        j += 1
-                        
-        print(f"New playlist: {[s['title'] for s in new_playlist]}")
-        return new_playlist
 
 def _create_json_response(data, status=200):
     """Synchronous helper to create JsonResponse"""
