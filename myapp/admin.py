@@ -26,25 +26,17 @@ class SongAdmin(admin.ModelAdmin):
         'cover_url',)
     search_fields = ('id', 'name', 'author')
 
-    # def get_search_results(self, request, queryset, search_term):
-    #     if search_term:
-    #         search = SongDocument.search().query("multi_match", query=search_term, fields=self.search_fields)
-    #         song_ids = [hit.meta.id for hit in search]
-    #         queryset = queryset.filter(id__in=song_ids)
-    #     return super().get_search_results(request, queryset, search_term)
+
     
     def get_search_results(self, request, queryset, search_term):
         if search_term:
-            # hits_total, hits = search_music(search_term, 'all', 0, 10)
-            # song_ids = [hit['_source']["id"] for hit in hits]
-
-            url = f"http://localhost:8000/song/search/?search={search_term}&limit=20" 
+            url = f"http://localhost:8000/song/search/?search={search_term}&ai=True"
             response = requests.get(url) 
-            if response.status_code == 200: 
+            if response.status_code == 200:
                 data = response.json()
-            song_ids = [int(item['id']) for item in data['results']]
+            song_ids = [int(item['id']) for item in data]
             queryset = queryset.filter(id__in=song_ids)
-        return super().get_search_results(request, queryset, search_term)
+        return super().get_search_results(request, queryset, '')
 
     def save_model(self, request, song, form, change):
         sessionid = request.COOKIES.get('sessionid')

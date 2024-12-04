@@ -279,6 +279,11 @@ class SongSearchView(DocumentViewSet):
     def filter_queryset(self, queryset):
         field = self.request.query_params.get('field', None)
         search = self.request.query_params.get('search', None)
+        ai = self.request.query_params.get('ai', None)
+
+        # Exclude results where author is "SunoAI"
+        if ai != 'True':
+            queryset = queryset.query("bool", must_not=[{"match": {"author": "SunoAI"}}])
 
         if field and search:
             if field in self.search_fields:

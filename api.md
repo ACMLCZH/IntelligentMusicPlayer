@@ -141,6 +141,7 @@ DELETE http://localhost:8000/song/1/
 
 search=keyword
 limit=X
+ai=True
 ##### Example Request:
 ```http
 GET http://localhost:8000/song/search/?search=Imagine&limit=20
