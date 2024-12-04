@@ -2,14 +2,47 @@ import requests
 import json
 from typing import List, Dict
 from .ai_clients import suno_client, openai_client
+import time
 
 local_song_url = "http://localhost:8000/song/"
 local_favlist_url = "http://localhost:8000/favlist/"
+callback_url = "https://webhook.site/"
 local_headers = {
     'content-type': 'application/json',
 }
 suno_artist = 'SunoAI'
 suno_album = 'SunoAI Generation'
+default_response = {
+    "success": True,
+    "data": [{
+        "state": "succeeded",
+        "id": "fabfea10-4805-4b81-b54d-ee089ae1533a_1",
+        "title": "The Rhyme Chronicles",
+        "image_url": "https://cdn2.suno.ai/image_ee0717ad-aded-4008-a30c-4f43bbcb3fc3.jpeg",
+        "lyric": "[Verse 1]\nGot the city lights flickerin\", a masterpiece in bricks,\nSippin\" on wisdom, every corner tales stick.\nDodgin\" pitfalls, my Nike kicks on a mission,\nSlingin’ poetry, listen close, no intermission.\n\n[Verse 2]\nAlleyways been my stage, where I earn my crown,\nGraffiti dreams speak loud, never backin\" down.\nSurvival tactics, every street got a code,\nIn this jungle, respect paid in heavy loads.\n\n[Chorus]\nRhymes sharp as a blade, cut through the night,\nStories etched in shadows, truth in the fight.\nCiphers in the park, life’s gritty aesthetic,\nSpittin’ for the love, ink eternally kinetic.\n\n[Verse 3]\nEchoes in the hallways, memories in the dust,\nChasin’ after glory while dodgin’ the rust.\nMelodies in the sirens, beats in the grind,\nClock ticks relentless, but I’m never behind.\n\n[Bridge]\nLocked eyes with the storm, composed in the chaos,\nKeys to the rhythm, my heart syncopated dauntless.\nPages of the struggle, tales of the street,\nEvery bar scars deep, but victory’s sweet.\n\n[Verse 4]\nBlueprints on my mind, legacy in the flows,\nResilience in the veins, path in prose.\nVerse painted visceral, truths carved in stone,\nEvery neighborhood a chapter, every verse a throne.",
+        "audio_url": "https://cdn1.suno.ai/ee0717ad-aded-4008-a30c-4f43bbcb3fc3.mp3",
+        "video_url": "https://cdn1.suno.ai/ee0717ad-aded-4008-a30c-4f43bbcb3fc3.mp4",
+        "created_at": "2024-11-27T06:22:19.697Z",
+        "model": "chirp-v3-5",
+        "prompt": "Make a song of rap and hip-hop music, with a preference for hard-hitting beats, complex lyricism, and storytelling, from both classic and contemporary artists.",
+        "style": "High quality",
+        "duration": 189
+    }, {
+        "state": "succeeded",
+        "id": "fabfea10-4805-4b81-b54d-ee089ae1533a_2",
+        "title": "The Rhyme Chronicles",
+        "image_url": "https://cdn2.suno.ai/image_7d47a123-b4e0-436d-8b01-6e9acbc5f1bf.jpeg",
+        "lyric": "[Verse 1]\nGot the city lights flickerin\", a masterpiece in bricks,\nSippin\" on wisdom, every corner tales stick.\nDodgin\" pitfalls, my Nike kicks on a mission,\nSlingin’ poetry, listen close, no intermission.\n\n[Verse 2]\nAlleyways been my stage, where I earn my crown,\nGraffiti dreams speak loud, never backin\" down.\nSurvival tactics, every street got a code,\nIn this jungle, respect paid in heavy loads.\n\n[Chorus]\nRhymes sharp as a blade, cut through the night,\nStories etched in shadows, truth in the fight.\nCiphers in the park, life’s gritty aesthetic,\nSpittin’ for the love, ink eternally kinetic.\n\n[Verse 3]\nEchoes in the hallways, memories in the dust,\nChasin’ after glory while dodgin’ the rust.\nMelodies in the sirens, beats in the grind,\nClock ticks relentless, but I’m never behind.\n\n[Bridge]\nLocked eyes with the storm, composed in the chaos,\nKeys to the rhythm, my heart syncopated dauntless.\nPages of the struggle, tales of the street,\nEvery bar scars deep, but victory’s sweet.\n\n[Verse 4]\nBlueprints on my mind, legacy in the flows,\nResilience in the veins, path in prose.\nVerse painted visceral, truths carved in stone,\nEvery neighborhood a chapter, every verse a throne.",
+        "audio_url": "https://cdn1.suno.ai/7d47a123-b4e0-436d-8b01-6e9acbc5f1bf.mp3",
+        "video_url": "https://cdn1.suno.ai/7d47a123-b4e0-436d-8b01-6e9acbc5f1bf.mp4",
+        "created_at": "2024-11-27T06:22:19.716Z",
+        "model": "chirp-v3-5",
+        "prompt": "Make a song of rap and hip-hop music, with a preference for hard-hitting beats, complex lyricism, and storytelling, from both classic and contemporary artists.",
+        "style": "High quality",
+        "duration": 97
+    }],
+    "task_id": "7a1dceb4-aeae-46b6-b86b-49a8930d2f40"
+}
 
 generate_system_prompt = \
     "You are an expert music analyst. Your task is to evaluate a list of songs provided by the user "\
@@ -21,12 +54,6 @@ def generate_songs(songs_jsons: List[Dict]) -> List[Dict]:
         for song_json in songs_jsons
     ])
 
-    # local_response = requests.get(f"{local_url}{fav_id}", headers=local_headers)
-    # if local_response.status_code == 200:
-    #     break
-    # else:
-    #     print(f"Failed to get favorite list from local server with error: {local_response.status_code}, {local_response.text}. Retry now.")
-    # music_jsons = local_response.json()['songs_detail']
     generate_user_prompt = \
         "Here is a list of songs:\n"\
         f"{songs_info}\n"\
@@ -34,10 +61,23 @@ def generate_songs(songs_jsons: List[Dict]) -> List[Dict]:
         "Your answer should be recapitulatory and begin with \"The user likely enjoys...\"."
     print(generate_user_prompt)
 
-    generate_answer = openai_client.request('generate', generate_system_prompt, generate_user_prompt)
-    while generate_answer.startswith("The user likely enjoys") or len(generate_answer) > 200:
+    generate_data = {
+        "model": "gpt-4",
+        "messages": [{
+            "role": "system",
+            "content": generate_system_prompt
+        }, {
+            "role": "user",
+            "content": generate_user_prompt
+        }],
+        "temperature": 0.7,
+        "max_tokens": 100,
+        "top_p": 1,
+    }
+    generate_answer = openai_client.request(generate_data)
+    while not generate_answer.startswith("The user likely enjoys") or len(generate_answer) > 200:
         print(f"Warning: the answer '{generate_answer}' does not meet the requirement, re-generate now.")
-        generate_answer = openai_client.request('generate', generate_system_prompt, generate_user_prompt)
+        generate_answer = openai_client.request(generate_data)
     print(generate_answer)
 
     suno_prompt = "Make a song of " + generate_answer[23:]
@@ -48,9 +88,25 @@ def generate_songs(songs_jsons: List[Dict]) -> List[Dict]:
         'custom': False,
         'instrumental': False,
     }
-    suno_response = suno_client.request(suno_data)
+    try:
+        # raise requests.exceptions.RequestException
+        suno_response = suno_client.request(suno_data)
+    except requests.exceptions.RequestException as e:
+        suno_response = default_response
+    except:
+        raise
+
+    # while True:
+    #     time.sleep(60)
+    #     response = requests.get(f"{callback_url}/{task_id}", headers=local_headers)
+    #     if response.status_code == 200:
+    #         suno_response = response.json()
+    #         break
+    #     else:
+    #         print(response.text)
 
     music_jsons = suno_response['data']
+    print(music_jsons)
     music_list = list()
     for music_json in music_jsons:
         local_data = {
@@ -59,14 +115,15 @@ def generate_songs(songs_jsons: List[Dict]) -> List[Dict]:
             'album': suno_album,
             'duration': music_json['duration'],
             'lyrics': music_json['lyric'],
+            'topics': "AI generated",
             'mp3_url': music_json['audio_url'],
             'cover_url': music_json['image_url'],
         }
         local_response = requests.post(local_song_url, headers=local_headers, json=local_data)
-        if local_response.status_code == 200:
-            music_list.append(local_response.json())
-        else:
+        if local_response.status_code >= 300:
             raise Exception(f"Failed to post song to local server with error: {local_response.status_code}, {local_response.text}.")
+        else:
+            music_list.append(local_response.json())
 
     return music_list
 
@@ -120,7 +177,17 @@ class PlaylistOrganizer:
     async def parse_instruction(self, instruction: str) -> Dict:
         """Use GPT to parse the natural language instruction"""
         # Convert string response to Dict
-        content = openai_client.request('organize', self.system_prompt, instruction)
+        organize_data = {
+            "model": "gpt-4o-mini",
+            "messages": [{
+                "role": "system",
+                "content": self.system_prompt
+            }, {
+                "role": "user",
+                "content": instruction
+            }],
+        }
+        content = openai_client.request(organize_data)
         return json.loads(content)
 
     async def reorganize_playlist(self, instruction: str) -> List[Dict]:
@@ -155,6 +222,5 @@ class PlaylistOrganizer:
 
 
 if __name__ == "__main__":
-    pass
-    # Play the first song in memory
-    # audio_data_list = generate_songs("Make a song of rap and hip-hop music, with a preference for hard-hitting beats, complex lyricism, and storytelling, from both classic and contemporary artists.")
+    mp3_url = "https://cdn1.suno.ai/d4bd4d4e-1123-4d8f-998e-0e08cec2e808.mp3"
+    cover_url = "https://cdn2.suno.ai/image_d4bd4d4e-1123-4d8f-998e-0e08cec2e808.jpeg"

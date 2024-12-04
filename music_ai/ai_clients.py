@@ -17,12 +17,13 @@ curl -X POST 'https://api.acedata.cloud/suno/audios' \
     "prompt": "Make a song of rap and hip-hop music, with a preference for hard-hitting beats, complex lyricism, and storytelling, from both classic and contemporary artists.",
     "model": "chirp-v3-5",
     "custom": false,
-    "instrumental": false
+    "instrumental": false,
+    "callback_url": "https://webhook.site/"
 }'
 
 Example Result:
 {
-    "success": true,
+    "success": True,
     "data": [{
         "state": "succeeded",
         "id": "fabfea10-4805-4b81-b54d-ee089ae1533a_1",
@@ -65,7 +66,7 @@ class SunoAIClient:
             'content-type': 'application/json',
         }
     
-    def request(self, data) -> Dict:
+    def request(self, data: Dict) -> Dict:
         response = requests.post(self.url, headers=self.headers, json=data)
         if response.status_code != 200:
             raise Exception(f'Error: {response.status_code}, {response.text}')
@@ -88,36 +89,8 @@ class OpenAIClient:
             api_key = os.environ['OPENAI_API_KEY']
         self.client = openai.OpenAI(api_key=api_key)
     
-    def request(self, functionality, system_prompt, user_prompt) -> str:
-        # TODO: use request?
-        if functionality == 'generate':
-            response = self.client.chat.completions.create(
-                model="gpt-4",
-                messages=[{
-                    "role": "system",
-                    "content": system_prompt
-                }, {
-                    "role": "user",
-                    "content": user_prompt
-                }],
-                temperature=0.7,
-                max_tokens=100,
-                top_p=1
-            )
-        elif functionality == 'organize':
-            response = self.client.chat.completions.create(
-                model="gpt-4o-mini",
-                messages=[{
-                    "role": "system",
-                    "content": system_prompt
-                }, {
-                    "role": "user",
-                    "content": user_prompt
-                }],
-            )
-        else:
-            raise Exception(f"Unknown functionality: {functionality}")
-        
+    def request(self, data: Dict) -> str:
+        response = self.client.chat.completions.create(**data)
         return response.choices[0].message.content
 
 openai_client = OpenAIClient(
