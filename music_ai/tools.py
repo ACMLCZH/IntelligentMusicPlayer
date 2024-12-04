@@ -1,7 +1,7 @@
 import requests
 import json
 from typing import List, Dict
-from ai_clients import suno_client, openai_client
+from .ai_clients import suno_client, openai_client
 
 local_song_url = "http://localhost:8000/song/"
 local_favlist_url = "http://localhost:8000/favlist/"

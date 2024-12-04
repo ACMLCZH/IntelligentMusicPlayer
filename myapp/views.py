@@ -373,6 +373,8 @@ class GenerateSongsView(generics.GenericAPIView):
         result = await generate_songs(songs_serial.data)
         return Response(result)
 
+    async def get_queryset(self):
+        return self.queryset
 
 @csrf_exempt
 def custom_logout(request):
