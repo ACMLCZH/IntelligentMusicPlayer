@@ -44,17 +44,27 @@ body {
 }
 
 .nav-search button {
-    padding: 10px 15px;
+    width: 35px;              /* 按钮的宽度 */
+    height: 35px;             /* 按钮的高度，与宽度相同以形成正方形 */
+    background-color: #FFF;/* 按钮的背景颜色 */
+    border: none;             /* 去除默认边框 */
+    border-radius: 50%;       /* 使按钮成为圆形 */
+    cursor: pointer;          /* 鼠标变为指针 */
+    position: relative;       /* 为子元素定位做准备 */
+    display: flex;            /* 使用Flex布局 */
+    align-items: center;      /* 垂直居中 */
+    justify-content: center;  /* 水平居中 */
+    transition: background-color 0.3s; /* 添加过渡效果 */
     margin-left: 5px;
-    background-color: #555;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
+}
+
+#search-button img {
+    width: 30px;           
+    height: 30px;
 }
 
 .nav-search button:hover {
-    background-color: #666;
+    background-color: #ccc;
 }
 
 .nav-user {
@@ -66,8 +76,8 @@ body {
 }
 
 #user-avatar {
-    width: 40px;
-    height: 40px;
+    width: 47px;
+    height: 47px;
     border-radius: 50%;
     cursor: pointer;
 }
@@ -99,6 +109,8 @@ body {
 .nav-user.active .dropdown-menu {
     display: block;
 }
+
+
 
 /* Content Area Styles */
 .content-area {
