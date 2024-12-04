@@ -231,14 +231,28 @@ async def reorganize_playlist(request):
         405
     )
 
+
+class IsSuperUserOrReadOnly(IsAuthenticated):
+    def has_permission(self, request, view):
+        # Allow read-only methods for any authenticated user
+        if request.method in ['GET', 'HEAD', 'OPTIONS']:
+            return True
+        # Only superuser can create, update, or destroy
+        if request.user and request.user.is_superuser:
+            return True
+        return False
+
+
 class SongListCreateAPIView(generics.ListCreateAPIView):
     queryset = Song.objects.all()
     serializer_class = SongSerializer
+    permission_classes = [IsSuperUserOrReadOnly]
 
 
 class SongRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Song.objects.all()
     serializer_class = SongSerializer
+    permission_classes = [IsSuperUserOrReadOnly]
 
 
 class SongSearchView(DocumentViewSet):
