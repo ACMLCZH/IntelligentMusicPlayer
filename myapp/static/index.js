@@ -89,6 +89,10 @@ document.addEventListener('DOMContentLoaded', function() {
             dropdown.style.display = 'none';
         }
     });
+
+    document.getElementById('ai-generate-button').addEventListener('click', function() {
+        generateSongsWithAI();
+    });
     
 });
 
@@ -647,4 +651,98 @@ function logoutUser() {
         console.error('Error during logout:', error);
         alert('An error occurred during logout. Please try again.');
     });
+}
+
+function generateSongsWithAI() {
+    if (!currentPlaylistData || !currentPlaylistData.id) {
+        alert('No playlist selected.');
+        return;
+    }
+
+    const playlistId = currentPlaylistData.id;
+
+    // console.log(`Generating songs for playlist ID: ${playlistId}`);
+
+    // Create an AbortController to allow canceling the request
+    const controller = new AbortController();
+    const signal = controller.signal;
+
+    // Show loading spinner and disable UI
+    showLoadingSpinner(controller);
+
+    // Send GET request to the generate-songs API
+    fetch(`/generate-songs/${playlistId}/`, { signal })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error generating songs: ' + response.statusText);
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Hide loading spinner and enable UI
+            hideLoadingSpinner();
+
+            // Display generated songs
+            if (Array.isArray(data)) {
+                displaySearchResults(data);
+            } else {
+                console.error('Unexpected API response:', data);
+                alert('Error: Unexpected response from the server.');
+            }
+        })
+        .catch(error => {
+            if (error.name === 'AbortError') {
+                console.log('Request canceled');
+            } else {
+                console.error('Error generating songs:', error);
+                alert('An error occurred while generating songs.');
+            }
+            // Hide loading spinner and enable UI
+            hideLoadingSpinner();
+        });
+}
+
+function showLoadingSpinner(controller) {
+    // Create overlay
+    const overlay = document.createElement('div');
+    overlay.id = 'loading-overlay';
+    overlay.style.position = 'fixed';
+    overlay.style.top = 0;
+    overlay.style.left = 0;
+    overlay.style.width = '100%';
+    overlay.style.height = '100%';
+    overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+    overlay.style.zIndex = 10000;
+    overlay.style.display = 'flex';
+    overlay.style.flexDirection = 'column';
+    overlay.style.alignItems = 'center';
+    overlay.style.justifyContent = 'center';
+
+    // Create spinner
+    const spinner = document.createElement('div');
+    spinner.classList.add('spinner');
+
+    // Create cancel button
+    const cancelButton = document.createElement('button');
+    cancelButton.textContent = 'Cancel';
+    cancelButton.style.marginTop = '20px';
+    cancelButton.style.padding = '10px 20px';
+    cancelButton.style.fontSize = '16px';
+    cancelButton.style.cursor = 'pointer';
+    cancelButton.addEventListener('click', function() {
+        controller.abort(); // Abort the fetch request
+        hideLoadingSpinner();
+    });
+
+    overlay.appendChild(spinner);
+    overlay.appendChild(cancelButton);
+
+    document.body.appendChild(overlay);
+}
+
+function hideLoadingSpinner() {
+    const overlay = document.getElementById('loading-overlay');
+    if (overlay) {
+        document.body.removeChild(overlay);
+    }
 }
