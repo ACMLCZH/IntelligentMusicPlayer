@@ -203,20 +203,35 @@ class PlaylistOrganizer:
         
     async def search_songs_by_name(self, name: str) -> List[Dict]:
         # Stub - will be replaced with actual API call
-        print(name)
+
         local_response = requests.get(local_url.format(search=name, field='name'), headers=local_headers)
 
         print([song for song in self.playlists if song['title'].lower() == name.lower()])
         print(local_response.json())
-        return local_response.json()
-        return [song for song in self.playlists if song['title'].lower() == name.lower()]
+        
+        retrieved_song = local_response.json()
+        return [{
+            'id': song['id'],
+            'title': song['name'],
+            'artist': song['author'],
+            'cover': song['cover_url'],
+            'url': song['mp3_url']
+        } for song in retrieved_song]
+        # return [song for song in self.playlists if song['title'].lower() == name.lower()]
     
     async def search_songs_by_genre(self, genre: str) -> List[Dict]:
         # Stub - will be replaced with actual API call 
 
         local_response = requests.get(local_url.format(search=genre, field='topics'), headers=local_headers)
-        return local_response.json()
-        return [song for song in self.playlists if song.get('genre','').lower() == genre.lower()]
+        retrieved_song = local_response.json()
+        return [{
+            'id': song['id'],
+            'title': song['name'],
+            'artist': song['author'],
+            'cover': song['cover_url'],
+            'url': song['mp3_url']
+        } for song in retrieved_song]
+        # return [song for song in self.playlists if song.get('genre','').lower() == genre.lower()]
 
     def parse_instruction(self, instruction: str) -> Dict:
         """Use GPT to parse the natural language instruction"""
