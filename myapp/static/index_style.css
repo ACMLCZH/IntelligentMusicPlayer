@@ -209,22 +209,42 @@ body {
 
 .playlist-info {
     display: flex;
-    flex-direction: column;  /* 垂直排列子元素 */
+    align-items: center;
     margin-bottom: 20px;
+    background: linear-gradient(to bottom, #3291f027, #3291f000);
+    padding: 20px;
+    border-top-left-radius: 18px;
+    border-top-right-radius: 18px;
+    border-bottom: 1px solid #ccc; 
+    padding-bottom: 30px; 
 }
 
+#playlist-cover {
+    width: 60px;
+    height: 60px;
+    margin-right: 20px;
+    border-radius: 5px;
+    object-fit: cover;
+}
+
+#current-playlist-title {
+    flex-grow: 1;
+    margin: 0;
+}
+
+
 #add-to-playqueue {
-    width: 50px;              /* 按钮的宽度 */
-    height: 50px;             /* 按钮的高度，与宽度相同以形成正方形 */
-    background-color: #3291F0;/* 按钮的背景颜色 */
-    border: none;             /* 去除默认边框 */
-    border-radius: 50%;       /* 使按钮成为圆形 */
-    cursor: pointer;          /* 鼠标变为指针 */
-    position: relative;       /* 为子元素定位做准备 */
-    display: flex;            /* 使用Flex布局 */
-    align-items: center;      /* 垂直居中 */
-    justify-content: center;  /* 水平居中 */
-    transition: background-color 0.3s; /* 添加过渡效果 */
+    margin-left: 10px;
+    width: 50px;
+    height: 50px;
+    background-color: #3291F0;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s;
 }
 
 #add-to-playqueue img {

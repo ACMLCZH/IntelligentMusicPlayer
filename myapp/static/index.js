@@ -263,6 +263,16 @@ function displaySongs(favListData) {
     if (player) {
         player.updatePlaylistItems();
     }
+
+    const playlistCover = document.getElementById('playlist-cover');
+    if (songsDetail.length > 0) {
+        // Select a random song
+        const randomIndex = Math.floor(Math.random() * songsDetail.length);
+        const randomSong = songsDetail[randomIndex];
+        playlistCover.src = randomSong.cover_url;
+    } else {
+        playlistCover.src = '/static/default-cover.jpg';
+    }
 }
 
 // Play a song
