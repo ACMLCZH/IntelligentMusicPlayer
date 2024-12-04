@@ -21,6 +21,7 @@ class Song(models.Model):
 class Favlist(models.Model):
     name = models.CharField(max_length=255)
     songs = models.ManyToManyField(Song, related_name='favlists')
+    owner = models.ForeignKey(User, related_name='favlists', on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name

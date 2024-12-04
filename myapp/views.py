@@ -3,7 +3,7 @@ import requests
 from asgiref.sync import sync_to_async
 from rest_framework import status, generics
 from rest_framework.response import Response
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import ValidationError, PermissionDenied
 from rest_framework.permissions import IsAuthenticated
 
 from django.shortcuts import render, redirect
@@ -290,11 +290,27 @@ class SongSearchView(DocumentViewSet):
 class FavlistListCreateView(generics.ListCreateAPIView):
     queryset = Favlist.objects.all()
     serializer_class = FavlistSerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
 
 
 class FavlistRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Favlist.objects.all()
     serializer_class = FavlistSerializer
+    permission_classes = [IsAuthenticated]
+
+
+    def perform_update(self, serializer):
+        if self.get_object().owner != self.request.user:
+            raise PermissionDenied("You do not have permission to edit this Favlist.")
+        serializer.save()
+
+    def perform_destroy(self, instance):
+        if instance.owner != self.request.user:
+            raise PermissionDenied("You do not have permission to delete this Favlist.")
+        instance.delete()
 
     def retrieve(self, request, *args, **kwargs):
         favlist = self.get_object()
@@ -329,7 +345,7 @@ class UserFavView(generics.GenericAPIView):
 
         if not instance.favlists.exists():
             # Create a new Favlist with default name
-            default_favlist = Favlist.objects.create(name="My favorites")
+            default_favlist = Favlist.objects.create(name="My favorites", owner=request.user)
             # Add the new Favlist to user's favlists
             instance.favlists.add(default_favlist)
 
