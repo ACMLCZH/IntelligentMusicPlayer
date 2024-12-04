@@ -197,8 +197,31 @@ body {
 
 .playlist-info {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column;  /* 垂直排列子元素 */
+    margin-bottom: 20px;
+}
+
+#add-to-playqueue {
+    width: 50px;              /* 按钮的宽度 */
+    height: 50px;             /* 按钮的高度，与宽度相同以形成正方形 */
+    background-color: #3291F0;/* 按钮的背景颜色 */
+    border: none;             /* 去除默认边框 */
+    border-radius: 50%;       /* 使按钮成为圆形 */
+    cursor: pointer;          /* 鼠标变为指针 */
+    position: relative;       /* 为子元素定位做准备 */
+    display: flex;            /* 使用Flex布局 */
+    align-items: center;      /* 垂直居中 */
+    justify-content: center;  /* 水平居中 */
+    transition: background-color 0.3s; /* 添加过渡效果 */
+}
+
+#add-to-playqueue img {
+    width: 35px;              /* 调整箭头图片的大小 */
+    height: 35px;
+}
+
+#add-to-playqueue:hover {
+    background-color: #256bb5; /* 鼠标悬停时的背景颜色 */
 }
 
 /* Song Item Styles */
