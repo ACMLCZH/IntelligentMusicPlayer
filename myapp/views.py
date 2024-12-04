@@ -187,6 +187,12 @@ async def play_music(request):
 token = "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" # a temporary token for testing
 endpoint = "https://models.inference.ai.azure.com"
 model_name = "gpt-4o-mini"
+
+local_url = "http://localhost:8000/song/search/?search={search}&field={field}"
+local_headers = {
+    'content-type': 'application/json',
+}
+
 class PlaylistOrganizer:
     def __init__(self):
         self.client = OpenAI(
@@ -197,10 +203,19 @@ class PlaylistOrganizer:
         
     async def search_songs_by_name(self, name: str) -> List[Dict]:
         # Stub - will be replaced with actual API call
+        print(name)
+        local_response = requests.get(local_url.format(search=name, field='name'), headers=local_headers)
+
+        print([song for song in self.playlists if song['title'].lower() == name.lower()])
+        print(local_response.json())
+        return local_response.json()
         return [song for song in self.playlists if song['title'].lower() == name.lower()]
     
     async def search_songs_by_genre(self, genre: str) -> List[Dict]:
         # Stub - will be replaced with actual API call 
+
+        local_response = requests.get(local_url.format(search=genre, field='topics'), headers=local_headers)
+        return local_response.json()
         return [song for song in self.playlists if song.get('genre','').lower() == genre.lower()]
 
     def parse_instruction(self, instruction: str) -> Dict:
@@ -338,6 +353,14 @@ class SongSearchView(DocumentViewSet):
     ordering = ('_score',)
 
     def filter_queryset(self, queryset):
+        field = self.request.query_params.get('field', None)
+        search = self.request.query_params.get('search', None)
+
+        if field and search:
+            if field in self.search_fields:
+                return queryset.query("match", **{field: search})
+            else:
+                raise ValueError(f"Field '{field}' is not a valid search field.")
         return super().filter_queryset(queryset)
 
 
