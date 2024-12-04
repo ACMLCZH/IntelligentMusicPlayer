@@ -72,16 +72,13 @@
 
         <!-- Right Sidebar: Play Queue -->
         <div class="play-queue">
-            <!-- Current Playing Playlist -->
-            <div class="playlist">
-                <h3>Play Queue</h3>
-                <ul id="playlist-container" data-current-index="-1">
-                    <li class="empty-queue">
-                        <p>No tracks in queue</p>
-                        <p class="empty-queue-subtitle">Select a playlist to get started</p>
-                    </li>
-                </ul>
-            </div>
+            <h3>Play Queue</h3>
+            <ul id="playlist-container" data-current-index="-1">
+                <li class="empty-queue">
+                    <p>No tracks in queue</p>
+                    <p class="empty-queue-subtitle">Select a playlist to get started</p>
+                </li>
+            </ul>
 
             <!-- Natural Language Play Queue Management -->
             <div class="nlp-management">
@@ -110,15 +107,12 @@
                     <h3 id="track-artist">No track playing</h3>
                 </div>
                 <div class="controls">
-                    <button id="prev-btn" disabled>
-                        <i class="fas fa-step-backward"></i>
-                    </button>
+                    <button id="prev-btn" disabled><img src="/static/previous.png" alt="Previous" style="width: 24px; height: 24px;"></button>
                     <audio id="audio-player" controls>
                         <source src="" type="audio/mpeg">
+                        Your browser does not support the audio element.
                     </audio>
-                    <button id="next-btn" disabled>
-                        <i class="fas fa-step-forward"></i>
-                    </button>
+                    <button id="next-btn" disabled><img src="/static/next.png" alt="Next" style="width: 24px; height: 24px;"></button>
                 </div>
             </div>
         </div>

@@ -1,11 +1,16 @@
 let accessibleFavlists = [];
 let currentPlaylistData = null;
+// Declare a global variable to hold the MusicPlayer instance
+let player = null;
 
 document.addEventListener('DOMContentLoaded', function() {
     // Load playlists
     fetchPlaylists();
 
     setupNavbar();
+
+    // Initialize the MusicPlayer instance
+    player = new MusicPlayer();
 
     // Click on a playlist to load its songs
     document.getElementById('playlist-list').addEventListener('click', function(e) {
@@ -29,57 +34,39 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Add to play queue button
     document.getElementById('add-to-playqueue').addEventListener('click', function() {
-        // // Logic to add the current playlist to the play queue
-        // console.log("Add to Play Queue clicked");
-
-        // Update play queue
         const playQueue = document.getElementById('playlist-container');
         playQueue.innerHTML = currentPlaylistData.songs_detail.map((song, index) => `
-            <li data-song-id="${song.id}" ${index === 0 ? 'class="active"' : ''}>
-                <button class="song-select"
-                    data-url="${song.mp3_url}"
-                    data-cover="${song.cover_url}"
-                    data-title="${song.name}"
-                    data-artist="${song.author}">
-                    <i class="fas fa-music"></i> ${song.name} - ${song.author}
-                </button>
+            <li class="queue-item ${index === 0 ? 'active' : ''}" data-song-id="${song.id}" data-url="${song.mp3_url}">
+                <img class="queue-image" src="${song.cover_url}" alt="Song Cover">
+                <div class="queue-details">
+                    <p class="queue-title">${song.name}</p>
+                    <p class="queue-artist">${song.author}</p>
+                </div>
             </li>
         `).join('');
-
-        // Update player UI if this is the first song
-        if (currentPlaylistData.songs_detail.length > 0) {
-            const firstSong = currentPlaylistData.songs_detail[0];
-            document.querySelector('.player-container').innerHTML = `
-                <img src="${firstSong.cover_url}" alt="Album Cover" class="cover-art" id="cover-art">
-                <div class="player-info">
-                    <h2 id="track-title">${firstSong.name}</h2>
-                    <h3 id="track-artist">${firstSong.author}</h3>
-                </div>
-                <audio id="audio-player" controls>
-                    <source src="${firstSong.mp3_url}" type="audio/mpeg">
-                    Your browser does not support the audio element.
-                </audio>
-                <div class="controls">
-                    <button id="prev-btn">
-                        <i class="fas fa-step-backward"></i> Previous
-                    </button>
-                    <button id="next-btn">
-                        Next <i class="fas fa-step-forward"></i>
-                    </button>
-                </div>
-            `;
-
-            // Initialize new player instance
-            const player = new MusicPlayer();
+    
+        // Use the existing player instance
+        if (player) {
+            player.playlistItems = Array.from(playQueue.getElementsByTagName('li'));
+            player.currentIndex = 0;
+    
+            // Update the player UI elements with the first song
+            if (currentPlaylistData.songs_detail.length > 0) {
+                const firstSong = currentPlaylistData.songs_detail[0];
+                player.coverArt.src = firstSong.cover_url;
+                player.titleElement.textContent = firstSong.name;
+                player.artistElement.textContent = firstSong.author;
+                player.audio.src = firstSong.mp3_url;
+    
+                // Play the first song
+                player.audio.play();
+            }
+    
+            player.updateNavigationButtons();
         }
     });
 
     // Natural language play queue management
-    document.getElementById('nlp-button').addEventListener('click', function() {
-        let command = document.getElementById('nlp-input').value;
-        updatePlayQueue(command);
-    });
-
     document.getElementById('nlp-input').addEventListener('input', function () {
         this.style.height = 'auto'; 
         this.style.height = this.scrollHeight + 'px';
@@ -272,53 +259,44 @@ function displaySongs(favListData) {
 
         songsList.appendChild(songItem);
     });
+    // Update player's playlist items
+    if (player) {
+        player.updatePlaylistItems();
+    }
 }
 
 // Play a song
 function playSong(song) {
-    // Create the audio player UI if it doesn't exist
+    // Update the play queue with the selected song
     const playQueue = document.getElementById('playlist-container');
-    
-    // Add the song to play queue
     const songElement = `
-        <li data-song-id="${song.id}" class="active">
-            <button class="song-select"
-                data-url="${song.mp3_url}"
-                data-cover="${song.cover_url}"
-                data-title="${song.name}"
-                data-artist="${song.author}">
-                <i class="fas fa-music"></i> ${song.name} - ${song.author}
-            </button>
+        <li class="queue-item active" data-song-id="${song.id}" data-url="${song.mp3_url}">
+            <img class="queue-image" src="${song.cover_url}" alt="Song Cover">
+            <div class="queue-details">
+                <p class="queue-title">${song.name}</p>
+                <p class="queue-artist">${song.author}</p>
+            </div>
         </li>
     `;
     playQueue.innerHTML = songElement;
-
-    // Update player UI
-    document.querySelector('.player-container').innerHTML = `
-        <img src="${song.cover_url}" alt="Album Cover" class="cover-art" id="cover-art">
-        <div class="player-info">
-            <h2 id="track-title">${song.name}</h2>
-            <h3 id="track-artist">${song.author}</h3>
-        </div>
-        <audio id="audio-player" controls>
-            <source src="${song.mp3_url}" type="audio/mpeg">
-            Your browser does not support the audio element.
-        </audio>
-        <div class="controls">
-            <button id="prev-btn">
-                <i class="fas fa-step-backward"></i> Previous
-            </button>
-            <button id="next-btn">
-                Next <i class="fas fa-step-forward"></i>
-            </button>
-        </div>
-    `;
-
-    // Initialize player and start playing
-    const player = new MusicPlayer();
-    const songButton = playQueue.querySelector('.song-select');
-    if (songButton) {
-        player.loadTrack(songButton, 0);
+    
+    // Use the existing player instance
+    if (player) {
+        // Update the playlist items
+        player.playlistItems = Array.from(playQueue.getElementsByTagName('li'));
+        player.currentIndex = 0;
+        
+        // Update the player UI elements
+        player.coverArt.src = song.cover_url;
+        player.titleElement.textContent = song.name;
+        player.artistElement.textContent = song.author;
+        player.audio.src = song.mp3_url;
+        
+        // Play the song
+        player.audio.play();
+        
+        // Update navigation buttons if necessary
+        player.updateNavigationButtons();
     }
 }
 
