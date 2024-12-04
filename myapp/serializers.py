@@ -28,15 +28,16 @@ class SongDocumentSerializer(DocumentSerializer):
 
 class FavlistSerializer(serializers.ModelSerializer):
     songs = serializers.PrimaryKeyRelatedField(queryset=Song.objects.all(), many=True)
+    owner = serializers.ReadOnlyField(source='owner.username')
 
     class Meta:
         model = Favlist
-        fields = ['id', 'name', 'songs']
+        fields = ['id', 'name', 'songs', 'owner']
 
 class FavlistBasicSerializer(serializers.ModelSerializer):
     class Meta:
         model = Favlist
-        fields = ['id', 'name']
+        fields = ['id', 'name', 'owner']
 
 
 class UserFavSerializer(serializers.ModelSerializer):
