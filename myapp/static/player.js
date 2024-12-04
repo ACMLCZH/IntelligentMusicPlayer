@@ -16,19 +16,54 @@ class MusicPlayer {
 
         this.playlistItems = Array.from(this.playlist.getElementsByTagName('li'));
         this.currentIndex = 0;
-        
-        this.setupEventListeners();
+        // Add a flag to track submission state
+        this.isSubmitting = false;
+
+        // Bind event listeners only once
+        // if (!this.eventListenersSet) {
+            this.setupEventListeners();
+            // this.eventListenersSet = true;
+        // }
         this.updateNavigationButtons();
+    }
+
+    updatePlaylistItems() {
+        this.playlistItems = Array.from(this.playlist.getElementsByTagName('li'));
+        this.currentIndex = 0; // Reset to first track
+        this.updateNavigationButtons();
+    }
+
+    async loadTrackFromListItem(listItem, newIndex) {
+        const url = listItem.dataset.url;
+        const cover = listItem.querySelector('.queue-image').src;
+        const title = listItem.querySelector('.queue-title').textContent;
+        const artist = listItem.querySelector('.queue-artist').textContent;
+    
+        // Update UI
+        document.querySelector('.queue-item.active')?.classList.remove('active');
+        listItem.classList.add('active');
+        this.currentIndex = newIndex;
+    
+        try {
+            this.audio.src = url;
+            this.coverArt.src = cover;
+            this.titleElement.textContent = title;
+            this.artistElement.textContent = artist;
+    
+            this.audio.play();
+            this.updateNavigationButtons();
+        } catch (error) {
+            console.error('Error loading track:', error);
+        }
     }
 
     setupEventListeners() {
         // Playlist clicks
         this.playlist.addEventListener('click', (e) => {
-            const button = e.target.closest('.song-select');
-            if (button) {
-                const listItem = button.closest('li');
+            const listItem = e.target.closest('.queue-item');
+            if (listItem) {
                 const newIndex = this.playlistItems.indexOf(listItem);
-                this.loadTrack(button, newIndex);
+                this.loadTrackFromListItem(listItem, newIndex);
             }
         });
 
@@ -47,8 +82,25 @@ class MusicPlayer {
         });
 
         // Playlist reorganization
-        document.getElementById('playlist-form')?.addEventListener('submit', 
-            (e) => this.reorganizePlaylist(e));
+        // Single form submit handler
+        const form = document.getElementById('playlist-form');
+        if (form) {
+            const oldForm = form.cloneNode(true);
+            form.parentNode.replaceChild(oldForm, form);
+
+            oldForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                if (this.isSubmitting) return false;
+                
+                this.isSubmitting = true;
+                await this.reorganizePlaylist(e);
+                
+                setTimeout(() => {
+                    this.isSubmitting = false;
+                }, 1000);
+            });
+        }
     }
 
     async loadTrack(button, newIndex) {
@@ -79,23 +131,21 @@ class MusicPlayer {
     }
 
     updateNavigationButtons() {
-        this.prevBtn.disabled = this.currentIndex === 0;
-        this.nextBtn.disabled = this.currentIndex === this.playlistItems.length - 1;
+        this.prevBtn.disabled = this.currentIndex <= 0;
+        this.nextBtn.disabled = this.currentIndex >= this.playlistItems.length - 1;
     }
 
     playNext() {
         if (this.currentIndex < this.playlistItems.length - 1) {
             const nextTrack = this.playlistItems[this.currentIndex + 1];
-            const button = nextTrack.querySelector('.song-select');
-            this.loadTrack(button, this.currentIndex + 1);
+            this.loadTrackFromListItem(nextTrack, this.currentIndex + 1);
         }
     }
-
+    
     playPrevious() {
         if (this.currentIndex > 0) {
             const prevTrack = this.playlistItems[this.currentIndex - 1];
-            const button = prevTrack.querySelector('.song-select');
-            this.loadTrack(button, this.currentIndex - 1);
+            this.loadTrackFromListItem(prevTrack, this.currentIndex - 1);
         }
     }
 
@@ -114,10 +164,16 @@ class MusicPlayer {
             });
 
             const data = await response.json();
-            if (data.status === 'success') {
+            // Check HTTP status first
+            if (!response.ok) {
+                throw new Error(data.message || 'Server error occurred');
+            }
+
+            // Only update UI if we have valid playlist data
+            if (data.playlist && Array.isArray(data.playlist)) {
                 this.updatePlaylistUI(data.playlist);
             } else {
-                alert(data.message);
+                throw new Error('Invalid playlist data received');
             }
         } catch (error) {
             console.error('Error reorganizing playlist:', error);
@@ -127,14 +183,12 @@ class MusicPlayer {
 
     updatePlaylistUI(newPlaylist) {
         this.playlist.innerHTML = newPlaylist.map((song, index) => `
-            <li data-song-id="${song.id}" ${index === this.currentIndex ? 'class="active"' : ''}>
-                <button class="song-select" 
-                    data-url="${song.url}"
-                    data-cover="${song.cover}"
-                    data-title="${song.title}"
-                    data-artist="${song.artist}">
-                    <i class="fas fa-music"></i> ${song.title} - ${song.artist}
-                </button>
+            <li class="queue-item ${index === this.currentIndex ? 'active' : ''}" data-song-id="${song.id}" data-url="${song.url}">
+                <img class="queue-image" src="${song.cover}" alt="Song Cover">
+                <div class="queue-details">
+                    <p class="queue-title">${song.title}</p>
+                    <p class="queue-artist">${song.artist}</p>
+                </div>
             </li>
         `).join('');
         this.playlistItems = Array.from(this.playlist.getElementsByTagName('li'));

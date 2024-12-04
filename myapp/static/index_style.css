@@ -44,17 +44,27 @@ body {
 }
 
 .nav-search button {
-    padding: 10px 15px;
+    width: 35px;              /* 按钮的宽度 */
+    height: 35px;             /* 按钮的高度，与宽度相同以形成正方形 */
+    background-color: #FFF;/* 按钮的背景颜色 */
+    border: none;             /* 去除默认边框 */
+    border-radius: 50%;       /* 使按钮成为圆形 */
+    cursor: pointer;          /* 鼠标变为指针 */
+    position: relative;       /* 为子元素定位做准备 */
+    display: flex;            /* 使用Flex布局 */
+    align-items: center;      /* 垂直居中 */
+    justify-content: center;  /* 水平居中 */
+    transition: background-color 0.3s; /* 添加过渡效果 */
     margin-left: 5px;
-    background-color: #555;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
+}
+
+#search-button img {
+    width: 30px;           
+    height: 30px;
 }
 
 .nav-search button:hover {
-    background-color: #666;
+    background-color: #ccc;
 }
 
 .nav-user {
@@ -66,8 +76,8 @@ body {
 }
 
 #user-avatar {
-    width: 40px;
-    height: 40px;
+    width: 47px;
+    height: 47px;
     border-radius: 50%;
     cursor: pointer;
 }
@@ -99,6 +109,8 @@ body {
 .nav-user.active .dropdown-menu {
     display: block;
 }
+
+
 
 /* Content Area Styles */
 .content-area {
@@ -197,8 +209,51 @@ body {
 
 .playlist-info {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    margin-bottom: 20px;
+    background: linear-gradient(to bottom, #3291f027, #3291f000);
+    padding: 20px;
+    border-top-left-radius: 18px;
+    border-top-right-radius: 18px;
+    border-bottom: 1px solid #ccc; 
+    padding-bottom: 30px; 
+}
+
+#playlist-cover {
+    width: 60px;
+    height: 60px;
+    margin-right: 20px;
+    border-radius: 5px;
+    object-fit: cover;
+}
+
+#current-playlist-title {
+    flex-grow: 1;
+    margin: 0;
+}
+
+
+#add-to-playqueue {
+    margin-left: 10px;
+    width: 50px;
+    height: 50px;
+    background-color: #3291F0;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s;
+}
+
+#add-to-playqueue img {
+    width: 35px;              /* 调整箭头图片的大小 */
+    height: 35px;
+}
+
+#add-to-playqueue:hover {
+    background-color: #256bb5; /* 鼠标悬停时的背景颜色 */
 }
 
 /* Song Item Styles */
@@ -277,6 +332,90 @@ body {
 }
 
 /* Right Sidebar Styles */
+/* Play Queue Styles */
+.queue-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-radius: 6px;
+    transition: background-color 0.2s;
+    cursor: pointer;
+    margin-bottom: 5px;
+}
+
+.queue-item:hover {
+    background-color: #3291f045;
+}
+
+.queue-item.active {
+    background-color: #3291f080;
+}
+
+.queue-image {
+    width: 40px;
+    height: 40px;
+    border-radius: 4px;
+    margin-right: 10px;
+    object-fit: cover;
+}
+
+.queue-details {
+    flex-grow: 1;
+    min-width: 0;
+}
+
+.queue-title {
+    font-weight: bold;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.queue-artist {
+    color: #666;
+    margin: 0;
+    font-size: 0.9em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.play-icon {
+    width: 20px;
+    height: 20px;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+.play-icon:hover {
+    opacity: 1;
+}
+
+.queue-item .song-select {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    margin-left: 10px;
+}
+
+/* Empty queue state */
+.empty-queue {
+    text-align: center;
+    padding: 20px;
+    color: #666;
+}
+
+.empty-queue p {
+    margin: 5px 0;
+}
+
+#playlist-container {
+    padding-left: 0;
+    margin-left: 0;
+}
+
 .play-queue {
     width: 20%;
     background-color: #3291f012;
@@ -313,30 +452,46 @@ body {
 
 #nlp-input {
     width: 100%;
-    min-height: 30px;
-    resize: none;
-    overflow: hidden;
-    line-height: 1.5;
-    margin-bottom: 10px;
-    white-space: pre-wrap;
-    word-wrap: break-word;
+    min-height: 60px;
+    resize: vertical; /* 允许垂直调整大小 */
+    padding: 10px;
+    margin-bottom: 15px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box; /* 包含内边距和边框 */
+}
+
+#playlist-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* 水平居中 */
 }
 
 #nlp-button {
-    width: 100%;
-    padding: 8px;
+    background-color: #3291F0; /* 按钮背景颜色 */
+    color: #fff; /* 按钮文字颜色 */
+    border: none; /* 去除默认边框 */
+    border-radius: 5px; /* 按钮圆角 */
+    padding: 10px 20px; /* 内边距 */
+    cursor: pointer; /* 鼠标悬停时的指针样式 */
+    font-size: 16px; /* 字体大小 */
+    font-weight: bold; /* 字体加粗 */
+    transition: background-color 0.3s, transform 0.1s; /* 过渡效果 */
+}
+
+#nlp-button:hover {
+    background-color: #256bb5; /* 悬停时的背景颜色 */
+    transform: scale(1.02); /* 悬停时的轻微放大效果 */
 }
 
 /* Player Area Styles */
 .player-area {
     position: fixed;
     bottom: 0;
-    left: 0;
-    right: 0;
-    background: linear-gradient(to right, #1a1a1a, #2a2a2a);
-    padding: 10px 20px;
+    width: 100%;
+    background: #ACCAF4;
     z-index: 1000;
-    border-top: 1px solid #333;
 }
 
 .song-actions img.add-to-favlist-button {
@@ -370,45 +525,39 @@ body {
 }
 
 .player-container {
+    max-width: 800px; 
+    margin: 0 auto;
+    padding: 10px;
     display: flex;
     align-items: center;
-    max-width: 1400px;
-    margin: 0 auto;
-    gap: 20px;
 }
 
 .player-left {
-    flex-shrink: 0;
+    margin-right: 20px;
 }
 
 .cover-art {
-    width: 60px;
-    height: 60px;
-    border-radius: 8px;
-    object-fit: cover;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    width: 50px;
+    height: 50px;
+    border-radius: 5px;
 }
 
 .player-center {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+    flex: 1;
 }
 
 .player-info {
-    display: flex;
-    flex-direction: column;
+    text-align: center;
 }
 
 .player-info h2 {
-    color: #fff;
+    color: #111;
     font-size: 14px;
     margin: 0;
 }
 
 .player-info h3 {
-    color: #aaa;
+    color: #1a010172;
     font-size: 12px;
     margin: 0;
 }
@@ -416,27 +565,30 @@ body {
 .controls {
     display: flex;
     align-items: center;
-    gap: 15px;
+    justify-content: center;
 }
 
 .controls button {
-    background: transparent;
+    background: none;
     border: none;
-    color: #fff;
     cursor: pointer;
-    padding: 8px;
-    border-radius: 50%;
-    transition: background-color 0.2s;
+    padding: 5px;
+    margin: 0 10px;
+    opacity: 0.8;
+    transition: opacity 0.2s;
 }
 
 .controls button:hover {
-    background-color: rgba(255,255,255,0.1);
+    opacity: 1;
 }
 
 #audio-player {
-    flex-grow: 1;
-    height: 32px;
-    border-radius: 16px;
+    width: 700px;
+}
+audio::-webkit-media-controls-play-button,
+audio::-webkit-media-controls-panel {
+    /* background-color: #3291f065; */
+    background-color: #ACCAF4;
 }
 
 /* Add margin to main content to prevent player overlap */
@@ -464,7 +616,7 @@ body {
 
 /* Disabled controls */
 .controls button:disabled {
-    opacity: 0.5;
+    opacity: 0.3;
     cursor: not-allowed;
 }
 

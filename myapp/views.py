@@ -7,9 +7,8 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
 
 from django.shortcuts import render, redirect
-from django.shortcuts import render
 from django.contrib import messages
-from django.contrib.auth import authenticate,login as auth_login
+from django.contrib.auth import authenticate, logout, login as auth_login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
@@ -264,6 +263,14 @@ class SongSearchView(DocumentViewSet):
     ordering = ('_score',)
 
     def filter_queryset(self, queryset):
+        field = self.request.query_params.get('field', None)
+        search = self.request.query_params.get('search', None)
+
+        if field and search:
+            if field in self.search_fields:
+                return queryset.query("match", **{field: search})
+            else:
+                raise ValueError(f"Field '{field}' is not a valid search field.")
         return super().filter_queryset(queryset)
 
 
@@ -353,3 +360,11 @@ class UserFavView(generics.GenericAPIView):
         instance = self.get_object()
         instance.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+@csrf_exempt
+def custom_logout(request):
+    if request.method == 'POST':
+        logout(request)
+        return JsonResponse({'message': 'Logged out successfully.'})
+    else:
+        return JsonResponse({'error': 'Invalid request method.'}, status=400)

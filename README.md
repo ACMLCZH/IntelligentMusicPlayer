@@ -36,6 +36,16 @@ python manage.py migrate --run-syncdb
 pip install -r requirements.txt
 ```
 
+
+```bash
+# delete elasticsearch database
+curl -X GET "http://localhost:9200/_cat/indices?v"
+
+# replace index with index name in elasticsearch
+curl -X DELETE "http://localhost:9200/index"
+
+```
+
 # STEP1: run backend server
 
 ```bash

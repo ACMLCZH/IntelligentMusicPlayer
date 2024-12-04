@@ -26,10 +26,12 @@
         </div>
         <div class="nav-search">
             <input type="text" id="search-input" placeholder="Search...">
-            <button id="search-button">S</button>
+            <button id="search-button">
+                <img src="/static/search.png" alt="Search" id="search-img">
+            </button>
         </div>
         <div class="nav-user" id="nav-user">
-            <img src="https://via.placeholder.com/50" alt="User Avatar" id="user-avatar">
+            <img src="/static/user.png" alt="User Avatar" id="user-avatar">
             <div class="dropdown-menu" id="user-dropdown">
                 <a href="#" id="edit-profile">Edit Profile</a>
                 <a href="#" id="logout">Logout</a>
@@ -60,8 +62,11 @@
         <div class="main-content">
             <!-- Current Playlist Information -->
             <div class="playlist-info">
+                <img id="playlist-cover" src="/static/default-cover.jpg" alt="Playlist Cover">
                 <h2 id="current-playlist-title">Playlist Title</h2>
-                <button id="add-to-playqueue">Add to Play Queue</button>
+                <button id="add-to-playqueue">
+                    <img src="/static/play.png" alt="Add to Play Queue" id="add-to-playqueue-img">
+                </button>
             </div>
 
             <!-- Song List -->
@@ -72,16 +77,13 @@
 
         <!-- Right Sidebar: Play Queue -->
         <div class="play-queue">
-            <!-- Current Playing Playlist -->
-            <div class="playlist">
-                <h3>Play Queue</h3>
-                <ul id="playlist-container" data-current-index="-1">
-                    <li class="empty-queue">
-                        <p>No tracks in queue</p>
-                        <p class="empty-queue-subtitle">Select a playlist to get started</p>
-                    </li>
-                </ul>
-            </div>
+            <h3>Play Queue</h3>
+            <ul id="playlist-container" data-current-index="-1">
+                <div class="empty-queue">
+                    <p class="empty-queue-message">No tracks in queue</p>
+                    <p class="empty-queue-subtitle">Select a playlist to get started</p>
+                </div>
+            </ul>
 
             <!-- Natural Language Play Queue Management -->
             <div class="nlp-management">
@@ -110,15 +112,12 @@
                     <h3 id="track-artist">No track playing</h3>
                 </div>
                 <div class="controls">
-                    <button id="prev-btn" disabled>
-                        <i class="fas fa-step-backward"></i>
-                    </button>
+                    <button id="prev-btn" disabled><img src="/static/previous.png" alt="Previous" style="width: 24px; height: 24px;"></button>
                     <audio id="audio-player" controls>
                         <source src="" type="audio/mpeg">
+                        Your browser does not support the audio element.
                     </audio>
-                    <button id="next-btn" disabled>
-                        <i class="fas fa-step-forward"></i>
-                    </button>
+                    <button id="next-btn" disabled><img src="/static/next.png" alt="Next" style="width: 24px; height: 24px;"></button>
                 </div>
             </div>
         </div>
