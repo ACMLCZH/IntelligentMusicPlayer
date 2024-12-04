@@ -432,18 +432,37 @@ body {
 
 #nlp-input {
     width: 100%;
-    min-height: 30px;
-    resize: none;
-    overflow: hidden;
-    line-height: 1.5;
-    margin-bottom: 10px;
-    white-space: pre-wrap;
-    word-wrap: break-word;
+    min-height: 60px;
+    resize: vertical; /* 允许垂直调整大小 */
+    padding: 10px;
+    margin-bottom: 15px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box; /* 包含内边距和边框 */
+}
+
+#playlist-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* 水平居中 */
 }
 
 #nlp-button {
-    width: 100%;
-    padding: 8px;
+    background-color: #3291F0; /* 按钮背景颜色 */
+    color: #fff; /* 按钮文字颜色 */
+    border: none; /* 去除默认边框 */
+    border-radius: 5px; /* 按钮圆角 */
+    padding: 10px 20px; /* 内边距 */
+    cursor: pointer; /* 鼠标悬停时的指针样式 */
+    font-size: 16px; /* 字体大小 */
+    font-weight: bold; /* 字体加粗 */
+    transition: background-color 0.3s, transform 0.1s; /* 过渡效果 */
+}
+
+#nlp-button:hover {
+    background-color: #256bb5; /* 悬停时的背景颜色 */
+    transform: scale(1.02); /* 悬停时的轻微放大效果 */
 }
 
 /* Player Area Styles */
@@ -512,7 +531,7 @@ body {
 }
 
 .player-info h2 {
-    color: #fff;
+    color: #111;
     font-size: 14px;
     margin: 0;
 }
