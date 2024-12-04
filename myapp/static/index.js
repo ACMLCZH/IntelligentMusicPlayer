@@ -140,7 +140,7 @@ function setupNavbar() {
     document.getElementById('logout').addEventListener('click', function(e) {
         e.preventDefault();
         // Logic to log out the user
-        console.log('User logged out');
+        logoutUser();
     });
 
     document.getElementById('edit-profile').addEventListener('click', function(e) {
@@ -551,4 +551,26 @@ function getCSRFToken() {
         }
     }
     return cookieValue;
+}
+
+function logoutUser() {
+    fetch('/logout/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCSRFToken() // Use your existing getCSRFToken function
+        }
+    })
+    .then(response => {
+        if (response.ok) {
+            // Logout was successful
+            window.location.href = '/login/'; // Redirect to the login page
+        } else {
+            throw new Error('Logout failed.');
+        }
+    })
+    .catch(error => {
+        console.error('Error during logout:', error);
+        alert('An error occurred during logout. Please try again.');
+    });
 }

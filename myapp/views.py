@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate,login as auth_login
+from django.contrib.auth import logout
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -465,3 +466,11 @@ class UserFavView(generics.GenericAPIView):
         instance = self.get_object()
         instance.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+@csrf_exempt
+def custom_logout(request):
+    if request.method == 'POST':
+        logout(request)
+        return JsonResponse({'message': 'Logged out successfully.'})
+    else:
+        return JsonResponse({'error': 'Invalid request method.'}, status=400)
