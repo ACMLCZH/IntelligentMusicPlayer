@@ -17,5 +17,6 @@ urlpatterns = [
     # path('userfav/', views.UserFavRetrieveUpdateDestroyView.as_view(), name='userfav-detail'),
     path('index/', views.index, name='index'),
     path('reorganize-playlist/', views.reorganize_playlist, name='reorganize-playlist'),
+    path('generate-songs/<int:pk>/', views.GenerateSongsView.as_view(), name='generate-songs'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
    ]

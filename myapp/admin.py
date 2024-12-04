@@ -8,7 +8,6 @@ from .models import Song
 from .documents import SongDocument
 from django_elasticsearch_dsl.registries import registry
 from elastic_search.methods import *
-from music_ai.gpt4 import make_song_prompt
 
 class SongAdmin(admin.ModelAdmin):
     list_display = (

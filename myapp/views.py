@@ -27,8 +27,7 @@ from django_elasticsearch_dsl_drf.pagination import LimitOffsetPagination
 from .models import Song, Favlist, UserFav
 from .serializers import SongSerializer, SongDocumentSerializer, FavlistSerializer, UserFavSerializer, FavlistBasicSerializer
 from .documents import SongDocument
-from music_ai.openai_utils import make_song_prompt, PlaylistOrganizer
-from music_ai.sunoai_utils import generate_song
+from music_ai.tools import generate_songs, PlaylistOrganizer
 
 @csrf_exempt
 def login(request):
@@ -297,8 +296,8 @@ class FavlistRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
 
 
 class UserFavView(generics.GenericAPIView):
-    serializer_class = UserFavSerializer
     queryset = UserFav.objects.all()
+    serializer_class = UserFavSerializer
 
     def get_object(self):
         user = self.request.user
@@ -361,6 +360,20 @@ class UserFavView(generics.GenericAPIView):
         instance.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
     
+    
+class GenerateSongsView(generics.GenericAPIView):
+    queryset = Favlist.objects.all()
+    serializer_class = UserFavSerializer
+
+    async def get(self, request, *args, **kwargs):
+        favlist = self.get_object()
+        songs = favlist.songs.all()
+        songs_serial = SongSerializer(songs, many=True)
+
+        result = await generate_songs(songs_serial.data)
+        return Response(result)
+
+
 @csrf_exempt
 def custom_logout(request):
     if request.method == 'POST':

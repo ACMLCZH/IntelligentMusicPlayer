@@ -379,6 +379,41 @@ Authorization: Bearer <JWT_TOKEN>
 }
 ```
 
+### 8. **AI Generate Songs API**
+#### Endpoint: `GET /generate-songs/<int:pk>/`
+##### Example Request:
+```http
+GET http://localhost:8000/generate-songs/1/
+```
+
+##### Example Response:
+```json
+[
+    {
+        "id": 1,
+        "name": "The Rhyme Chronicles",
+        "author": "SunoAI",
+        "album": "SunoAI Generation",
+        "duration": 189,
+        "lyrics": "[Verse 1]\nGot the city lights flickerin..",
+        "topics": "",
+        "mp3_url": "https://cdn1.suno.ai/ee0717ad-aded-4008-a30c-4f43bbcb3fc3.mp3",
+        "cover_url": "https://cdn2.suno.ai/image_ee0717ad-aded-4008-a30c-4f43bbcb3fc3.jpeg"
+    },
+    {
+        "id": 2,
+        "name": "The Rhyme Chronicles",
+        "author": "SunoAI",
+        "album": "SunoAI Generation",
+        "duration": 97,
+        "lyrics": "[Verse 1]\nGot the city lights flickerin..",
+        "topics": "",
+        "mp3_url": "https://cdn1.suno.ai/7d47a123-b4e0-436d-8b01-6e9acbc5f1bf.mp3",
+        "cover_url": "https://cdn2.suno.ai/image_7d47a123-b4e0-436d-8b01-6e9acbc5f1bf.jpeg"
+    }
+]
+```
+
 
 #### test
 
