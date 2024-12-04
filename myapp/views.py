@@ -62,9 +62,9 @@ def backend_login_process(request):
                 if user is not None:
                     auth_login(request, user)
                     response = {
-                    'response': 'Log In Successful!',
-                    'redirect': True,
-                    'redirect_url': reverse("index")
+                        'response': 'Log In Successful!',
+                        'redirect': True,
+                        'redirect_url': reverse("index")
                     }
                     return JsonResponse(response,status=200)
                 else:
@@ -403,14 +403,17 @@ class GenerateSongsView(generics.GenericAPIView):
 
     def get(self, request, *args, **kwargs):
         favlist = self.get_object()
-        songs = favlist.songs.all()
-        songs_serial = SongSerializer(songs, many=True)
+        favlist_songs = favlist.songs.all()
+        favlist_songs_serial = SongSerializer(favlist_songs, many=True)
 
-        result = generate_songs(songs_serial.data)
-        return Response(result)
+        generate_results = generate_songs(favlist_songs_serial.data)
+        generate_list = list()
+        for generate_result in generate_results:
+            generate_song = Song.objects.create(**generate_result)
+            generate_list.append(SongSerializer(generate_song).data)
 
-    def get_queryset(self):
-        return self.queryset
+        return Response(generate_list)
+
 
 @csrf_exempt
 def custom_logout(request):

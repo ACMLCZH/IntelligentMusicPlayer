@@ -233,7 +233,15 @@ body {
 }
 
 
-#add-to-playqueue {
+
+
+.playlist-buttons {
+    display: flex;
+    align-items: center;
+}
+
+#add-to-playqueue,
+#ai-generate-button {
     margin-left: 10px;
     width: 50px;
     height: 50px;
@@ -245,16 +253,21 @@ body {
     align-items: center;
     justify-content: center;
     transition: background-color 0.3s;
+    color: #FFF;
+    font-size: 18px;
 }
 
-#add-to-playqueue img {
-    width: 35px;              /* 调整箭头图片的大小 */
+#add-to-playqueue img,
+#ai-generate-button img {
+    width: 35px;
     height: 35px;
 }
 
-#add-to-playqueue:hover {
-    background-color: #256bb5; /* 鼠标悬停时的背景颜色 */
+#add-to-playqueue:hover,
+#ai-generate-button:hover {
+    background-color: #256bb5;
 }
+
 
 /* Song Item Styles */
 .song-item {
@@ -628,4 +641,32 @@ audio::-webkit-media-controls-panel {
 .player-info h3.empty {
     color: #666;
     font-style: italic;
+}
+
+/* Spinner styles */
+.spinner {
+    border: 12px solid #f3f3f3; /* Light grey */
+    border-top: 12px solid #3498db; /* Blue */
+    border-radius: 50%;
+    width: 80px;
+    height: 80px;
+    animation: spin 1.5s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Optional: Style the cancel button inside the overlay */
+#loading-overlay button {
+    background-color: #3291F0;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+#loading-overlay button:hover {
+    background-color: #256bb5;
 }
