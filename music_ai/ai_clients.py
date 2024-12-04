@@ -65,7 +65,7 @@ class SunoAIClient:
             'content-type': 'application/json',
         }
     
-    async def request(self, data) -> Dict:
+    def request(self, data) -> Dict:
         response = requests.post(self.url, headers=self.headers, json=data)
         if response.status_code != 200:
             raise Exception(f'Error: {response.status_code}, {response.text}')
@@ -88,7 +88,7 @@ class OpenAIClient:
             api_key = os.environ['OPENAI_API_KEY']
         self.client = openai.OpenAI(api_key=api_key)
     
-    async def request(self, functionality, system_prompt, user_prompt) -> str:
+    def request(self, functionality, system_prompt, user_prompt) -> str:
         # TODO: use request?
         if functionality == 'generate':
             response = self.client.chat.completions.create(

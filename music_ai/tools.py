@@ -15,7 +15,7 @@ generate_system_prompt = \
     "You are an expert music analyst. Your task is to evaluate a list of songs provided by the user "\
     "and summarize the music styles and properties that the user probably enjoys."
 
-async def generate_songs(songs_jsons: List[Dict]) -> List[Dict]:
+def generate_songs(songs_jsons: List[Dict]) -> List[Dict]:
     songs_info = "\n".join([
         f"Title: {song_json['name']}, Artist: {song_json['author']}, Album: {song_json['album']}"
         for song_json in songs_jsons
@@ -34,10 +34,10 @@ async def generate_songs(songs_jsons: List[Dict]) -> List[Dict]:
         "Your answer should be recapitulatory and begin with \"The user likely enjoys...\"."
     print(generate_user_prompt)
 
-    generate_answer = await openai_client.request('generate', generate_system_prompt, generate_user_prompt)
+    generate_answer = openai_client.request('generate', generate_system_prompt, generate_user_prompt)
     while generate_answer.startswith("The user likely enjoys") or len(generate_answer) > 200:
         print(f"Warning: the answer '{generate_answer}' does not meet the requirement, re-generate now.")
-        generate_answer = await openai_client.request('generate', generate_system_prompt, generate_user_prompt)
+        generate_answer = openai_client.request('generate', generate_system_prompt, generate_user_prompt)
     print(generate_answer)
 
     suno_prompt = "Make a song of " + generate_answer[23:]
@@ -48,7 +48,7 @@ async def generate_songs(songs_jsons: List[Dict]) -> List[Dict]:
         'custom': False,
         'instrumental': False,
     }
-    suno_response = await suno_client.request(suno_data)
+    suno_response = suno_client.request(suno_data)
 
     music_jsons = suno_response['data']
     music_list = list()
@@ -120,7 +120,7 @@ class PlaylistOrganizer:
     async def parse_instruction(self, instruction: str) -> Dict:
         """Use GPT to parse the natural language instruction"""
         # Convert string response to Dict
-        content = await openai_client.request('organize', self.system_prompt, instruction)
+        content = openai_client.request('organize', self.system_prompt, instruction)
         return json.loads(content)
 
     async def reorganize_playlist(self, instruction: str) -> List[Dict]:

@@ -11,6 +11,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, logout, login as auth_login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse, HttpResponseRedirect
 from django.http import Http404
@@ -379,15 +380,15 @@ class GenerateSongsView(generics.GenericAPIView):
     queryset = Favlist.objects.all()
     serializer_class = UserFavSerializer
 
-    async def get(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         favlist = self.get_object()
         songs = favlist.songs.all()
         songs_serial = SongSerializer(songs, many=True)
 
-        result = await generate_songs(songs_serial.data)
+        result = generate_songs(songs_serial.data)
         return Response(result)
 
-    async def get_queryset(self):
+    def get_queryset(self):
         return self.queryset
 
 @csrf_exempt
