@@ -434,7 +434,7 @@ body {
     position: fixed;
     bottom: 0;
     width: 100%;
-    background: #3291f06b;
+    background: #ACCAF4;
     z-index: 1000;
 }
 
@@ -531,7 +531,8 @@ body {
 }
 audio::-webkit-media-controls-play-button,
 audio::-webkit-media-controls-panel {
-    background-color: #3291f065;
+    /* background-color: #3291f065; */
+    background-color: #ACCAF4;
 }
 
 /* Add margin to main content to prevent player overlap */
