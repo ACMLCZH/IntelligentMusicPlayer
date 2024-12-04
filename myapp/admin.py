@@ -3,13 +3,15 @@ from django.contrib import admin
  
 # from .models import Songs
 # admin.site.register(Songs)
-
+from django.contrib import messages
 from .models import Song
 from .documents import SongDocument
 from django_elasticsearch_dsl.registries import registry
 from elastic_search.methods import *
 import requests
 import aiohttp
+from rest_framework.authtoken.models import Token
+from django.conf import settings
 
 class SongAdmin(admin.ModelAdmin):
     list_display = (
@@ -43,9 +45,19 @@ class SongAdmin(admin.ModelAdmin):
             song_ids = [int(item['id']) for item in data['results']]
             queryset = queryset.filter(id__in=song_ids)
         return super().get_search_results(request, queryset, search_term)
-    
-    async def save_model(self, request, song, form, change): 
-        add_music(song)
+
+    def save_model(self, request, song, form, change):
+        sessionid = request.COOKIES.get('sessionid')
+        csrftoken = request.COOKIES.get('csrftoken')
+
+        if not sessionid or not csrftoken:
+            messages.error(request, 'Session or CSRF token missing. Cannot delete via API.')
+            return
+
+        cookies = {'sessionid': sessionid, 'csrftoken': csrftoken}
+        headers = {'X-CSRFToken': csrftoken}
+        print(change)
+        print(song.id)
         data = dict(
             id=song.id,
             name=song.name,
@@ -57,30 +69,43 @@ class SongAdmin(admin.ModelAdmin):
             mp3_url=song.mp3_url,
             cover_url=song.cover_url,
         )
-        print("Sending data: ", data)
-        local_url = "http://localhost:8000/song/"
-        headers = {
-            'content-type': 'application/json',
-        }
-        async with aiohttp.ClientSession() as session:
-            async with session.post(local_url, headers=headers, json=data) as response:
-                return await response.text()
-        super().save_model(request, obj, form, change) 
+        if not change:
+            response = requests.post(
+                url='http://localhost:8000/song/',
+                json=data,
+                cookies=cookies,
+                headers=headers
+            )
+        else:
+            response = requests.put(
+                url=f'http://localhost:8000/song/{song.id}/',
+                json=data,
+                cookies=cookies,
+                headers=headers
+            )
 
-    # session_id = request.COOKIES.get('sessionid') 
+    # session_id = request.COOKIES.get('sessionid')
     # headers = {"Cookie": f"csrftoken={request.COOKIES.get('csrftoken')}; sessionid={session_id}" }
-    def delete_queryset(self, request, queryset): 
-        print("!!!",request)
-        user = request.user 
-        print(dir(request.user))
-        if user.is_authenticated: 
-            for obj in queryset: 
-                print("music_obj:",obj.id)
-                url = f"http://localhost:8000/song/{obj.id}/" 
-                # cookies = { 'csrftoken': str(request.COOKIES.get('csrftoken')), 'sessionid': str(request.COOKIES.get('sessionid')) }
-                response = requests.delete(url, )
-                print("response:",response)
-                return response
-        super().delete_model(request, obj)
+    def delete_queryset(self, request, queryset):
+        # Extract session ID and CSRF token from the request cookies
+        sessionid = request.COOKIES.get('sessionid')
+        csrftoken = request.COOKIES.get('csrftoken')
+
+        if not sessionid or not csrftoken:
+            messages.error(request, 'Session or CSRF token missing. Cannot delete via API.')
+            return
+
+        cookies = {'sessionid': sessionid, 'csrftoken': csrftoken}
+        headers = {'X-CSRFToken': csrftoken}
+
+        for obj in queryset:
+            del_id = obj.id
+            url = f'http://localhost:8000/song/{del_id}/'
+            response = requests.delete(url, cookies=cookies, headers=headers)
+
+            if response.status_code == 204:
+                messages.success(request, f'Successfully deleted Song with id {del_id} via API.')
+            else:
+                messages.error(request, f'Failed to delete Song with id {del_id} via API.')
 admin.site.register(Song, SongAdmin)
 
