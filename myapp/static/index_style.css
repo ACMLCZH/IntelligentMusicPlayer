@@ -379,6 +379,11 @@ body {
     margin: 5px 0;
 }
 
+#playlist-container {
+    padding-left: 0;
+    margin-left: 0;
+}
+
 .play-queue {
     width: 20%;
     background-color: #3291f012;
