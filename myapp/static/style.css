@@ -51,11 +51,6 @@ form {
   grid-row: 1 / 2;
 }
 
-form.sign-up-form {
-  opacity: 0;
-  z-index: 1;
-}
-
 form.sign-in-form {
   z-index: 2;
   width: 100%;
@@ -210,19 +205,6 @@ form.sign-in-form {
   transition-delay: 0.6s;
 }
 
-.panel .title-login{
-  font-size: 24px;
-  color: white;
-  width: 100px;
-  height: 100px;
-}
-
-.panel .icon{
-  height: 20%;
-  width: 20%;
-}
-
-
 .panel h3 {
   font-weight: 600;
   line-height: 1;
@@ -249,46 +231,6 @@ form.sign-in-form {
   transform: translateX(800px);
 }
 
-/* ANIMATION */
-
-.container.sign-up-mode:before {
-  transform: translate(100%, -50%);
-  right: 52%;
-}
-
-.container.sign-up-mode .left-panel .image,
-.container.sign-up-mode .left-panel .content {
-  transform: translateX(-800px);
-}
-
-.container.sign-up-mode .signin-signup {
-  left: 25%;
-}
-
-.container.sign-up-mode form.sign-up-form {
-  opacity: 1;
-  z-index: 2;
-}
-
-.container.sign-up-mode form.sign-in-form {
-  opacity: 0;
-  z-index: 1;
-  width: 100%;
-}
-
-.container.sign-up-mode .right-panel .image,
-.container.sign-up-mode .right-panel .content {
-  transform: translateX(0%);
-}
-
-.container.sign-up-mode .left-panel {
-  pointer-events: none;
-}
-
-.container.sign-up-mode .right-panel {
-  pointer-events: all;
-}
-
 @media (max-width: 870px) {
   .container {
     min-height: 800px;
@@ -302,9 +244,6 @@ form.sign-in-form {
   }
 
   .signin-signup,
-  .container.sign-up-mode .signin-signup {
-    left: 50%;
-  }
 
   .panels-container {
     grid-template-columns: 1fr;
@@ -339,19 +278,6 @@ form.sign-in-form {
     transition-delay: 0.8s;
   }
 
-  .panel .title-login{
-    font-size: 24px;
-    color: white;
-    width: 100px;
-    height: 100px;
-  }
-
-  .panel .icon{
-    height: 40px;
-    width: 40px;
-  }
-
-
   .panel h3 {
     font-size: 1.2rem;
   }
@@ -378,30 +304,9 @@ form.sign-in-form {
     transition: 2s ease-in-out;
   }
 
-  .container.sign-up-mode:before {
-    transform: translate(-50%, 100%);
-    bottom: 32%;
-    right: initial;
-  }
-
-  .container.sign-up-mode .left-panel .image,
-  .container.sign-up-mode .left-panel .content {
-    transform: translateY(-300px);
-  }
-
-  .container.sign-up-mode .right-panel .image,
-  .container.sign-up-mode .right-panel .content {
-    transform: translateY(0px);
-  }
-
   .right-panel .image,
   .right-panel .content {
     transform: translateY(300px);
-  }
-
-  .container.sign-up-mode .signin-signup {
-    top: 5%;
-    transform: translate(-50%, 0);
   }
 }
 
@@ -416,18 +321,6 @@ form.sign-in-form {
   .panel .content {
     padding: 0.5rem 1rem;
   }
-  .panel .title-login{
-    font-size: 24px;
-    color: white;
-    width: 100px;
-    height: 100px;
-  }
-
-  .panel .icon{
-    height: 40px;
-    width: 40px;
-  }
-
 
   .container {
     padding: 1.5rem;
@@ -435,11 +328,6 @@ form.sign-in-form {
 
   .container:before {
     bottom: 72%;
-    left: 50%;
-  }
-
-  .container.sign-up-mode:before {
-    bottom: 28%;
     left: 50%;
   }
 }
