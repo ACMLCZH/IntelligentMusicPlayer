@@ -58,6 +58,8 @@ class MusicPlayer {
     }
 
     setupEventListeners() {
+
+        this.audio.addEventListener('ended', () => this.playNext());
         // Playlist clicks
         this.playlist.addEventListener('click', (e) => {
             const listItem = e.target.closest('.queue-item');
