@@ -58,6 +58,8 @@ class MusicPlayer {
     }
 
     setupEventListeners() {
+
+        this.audio.addEventListener('ended', () => this.playNext());
         // Playlist clicks
         this.playlist.addEventListener('click', (e) => {
             const listItem = e.target.closest('.queue-item');
@@ -152,7 +154,8 @@ class MusicPlayer {
     async reorganizePlaylist(e) {
         e.preventDefault();
         const instruction = e.target.instruction.value;
-
+        const playlistId = currentPlaylistData.id; // Get the current playlist ID
+    
         try {
             const response = await fetch('/reorganize-playlist/', {
                 method: 'POST',
@@ -160,15 +163,15 @@ class MusicPlayer {
                     'Content-Type': 'application/json',
                     'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
                 },
-                body: JSON.stringify({ instruction })
+                body: JSON.stringify({ instruction, playlist_id: playlistId })
             });
-
+    
             const data = await response.json();
             // Check HTTP status first
             if (!response.ok) {
                 throw new Error(data.message || 'Server error occurred');
             }
-
+    
             // Only update UI if we have valid playlist data
             if (data.playlist && Array.isArray(data.playlist)) {
                 this.updatePlaylistUI(data.playlist);

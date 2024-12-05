@@ -137,29 +137,23 @@ def index(request):
     }
     return render(request, 'index.html', context)
 
-def get_playlist_from_api():
+def get_playlist_from_api(playlist_id):
     """Fetch playlist data from API"""
-    try:
-        response = requests.get('http://127.0.0.1:8000/favlist/1/')
-        if response.status_code == 200:
-            data = response.json()
-            # Transform API data to player format
-            playlist = []
-            for song in data.get('songs_detail', []):
-                playlist.append({
-                    'id': song['id'],
-                    'title': song['name'],
-                    'artist': song['author'],
-                    'cover': song['cover_url'],
-                    'url': song['mp3_url']
-                })
-            return playlist
-        else:
-            return []
-    except Exception as e:
-        print(f"Error fetching playlist: {e}")
-        return []
-    
+
+    favlist = Favlist.objects.get(id=playlist_id)
+    songs = favlist.songs.all()
+    song_serializer = SongSerializer(songs, many=True)
+    playlist = []
+    for song in song_serializer.data:
+        playlist.append({
+            'id': song['id'],
+            'title': song['name'],
+            'artist': song['author'],
+            'cover': song['cover_url'],
+            'url': song['mp3_url']
+        })
+    return playlist
+
 @csrf_exempt
 async def play_music(request):
     # Get playlist from API
@@ -203,27 +197,28 @@ async def reorganize_playlist(request):
         try:
             data = json.loads(request.body)
             instruction = data.get('instruction')
+            playlist_id = data.get('playlist_id')
             
             # Get playlist from API
-            playlist = await sync_to_async(get_playlist_from_api)()
+            playlist = await sync_to_async(get_playlist_from_api)(playlist_id)
             
-            organizer = PlaylistOrganizer()
-            organizer.playlists = playlist
-            
+            # Pass the playlist to the organizer
+            organizer = PlaylistOrganizer(playlist)
+
             new_playlist = await organizer.reorganize_playlist(instruction)
-            
-            # Wrap the entire session update and response in sync_to_async            
+
+            # Wrap the entire session update and response in sync_to_async
             return await sync_to_async(_update_session_and_respond)(request, new_playlist)
             
         except json.JSONDecodeError:
             return await sync_to_async(_create_json_response)(
-                {'status': 'error', 'message': 'Invalid JSON data'}, 
+                {'status': 'error', 'message': 'Invalid JSON data'},
                 400
             )
-            
+
         except Exception as e:
             return await sync_to_async(_create_json_response)(
-                {'status': 'error', 'message': str(e)}, 
+                {'status': 'error', 'message': str(e)},
                 500
             )
     
