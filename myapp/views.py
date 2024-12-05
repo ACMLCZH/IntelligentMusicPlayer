@@ -139,27 +139,21 @@ def index(request):
 
 def get_playlist_from_api(playlist_id):
     """Fetch playlist data from API"""
-    try:
-        response = requests.get(f'http://127.0.0.1:8000/userfav')
-        if response.status_code == 200:
-            data = response.json()
-            # Transform API data to player format
-            playlist = []
-            for song in data.get('songs_detail', []):
-                playlist.append({
-                    'id': song['id'],
-                    'title': song['name'],
-                    'artist': song['author'],
-                    'cover': song['cover_url'],
-                    'url': song['mp3_url']
-                })
-            return playlist
-        else:
-            return []
-    except Exception as e:
-        print(f"Error fetching playlist: {e}")
-        return []
-    
+
+    favlist = Favlist.objects.get(id=playlist_id)
+    songs = favlist.songs.all()
+    song_serializer = SongSerializer(songs, many=True)
+    playlist = []
+    for song in song_serializer.data:
+        playlist.append({
+            'id': song['id'],
+            'title': song['name'],
+            'artist': song['author'],
+            'cover': song['cover_url'],
+            'url': song['mp3_url']
+        })
+    return playlist
+
 @csrf_exempt
 async def play_music(request):
     # Get playlist from API
