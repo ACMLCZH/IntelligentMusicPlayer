@@ -116,6 +116,25 @@ document.addEventListener('DOMContentLoaded', function() {
     document.addEventListener('click', function(e) {
         closeContextMenus();
     });
+
+    document.getElementById('add-to-playlist-btn').addEventListener('click', function(e) {
+
+        e.stopPropagation(); // 防止事件冒泡
+        const currentSong = getCurrentPlayingSong();
+        if (currentSong) {
+            showFavlistDropdownInPlayer(currentSong.id, this);
+        } else {
+            alert('No song is currently playing.');
+        }
+    });
+
+    // Close the dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+        const dropdown = document.querySelector('.favlist-dropdown');
+        if (dropdown && !dropdown.contains(e.target)) {
+            dropdown.remove();
+        }
+    });
     
 });
 
@@ -495,6 +514,11 @@ function showFavlistDropdown(songId, addButtonElement) {
 }
 
 function addSongToFavlist(favlistId, songId) {
+
+    if (songId === null) {
+        alert('Cannot add current song to favlist.');
+        return;
+    }
     // Fetch the existing songs in the favlist
     fetch(`/favlist/${favlistId}/`)
         .then(response => {
@@ -899,4 +923,122 @@ function removeSongFromPlaylist(playlistId, songId) {
             console.error('Error fetching playlist data:', error);
             alert('An error occurred while removing the song from the playlist.');
         });
+}
+function showFavlistDropdownInPlayer(songId, buttonElement) {
+    // 移除任何现有的下拉菜单
+    const existingDropdown = document.querySelector('.favlist-dropdown');
+    if (existingDropdown) {
+        existingDropdown.remove();
+    }
+
+    // 创建下拉菜单元素
+    const dropdown = document.createElement('div');
+    dropdown.classList.add('favlist-dropdown');
+
+    // 先将下拉菜单添加到文档中，以便计算尺寸
+    document.body.appendChild(dropdown);
+
+    // 创建每个收藏列表的选项
+    accessibleFavlists.forEach(favlist => {
+        const item = document.createElement('div');
+        item.textContent = favlist.name;
+        item.style.padding = '10px';
+        item.style.cursor = 'pointer';
+        item.addEventListener('click', () => {
+            addSongToFavlist(favlist.id, songId);
+            if (dropdown.parentNode) {
+                dropdown.parentNode.removeChild(dropdown);
+            }
+        });
+        dropdown.appendChild(item);
+    });
+
+    // 获取按钮和下拉菜单的位置和尺寸
+    const rect = buttonElement.getBoundingClientRect();
+    const dropdownRect = dropdown.getBoundingClientRect();
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+
+    // 首选位置（向左上方延展）
+    let left = rect.right - dropdownRect.width + window.scrollX;
+    let top = rect.top - dropdownRect.height + window.scrollY;
+
+    // 如果下拉菜单超出顶部，则向下显示
+    if (top < window.scrollY) {
+        top = rect.bottom + window.scrollY;
+        // 确保不会超出底部
+        if (top + dropdownRect.height > viewportHeight + window.scrollY) {
+            top = viewportHeight + window.scrollY - dropdownRect.height;
+        }
+    }
+
+    // 如果下拉菜单超出左侧，则向右显示
+    if (left < 0) {
+        left = rect.left + window.scrollX;
+        // 确保不会超出右侧
+        if (left + dropdownRect.width > viewportWidth + window.scrollX) {
+            left = viewportWidth + window.scrollX - dropdownRect.width;
+        }
+    }
+
+    // 设置下拉菜单的位置
+    dropdown.style.position = 'absolute';
+    dropdown.style.left = `${left}px`;
+    dropdown.style.top = `${top}px`;
+
+    // 当点击其他地方时，关闭下拉菜单
+    document.addEventListener('click', function onClickOutside(event) {
+        if (!dropdown.contains(event.target) && event.target !== buttonElement) {
+            if (dropdown.parentNode) {
+                dropdown.parentNode.removeChild(dropdown);
+            }
+            document.removeEventListener('click', onClickOutside);
+        }
+    });
+}
+
+
+function getCurrentPlayingSong() {
+    const audioPlayer = document.getElementById('audio-player');
+    const titleElement = document.getElementById('track-title');
+    const artistElement = document.getElementById('track-artist');
+    const coverArt = document.getElementById('cover-art');
+
+    // 获取当前播放的歌曲 URL
+    const songUrl = audioPlayer.src;
+    if (!songUrl) {
+        return null;
+    }
+
+    // 从播放队列中查找匹配的歌曲信息
+    const playlistItems = document.querySelectorAll('#playlist-container .queue-item');
+    for (const item of playlistItems) {
+        if (item.dataset.url === songUrl) {
+            const songId = parseInt(item.dataset.songId);
+            const songName = item.querySelector('.queue-title').textContent;
+            const songArtist = item.querySelector('.queue-artist').textContent;
+            const songCover = item.querySelector('.queue-image').src;
+
+            return {
+                id: songId,
+                name: songName,
+                author: songArtist,
+                cover_url: songCover,
+                mp3_url: songUrl
+            };
+        }
+    }
+
+    // 如果未在播放队列中找到匹配项，使用播放器区域的信息
+    const songName = titleElement.textContent;
+    const songArtist = artistElement.textContent;
+    const songCover = coverArt.src;
+
+    return {
+        id: null, // 如果无法获取歌曲 ID，可以设置为 null
+        name: songName,
+        author: songArtist,
+        cover_url: songCover,
+        mp3_url: songUrl
+    };
 }
