@@ -73,7 +73,8 @@ class SunoAIClient:
         return response.json()
 
 
-suno_client = SunoAIClient(token='10eec3323fb7411fb5bc19198ea340a9')
+# suno_client = SunoAIClient(token='10eec3323fb7411fb5bc19198ea340a9')
+suno_client = SunoAIClient(token='732e5017197a4f9c8ae867791b8ae3bd')
 
 
 '''

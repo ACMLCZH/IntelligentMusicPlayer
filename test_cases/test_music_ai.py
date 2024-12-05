@@ -32,3 +32,6 @@ def test_clients_environ():
         return False
 
     return True
+
+if __name__ == '__main__':
+    assert test_clients_environ() == True
