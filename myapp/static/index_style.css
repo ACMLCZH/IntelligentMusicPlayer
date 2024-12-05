@@ -340,6 +340,10 @@ body {
 
 .song-details {
     flex-grow: 1;
+    max-width: 350px;
+    overflow: hidden;
+    
+
 }
 
 .song-title {
@@ -361,12 +365,13 @@ body {
 }
 
 .song-album {
-    width: 250px;
+    width: 200px;
     margin-left: 15px;
     text-align: left;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis; 
+    
 }
 
 .song-actions {
