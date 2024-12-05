@@ -5,7 +5,7 @@ from .ai_clients import suno_client, openai_client
 import time
 
 local_song_url = "http://localhost:8000/song/"
-local_favlist_url = "http://localhost:8000/favlist/"
+local_search_url = "http://localhost:8000/song/search/?search={search}&field={field}"
 callback_url = "https://webhook.site/"
 local_headers = {
     'content-type': 'application/json',
@@ -140,13 +140,14 @@ class PlaylistOrganizer:
         # Stub - will be replaced with actual API call
         # TODO: Use aiohttp
         local_response = requests.get(
-            local_favlist_url.format(search=name, field='name'),
+            local_search_url.format(search=name, field='name'),
             headers=local_headers
         )
-        print([song for song in self.playlists if song['title'].lower() == name.lower()])
-        print(local_response.json())
+        # print([song for song in self.playlists if song['title'].lower() == name.lower()])
+        # print(local_response.json())
         
         retrieved_song = local_response.json()
+        print("retrieved_song", retrieved_song)
         return [{
             'id': song['id'],
             'title': song['name'],
@@ -159,7 +160,7 @@ class PlaylistOrganizer:
         # Stub - will be replaced with actual API call 
         # TODO: Use aiohttp
         local_response = requests.get(
-            local_favlist_url.format(search=genre, field='topics'),
+            local_search_url.format(search=genre, field='topics'),
             headers=local_headers
         )
         retrieved_song = local_response.json()

@@ -277,6 +277,10 @@ function fetchSongs(playlistId) {
         })
         .then(data => {
             currentPlaylistData = data; // Store the data
+
+            // Expose it to the global scope
+            window.currentPlaylistData = currentPlaylistData;
+
             displaySongs(data);
         })
         .catch(error => {
