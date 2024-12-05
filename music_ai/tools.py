@@ -3,6 +3,7 @@ import json
 from typing import List, Dict
 from .ai_clients import suno_client, openai_client
 import time
+import random
 
 local_song_url = "http://localhost:8000/song/"
 local_search_url = "http://localhost:8000/song/search/?search={search}&field={field}"
@@ -140,14 +141,18 @@ class PlaylistOrganizer:
         # Stub - will be replaced with actual API call
         # TODO: Use aiohttp
         local_response = requests.get(
-            local_search_url.format(search=name, field='name'),
+            local_search_url.format(search=name, field='name') + "&limit={20}", # Limit to 20 results
             headers=local_headers
         )
         # print([song for song in self.playlists if song['title'].lower() == name.lower()])
         # print(local_response.json())
         
         retrieved_song = local_response.json()
-        print("retrieved_song", retrieved_song)
+        # print("retrieved_song", retrieved_song)
+        # randomly select 5 songs from the retrieved songs if there are more than 5
+        if len(retrieved_song) > 5:
+            retrieved_song = random.sample(retrieved_song, 5)
+        
         return [{
             'id': song['id'],
             'title': song['name'],
@@ -214,9 +219,17 @@ class PlaylistOrganizer:
                     if j < len(other_songs):
                         new_playlist.append(other_songs[j])
                         j += 1
-                        
+        elif parsed['type'] == 'genre':
+            # New code to handle genre type instructions
+            genre = parsed['genre']
+            genre_songs = await self.search_songs_by_genre(genre)
+            # Return the list of songs from the specified genre
+            return genre_songs
+        else:
+            # Handle other types or return the original playlist
+            return self.playlists
         print(f"New playlist: {[s['title'] for s in new_playlist]}")
-        return new_playlist
+        return new_playlist    
 
 
 if __name__ == "__main__":
