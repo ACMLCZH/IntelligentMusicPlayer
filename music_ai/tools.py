@@ -89,7 +89,7 @@ def generate_songs(songs_jsons: List[Dict]) -> List[Dict]:
         'instrumental': False,
     }
     try:
-        # raise requests.exceptions.RequestException
+        raise requests.exceptions.RequestException
         suno_response = suno_client.request(suno_data)
     except requests.exceptions.RequestException as e:
         print("Failed to generate songs. Just enjoy the default AI music!")
