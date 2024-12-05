@@ -16,6 +16,21 @@ body {
     color: white;
 }
 
+.nav-logo {
+    grid-column: 1;
+    justify-self: start;
+    display: flex;
+    align-items: center;
+}
+
+.nav-logo img {
+    width: 30px;
+    height: 30px;
+    margin-right: 10px;
+    border-radius: 50%;
+    vertical-align: middle;
+}
+
 .nav-user {
     grid-column: 3;
     justify-self: end;
@@ -43,6 +58,7 @@ body {
     text-decoration: none;
     font-size: 1.5em;
     font-weight: bold;
+    line-height: 1;
 }
 
 .nav-search {
