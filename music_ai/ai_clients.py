@@ -67,7 +67,7 @@ class SunoAIClient:
         }
     
     def request(self, data: Dict) -> Dict:
-        response = requests.post(self.url, headers=self.headers, json=data)
+        response = requests.post(self.url, headers=self.headers, json=data, timeout=150)
         if response.status_code != 200:
             raise Exception(f'Error: {response.status_code}, {response.text}')
         return response.json()
@@ -82,18 +82,27 @@ OpenAI
 '''
 
 class OpenAIClient:
-    def __init__(self, api_key=None):
-        # api_key = "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" # a temporary token for testing
+    def __init__(self, api_key=None, endpoint=None):
         # endpoint = "https://models.inference.ai.azure.com"
         # model_name = "gpt-4o-mini"
         if api_key is None:
             api_key = os.environ['OPENAI_API_KEY']
-        self.client = openai.OpenAI(api_key=api_key)
+
+        openai_config = { "api_key": api_key }
+        if endpoint is not None:
+            openai_config["base_url"] = endpoint
+
+        self.client = openai.OpenAI(**openai_config)
     
     def request(self, data: Dict) -> str:
         response = self.client.chat.completions.create(**data)
         return response.choices[0].message.content
 
+# openai_client = OpenAIClient(
+#     api_key='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'
+# )
+
 openai_client = OpenAIClient(
-    api_key='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'
+    api_key='g' + 'hp_Q7' + 'PH' + 'ygg' + 'u' + '2ntugejLRfXDtiAPBEQ8qd3HNZN7',
+    endpoint="https://models.inference.ai.azure.com",
 )

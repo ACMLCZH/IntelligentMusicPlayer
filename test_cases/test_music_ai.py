@@ -1,10 +1,13 @@
 from music_ai.ai_clients import *
+import os
 
 # Test AI clients with environment variable tokens.
 def test_clients_environ():
-    openai_client = OpenAIClient()
+    openai_client = OpenAIClient(
+        endpoint="https://models.inference.ai.azure.com",
+    )
     openai_data = {
-        "model": "gpt-3.5",
+        "model": "gpt-4o-mini",
         "messages": [{
             "role": "system",
             "content": "You are a chatting robot."
@@ -15,7 +18,9 @@ def test_clients_environ():
     }
     try:
         print(openai_client.request(openai_data))
-    except:
+        print("Passed!")
+    except Exception as e:
+        print(f"Fail to pass test case: {e}")
         return False
     
     suno_client = SunoAIClient()
@@ -28,7 +33,9 @@ def test_clients_environ():
     }
     try:
         print(suno_client.request(suno_data))
-    except:
+        print("Passed!")
+    except Exception as e:
+        print(f"Fail to pass test case: {e}")
         return False
 
     return True
