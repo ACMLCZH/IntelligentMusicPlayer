@@ -75,10 +75,10 @@ def find_songs(url):
 
 if __name__=='__main__':
     urls = [
-        # "https://freemusicarchive.org/genre/International",
-        # "https://freemusicarchive.org/genre/Blues/",
-        # "https://freemusicarchive.org/genre/Jazz/",
-        # "https://freemusicarchive.org/genre/novelty/",
+        "https://freemusicarchive.org/genre/International",
+        "https://freemusicarchive.org/genre/Blues/",
+        "https://freemusicarchive.org/genre/Jazz/",
+        "https://freemusicarchive.org/genre/novelty/",
         "https://freemusicarchive.org/genre/Old-Time__Historic/"
     ]
     for url in urls:
@@ -88,7 +88,7 @@ if __name__=='__main__':
             #     songs = []
             # else:
             #     url = f"{url}?page={i}"
-            url = f"{url}?pageSize=100&page=1"
+            url = f"{url}?pageSize=20&page=18"
             with open('./utils/songs.json', 'r', encoding='utf-8') as file: 
                 songs = json.load(file)
             songs = songs + find_songs(url)
