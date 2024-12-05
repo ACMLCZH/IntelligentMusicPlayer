@@ -131,13 +131,23 @@ class PlaylistOrganizer:
     def __init__(self, playlists):
         self.playlists = playlists
         self.system_prompt = \
-            "You are a music playlist organizer. Parse the user's instruction into a structured format."\
-            "Return a JSON object with:"\
-            "- type: \"pattern\" or \"genre\""\
-            "- song_name: (if pattern type)"\
-            "- interval: (if pattern type, integer) "\
-            "- genre: (if genre type)"
-        
+            "You are a music playlist organizer. Parse the user's instruction into a structured format.\n"\
+            "Return a JSON object with:\n"\
+            "- type: \"pattern\", \"genre\", or \"other\"\n"\
+            "- song_name: (if pattern type)\n"\
+            "- interval: (if pattern type, integer)\n"\
+            "- genre: (if genre type)\n"\
+            "- song_ids: (if other type) Return list of song IDs in desired order\n\n"\
+            "Example for 'other' type:\n"\
+            "Input: 'shuffle the playlist'\n"\
+            "Current playlist: [{\"id\": 1, \"name\": \"Song A\"}, {\"id\": 2, \"name\": \"Song B\"}]\n"\
+            "Output: {\"type\": \"other\", \"song_ids\": [2, 1]}"
+    
+    def _ids_to_playlist(self, ids: List[int]) -> List[Dict]:
+        """Convert list of IDs back to full playlist items"""
+        id_to_song = {song['id']: song for song in self.playlists}
+        return [id_to_song[id] for id in ids if id in id_to_song]
+    
     async def search_songs_by_name(self, name: str) -> List[Dict]:
         # Stub - will be replaced with actual API call
         # TODO: Use aiohttp
@@ -181,6 +191,15 @@ class PlaylistOrganizer:
 
     async def parse_instruction(self, instruction: str) -> Dict:
         """Use GPT to parse the natural language instruction"""
+        # print("self.playlists", self.playlists)
+        # Create simplified playlist representation
+        simple_playlist = [{"id": song["id"], "name": song["title"], "author": song["artist"]} for song in self.playlists]
+
+        # Combine instruction with playlist context
+        user_message = f"""Instruction: {instruction}
+        Current playlist: {json.dumps(simple_playlist)}"""
+        print('user_message', user_message)
+
         # Convert string response to Dict
         organize_data = {
             "model": "gpt-4o-mini",
@@ -189,11 +208,26 @@ class PlaylistOrganizer:
                 "content": self.system_prompt
             }, {
                 "role": "user",
-                "content": instruction
+                "content": user_message
             }],
         }
         content = openai_client.request(organize_data)
-        return json.loads(content)
+        print('content', content)
+        # if content has error, raise ValueError
+        # if 'error' in content:
+        #     raise ValueError(content['error'])
+        # try json.loads(content), it seems to fail?
+        try:
+            content = content.replace('```json', '').replace('```', '').strip()
+            json_content = json.loads(content)
+        # catch error
+        except Exception as e:
+            print(f"Failed to parse instruction: {content}, error: {e}")
+            raise ValueError(f"Failed to parse instruction: {content}, error: {e}")
+        
+        return json_content
+        # return json.loads(content)
+        # return content
 
     async def reorganize_playlist(self, instruction: str) -> List[Dict]:
         """Main method to reorganize playlist based on instruction"""
@@ -221,17 +255,23 @@ class PlaylistOrganizer:
                     if j < len(other_songs):
                         new_playlist.append(other_songs[j])
                         j += 1
+            return new_playlist
         elif parsed['type'] == 'genre':
+            print(f"Genre-based reorganization: {parsed['genre']}")
             # New code to handle genre type instructions
             genre = parsed['genre']
             genre_songs = await self.search_songs_by_genre(genre)
             # Return the list of songs from the specified genre
+            if not genre_songs:
+                raise ValueError(f"No songs found for genre {genre}")
             return genre_songs
-        else:
-            # Handle other types or return the original playlist
-            return self.playlists
+        elif parsed['type'] == 'other':
+            print(f"Other-based reorganization")
+            # Simply convert IDs back to full playlist items
+            return self._ids_to_playlist(parsed['song_ids'])
+        
         print(f"New playlist: {[s['title'] for s in new_playlist]}")
-        return new_playlist    
+        return self.playlists   
 
 
 if __name__ == "__main__":
