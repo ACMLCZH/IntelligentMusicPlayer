@@ -7,10 +7,10 @@ class Song(models.Model):
     author = models.CharField(max_length=100)
     album = models.CharField(max_length=100)
     duration = models.IntegerField()
-    lyrics = models.CharField(max_length=2000)
-    topics = models.CharField(max_length=100)
-    mp3_url = models.CharField(max_length=200)
-    cover_url = models.CharField(max_length=200)
+    lyrics = models.CharField(max_length=5000)
+    topics = models.CharField(max_length=500)
+    mp3_url = models.CharField(max_length=500)
+    cover_url = models.CharField(max_length=500)
 
     def __str__(self):
         return self.name
@@ -19,7 +19,7 @@ class Song(models.Model):
     #     verbose_name_plural = verbose_name
 
 class Favlist(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=100)
     songs = models.ManyToManyField(Song, related_name='favlists')
     owner = models.ForeignKey(User, related_name='favlists', on_delete=models.CASCADE)
 
