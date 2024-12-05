@@ -210,6 +210,7 @@ function performSearch(query) {
             console.log('Search API response data:', data);
             if (Array.isArray(data.results)) {
                 displaySongs(data.results);
+
             } else {
                 console.error('Unexpected API response:', data);
                 // Optionally display an error message to the user
@@ -783,6 +784,13 @@ function showPlaylistContextMenu(event, playlistItem) {
 function showSongContextMenu(event, songItem) {
     closeContextMenus(); // Close any existing context menus
 
+    // 检查是否为搜索结果项
+    const songsList = document.getElementById('songs-list');
+    if (songsList.contains(songItem)) {
+        console.log("Search results cannot be modified.");
+        return; // 直接返回，不显示右键菜单
+    }
+
     const menu = document.createElement('div');
     menu.classList.add('context-menu');
     menu.style.top = `${event.pageY}px`;
@@ -800,6 +808,7 @@ function showSongContextMenu(event, songItem) {
     menu.appendChild(removeOption);
     document.body.appendChild(menu);
 }
+
 
 function closeContextMenus() {
     const existingMenus = document.querySelectorAll('.context-menu');
