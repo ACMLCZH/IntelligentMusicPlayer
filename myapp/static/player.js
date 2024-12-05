@@ -29,11 +29,13 @@ class MusicPlayer {
 
     updatePlaylistItems() {
         this.playlistItems = Array.from(this.playlist.getElementsByTagName('li'));
-        this.currentIndex = 0; // Reset to first track
+        this.currentIndex = 0;      // Reset to first track
         this.updateNavigationButtons();
     }
 
-    async loadTrackFromListItem(listItem, newIndex) {
+    // async loadTrackFromListItem(listItem, newIndex) {
+    async loadCurrentTrack() {
+        const listItem = this.playlistItems[this.currentIndex];
         const url = listItem.dataset.url;
         const cover = listItem.querySelector('.queue-image').src;
         const title = listItem.querySelector('.queue-title').textContent;
@@ -42,7 +44,6 @@ class MusicPlayer {
         // Update UI
         document.querySelector('.queue-item.active')?.classList.remove('active');
         listItem.classList.add('active');
-        this.currentIndex = newIndex;
     
         try {
             this.audio.src = url;
@@ -58,14 +59,13 @@ class MusicPlayer {
     }
 
     setupEventListeners() {
-
         this.audio.addEventListener('ended', () => this.playNext());
         // Playlist clicks
         this.playlist.addEventListener('click', (e) => {
             const listItem = e.target.closest('.queue-item');
             if (listItem) {
-                const newIndex = this.playlistItems.indexOf(listItem);
-                this.loadTrackFromListItem(listItem, newIndex);
+                this.currentIndex = this.playlistItems.indexOf(listItem);
+                this.loadCurrentTrack();
             }
         });
 
@@ -139,15 +139,15 @@ class MusicPlayer {
 
     playNext() {
         if (this.currentIndex < this.playlistItems.length - 1) {
-            const nextTrack = this.playlistItems[this.currentIndex + 1];
-            this.loadTrackFromListItem(nextTrack, this.currentIndex + 1);
+            this.currentIndex += 1;
+            this.loadCurrentTrack();
         }
     }
     
     playPrevious() {
         if (this.currentIndex > 0) {
-            const prevTrack = this.playlistItems[this.currentIndex - 1];
-            this.loadTrackFromListItem(prevTrack, this.currentIndex - 1);
+            this.currentIndex -= 1;
+            this.loadCurrentTrack();
         }
     }
 

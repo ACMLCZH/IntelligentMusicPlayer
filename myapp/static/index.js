@@ -5,7 +5,7 @@ let player = null;
 
 document.addEventListener('DOMContentLoaded', function() {
     // Load playlists
-    fetchPlaylists();
+    fetchPlayLists();
     setupNavbar();
 
     // Initialize the MusicPlayer instance
@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (target) {
             let playlistId = target.dataset.id;
             console.log(`Fetching details for playlist ID: ${playlistId}`);
-            fetchFavList(playlistId);
+            fetchPlayList(playlistId);
 
             let playlistItems = document.querySelectorAll('#playlist-list li');
             playlistItems.forEach(function(item) {
@@ -25,9 +25,6 @@ document.addEventListener('DOMContentLoaded', function() {
             });
 
             target.classList.add('active');
-
-            document.getElementById('current-playlist-title').textContent = target.textContent;
-            
         }
     });
 
@@ -46,22 +43,24 @@ document.addEventListener('DOMContentLoaded', function() {
     
         // Use the existing player instance
         if (player) {
-            player.playlistItems = Array.from(playQueue.getElementsByTagName('li'));
-            player.currentIndex = 0;
+            player.updatePlaylistItems();
+            player.loadCurrentTrack();
+
+            // player.playlistItems = Array.from(playQueue.getElementsByTagName('li'));
+            // player.currentIndex = 0;
+            // player.updateNavigationButtons();
     
             // Update the player UI elements with the first song
-            if (currentPlaylistData.songs_detail.length > 0) {
-                const firstSong = currentPlaylistData.songs_detail[0];
-                player.coverArt.src = firstSong.cover_url;
-                player.titleElement.textContent = firstSong.name;
-                player.artistElement.textContent = firstSong.author;
-                player.audio.src = firstSong.mp3_url;
+            // if (currentPlaylistData.songs_detail.length > 0) {
+            //     const firstSong = currentPlaylistData.songs_detail[0];
+            //     player.coverArt.src = firstSong.cover_url;
+            //     player.titleElement.textContent = firstSong.name;
+            //     player.artistElement.textContent = firstSong.author;
+            //     player.audio.src = firstSong.mp3_url;
     
-                // Play the first song
-                player.audio.play();
-            }
-    
-            player.updateNavigationButtons();
+            //     // Play the first song
+            //     player.audio.play();
+            // }
         }
     });
 
@@ -254,7 +253,24 @@ function displaySongs(songs) {
 
         // Double-click to play
         songItem.addEventListener('dblclick', () => {
-            playSong(song);
+            // Update the play queue with the selected song
+            const playQueue = document.getElementById('playlist-container');
+            const songElement = `
+                <li class="queue-item active" data-song-id="${song.id}" data-url="${song.mp3_url}">
+                    <img class="queue-image" src="${song.cover_url}" alt="Song Cover">
+                    <div class="queue-details">
+                        <p class="queue-title">${song.name}</p>
+                        <p class="queue-artist">${song.author}</p>
+                    </div>
+                </li>
+            `;
+            playQueue.innerHTML = songElement;
+            
+            // Use the existing player instance
+            if (player) {
+                player.updatePlaylistItems();
+                player.loadCurrentTrack();
+            }
         });
 
         // Add to favlist button event
@@ -280,7 +296,7 @@ function displaySongs(songs) {
 
 
 // Fetch playlists from the server
-function fetchPlaylists() {
+function fetchPlayLists() {
     fetch('/userfav/')
         .then(response => {
             if (!response.ok) {
@@ -291,14 +307,14 @@ function fetchPlaylists() {
         })
         .then(data => {
             accessibleFavlists = data.favlists_detail; // Store the playlists data
-            displayPlaylists(data.favlists_detail);
+            displayPlayLists(data.favlists_detail);
         })
         .catch(error => {
             console.error('Error fetching playlists:', error);
         });
 }
 
-function displayPlaylists(playlists) {
+function displayPlayLists(playlists) {
     let playlistList = document.getElementById('playlist-list');
     playlistList.innerHTML = ''; // Clear existing playlists
 
@@ -314,10 +330,7 @@ function displayPlaylists(playlists) {
 }
 
 // Fetch songs from a specific playlist
-function fetchFavList(playlistId) {
-    // Show the playlist-info section
-    document.querySelector('.playlist-info').style.display = 'flex';
-
+function fetchPlayList(playlistId) {
     fetch(`/favlist/${playlistId}`)
         .then(response => {
             if (!response.ok) {
@@ -328,53 +341,24 @@ function fetchFavList(playlistId) {
         .then(data => {
             currentPlaylistData = data; // Store the data
             window.currentPlaylistData = currentPlaylistData;   // Expose it to the global scope
-            displayFavList(data);
+            displayPlayList(data);
         })
         .catch(error => {
             console.error('Error fetching playlists:', error);
         });
 }
 
-function displayFavList(favListData) {
-    console.log(favListData);
-    const songsDetail = favListData.songs_detail; // 提取 songs_detail 数据
-    displaySongs(songsDetail);
+function displayPlayList(playListData) {
+    // Show the playlist-info section
+    document.querySelector('.playlist-info').style.display = 'flex';
+    document.getElementById('current-playlist-title').textContent = playListData.name;
+    console.log(playListData);
+    displaySongs(playListData.songs_detail);
 }
 
 // Play a song
-function playSong(song) {
-    // Update the play queue with the selected song
-    const playQueue = document.getElementById('playlist-container');
-    const songElement = `
-        <li class="queue-item active" data-song-id="${song.id}" data-url="${song.mp3_url}">
-            <img class="queue-image" src="${song.cover_url}" alt="Song Cover">
-            <div class="queue-details">
-                <p class="queue-title">${song.name}</p>
-                <p class="queue-artist">${song.author}</p>
-            </div>
-        </li>
-    `;
-    playQueue.innerHTML = songElement;
-    
-    // Use the existing player instance
-    if (player) {
-        // Update the playlist items
-        player.playlistItems = Array.from(playQueue.getElementsByTagName('li'));
-        player.currentIndex = 0;
-        
-        // Update the player UI elements
-        player.coverArt.src = song.cover_url;
-        player.titleElement.textContent = song.name;
-        player.artistElement.textContent = song.author;
-        player.audio.src = song.mp3_url;
-        
-        // Play the song
-        player.audio.play();
-        
-        // Update navigation buttons if necessary
-        player.updateNavigationButtons();
-    }
-}
+// function playSong(song) {
+// }
 
 // Toggle favorite status of a song
 function toggleCollection(songId, buttonElement) {
@@ -611,7 +595,7 @@ function updateUserFavlists(newFavlistId) {
             .then(updatedUserFav => {
                 console.log('User favlists updated:', updatedUserFav);
                 // Refresh the playlists display
-                fetchPlaylists();
+                fetchPlayLists();
             })
             .catch(error => {
                 console.error('Error updating user favlists:', error);
