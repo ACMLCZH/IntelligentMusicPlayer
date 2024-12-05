@@ -73,8 +73,7 @@ class SunoAIClient:
         return response.json()
 
 
-# suno_client = SunoAIClient(token='10eec3323fb7411fb5bc19198ea340a9')
-suno_client = SunoAIClient(token='732e5017197a4f9c8ae867791b8ae3bd')
+suno_client = SunoAIClient()
 
 
 '''
@@ -98,11 +97,4 @@ class OpenAIClient:
         response = self.client.chat.completions.create(**data)
         return response.choices[0].message.content
 
-# openai_client = OpenAIClient(
-#     api_key='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'
-# )
-
-openai_client = OpenAIClient(
-    api_key='g' + 'hp_Q7' + 'PH' + 'ygg' + 'u' + '2ntugejLRfXDtiAPBEQ8qd3HNZN7',
-    endpoint="https://models.inference.ai.azure.com",
-)
+openai_client = OpenAIClient(endpoint="https://models.inference.ai.azure.com")
