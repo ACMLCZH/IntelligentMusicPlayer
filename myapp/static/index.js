@@ -187,11 +187,9 @@ function setupNavbar() {
         logoutUser();
     });
 
-    document.getElementById('edit-profile').addEventListener('click', function(e) {
-        e.preventDefault();
-        // Logic to navigate to the edit profile page
-        console.log('Navigate to edit profile page');
-    });
+
+    // Edit profile link
+    // Delated
 }
 
 // Function to perform search
@@ -296,37 +294,49 @@ function displaySongs(songs) {
 
 
 // Fetch playlists from the server
-function fetchPlayLists() {
+function fetchPlayLists(selectedPlaylistId = null) {
+    console.log(`selectedPlaylistId: ${selectedPlaylistId}`);
     fetch('/userfav/')
         .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok ' + response.statusText);
             }
             return response.json();
-            
         })
         .then(data => {
             accessibleFavlists = data.favlists_detail; // Store the playlists data
-            displayPlayLists(data.favlists_detail);
+            displayPlayLists(data.favlists_detail, selectedPlaylistId);
         })
         .catch(error => {
             console.error('Error fetching playlists:', error);
         });
 }
 
-function displayPlayLists(playlists) {
+function displayPlayLists(playlists, selectedPlaylistId = null) {
     let playlistList = document.getElementById('playlist-list');
-    playlistList.innerHTML = ''; // Clear existing playlists
+    playlistList.innerHTML = ''; // 清空现有的播放列表
 
     playlists.forEach(function(playlist) {
         let li = document.createElement('li');
-        li.textContent = playlist.name; // Use `name` from the Favlist model
+        li.textContent = playlist.name; // 使用 Favlist 模型中的 `name`
         li.dataset.id = playlist.id;
         playlistList.appendChild(li);
 
         playlistList.style.userSelect = 'none';
     });
 
+    // 自动选择并加载指定的播放列表，若未指定则选择第一个
+    if (selectedPlaylistId && playlistList) {
+        const selectedItem = playlistList.querySelector(`li[data-id="${selectedPlaylistId.toString()}"]`);
+        console.log(`Selected playlist ID: ${selectedPlaylistId}`);
+        if (selectedItem) {
+            selectedItem.click();
+        } else {
+            console.log('Selected item not found in the playlist.');
+        }
+    } else {
+        playlistList.firstElementChild.click();
+    }
 }
 
 // Fetch songs from a specific playlist
@@ -355,10 +365,6 @@ function displayPlayList(playListData) {
     console.log(playListData);
     displaySongs(playListData.songs_detail);
 }
-
-// Play a song
-// function playSong(song) {
-// }
 
 // Toggle favorite status of a song
 function toggleCollection(songId, buttonElement) {
@@ -526,7 +532,6 @@ function createNewPlaylist() {
     // Call function to create the playlist
     postNewFavlist(playlistName);
 }
-
 function postNewFavlist(playlistName) {
     fetch('/favlist/', {
         method: 'POST',
@@ -547,17 +552,23 @@ function postNewFavlist(playlistName) {
     })
     .then(newFavlist => {
         console.log('New favlist created:', newFavlist);
-        // Update the user's favlists
+        // Update the user's favlists and auto-select the new playlist
         updateUserFavlists(newFavlist.id);
         // Clear the input field and hide the dropdown
         document.getElementById('new-playlist-name').value = '';
         document.getElementById('add-playlist-dropdown').style.display = 'none';
+        // Automatically select the newly created playlist
+
+
+        // fetchPlaylists(newFavlist.id);
     })
     .catch(error => {
         console.error('Error creating new favlist:', error);
         alert('Error creating playlist. Please try again.');
     });
 }
+
+
 
 function updateUserFavlists(newFavlistId) {
     // First, fetch the current favlists of the user
@@ -595,7 +606,7 @@ function updateUserFavlists(newFavlistId) {
             .then(updatedUserFav => {
                 console.log('User favlists updated:', updatedUserFav);
                 // Refresh the playlists display
-                fetchPlayLists();
+                fetchPlayLists(newFavlistId);
             })
             .catch(error => {
                 console.error('Error updating user favlists:', error);

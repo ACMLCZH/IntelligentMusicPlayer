@@ -22,7 +22,8 @@
     <!-- Navigation Bar -->
     <nav class="navbar">
         <div class="nav-logo">
-            <a href="/index" id="home-link">MyMusicApp</a>
+            <img src="/static/logo.png" alt="Logo" id="logo">
+            <a href="/index" id="home-link">Intelli Music</a>
         </div>
         <div class="nav-search">
             <input type="text" id="search-input" placeholder="Search...">
@@ -31,9 +32,10 @@
             </button>
         </div>
         <div class="nav-user" id="nav-user">
+            <span class="username" id="username-display">{{ user.username }}</span>
             <img src="/static/user.png" alt="User Avatar" id="user-avatar">
             <div class="dropdown-menu" id="user-dropdown">
-                <a href="#" id="edit-profile">Edit Profile</a>
+                <!-- <a href="#" id="edit-profile">Edit Profile</a> -->
                 <a href="#" id="logout">Logout</a>
             </div>
         </div>

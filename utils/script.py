@@ -2,8 +2,8 @@ import json
 import asyncio
 import aiohttp
 
-# 定义并发限制为16
-CONCURRENT_LIMIT = 16
+# 定义并发限制为8
+CONCURRENT_LIMIT = 8
 semaphore = asyncio.Semaphore(CONCURRENT_LIMIT)
 
 async def convert_duration_to_minutes(duration_str): 

@@ -63,8 +63,8 @@ class MusicPlayer {
         // Playlist clicks
         this.playlist.addEventListener('click', (e) => {
             const listItem = e.target.closest('.queue-item');
-            if (listItem) {
-                this.currentIndex = this.playlistItems.indexOf(listItem);
+            if (!listItem.classList.contains('active')) {
+                this.currentIndex = Array.from(this.playlist.children).indexOf(listItem);
                 this.loadCurrentTrack();
             }
         });

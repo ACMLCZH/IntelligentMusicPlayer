@@ -19,6 +19,38 @@ body {
 .nav-logo {
     grid-column: 1;
     justify-self: start;
+    display: flex;
+    align-items: center;
+}
+
+.nav-logo img {
+    width: 30px;
+    height: 30px;
+    margin-right: 10px;
+    border-radius: 50%;
+    vertical-align: middle;
+}
+
+.nav-user {
+    grid-column: 3;
+    justify-self: end;
+    position: relative;
+    display: flex;
+    align-items: center; /* 使用 Flex 布局对齐 */
+}
+
+.username {
+    margin-right: 10px; /* 与头像之间的间距 */
+    font-size: 1em;
+    color: white;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.nav-logo {
+    grid-column: 1;
+    justify-self: start;
 }
 
 .nav-logo a {
@@ -26,6 +58,7 @@ body {
     text-decoration: none;
     font-size: 1.5em;
     font-weight: bold;
+    line-height: 1;
 }
 
 .nav-search {
