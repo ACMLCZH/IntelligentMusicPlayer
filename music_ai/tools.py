@@ -141,7 +141,7 @@ class PlaylistOrganizer:
         # Stub - will be replaced with actual API call
         # TODO: Use aiohttp
         local_response = requests.get(
-            local_search_url.format(search=name, field='name') + "&limit={20}", # Limit to 20 results
+            local_search_url.format(search=name, field='name'),
             headers=local_headers
         )
         # print([song for song in self.playlists if song['title'].lower() == name.lower()])
@@ -149,9 +149,6 @@ class PlaylistOrganizer:
         
         retrieved_song = local_response.json()
         # print("retrieved_song", retrieved_song)
-        # randomly select 5 songs from the retrieved songs if there are more than 5
-        if len(retrieved_song) > 5:
-            retrieved_song = random.sample(retrieved_song, 5)
         
         return [{
             'id': song['id'],
@@ -165,10 +162,14 @@ class PlaylistOrganizer:
         # Stub - will be replaced with actual API call 
         # TODO: Use aiohttp
         local_response = requests.get(
-            local_search_url.format(search=genre, field='topics'),
+            local_search_url.format(search=genre, field='topics') + "&limit={20}", # Limit to 20 results
             headers=local_headers
         )
         retrieved_song = local_response.json()
+        print("retrieved_song", retrieved_song)
+        # randomly select 5 songs from the retrieved songs if there are more than 5
+        if len(retrieved_song) > 5:
+            retrieved_song = random.sample(retrieved_song, 5)
         return [{
             'id': song['id'],
             'title': song['name'],

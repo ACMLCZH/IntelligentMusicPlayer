@@ -42,7 +42,9 @@ class MusicPlayer {
         // Update UI
         document.querySelector('.queue-item.active')?.classList.remove('active');
         listItem.classList.add('active');
+        // Update current index and refresh playlist items
         this.currentIndex = newIndex;
+        this.playlistItems = Array.from(this.playlist.getElementsByTagName('li'));
     
         try {
             this.audio.src = url;
@@ -63,8 +65,9 @@ class MusicPlayer {
         // Playlist clicks
         this.playlist.addEventListener('click', (e) => {
             const listItem = e.target.closest('.queue-item');
-            if (listItem) {
-                const newIndex = this.playlistItems.indexOf(listItem);
+            // Only load track if it's not already playing
+            if (!listItem.classList.contains('active')) {
+                const newIndex = Array.from(this.playlist.children).indexOf(listItem);
                 this.loadTrackFromListItem(listItem, newIndex);
             }
         });
