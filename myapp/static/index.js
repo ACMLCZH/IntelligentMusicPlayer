@@ -111,7 +111,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (currentSong) {
             showFavlistDropdownInPlayer(currentSong.id, this);
         } else {
-            alert('No song is currently playing.');
         }
     });
 
@@ -787,12 +786,12 @@ function showPlaylistContextMenu(event, playlistItem) {
 function showSongContextMenu(event, songItem) {
     closeContextMenus(); // Close any existing context menus
 
-    // 检查是否为搜索结果项
-    const songsList = document.getElementById('songs-list');
-    if (songsList.contains(songItem)) {
-        console.log("Search results cannot be modified.");
-        return; // 直接返回，不显示右键菜单
-    }
+    // // 检查是否为搜索结果项
+    // const songsList = document.getElementById('songs-list');
+    // if (songsList.contains(songItem)) {
+    //     console.log("Search results cannot be modified.");
+    //     return; // 直接返回，不显示右键菜单
+    // }
 
     const menu = document.createElement('div');
     menu.classList.add('context-menu');
