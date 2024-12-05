@@ -199,6 +199,7 @@ function performSearch(query) {
             console.log('Search API response data:', data);
             if (Array.isArray(data.results)) {
                 displaySongs(data.results);
+
             } else {
                 console.error('Unexpected API response:', data);
                 // Optionally display an error message to the user
@@ -208,6 +209,13 @@ function performSearch(query) {
         .catch(error => {
             console.error('Error during search:', error);
         });
+}
+
+
+function formatDuration(seconds) {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
 }
 
 
@@ -230,7 +238,7 @@ function displaySongs(songs) {
                 <p class="song-artist">${song.author}</p>
             </div>
             <div class="song-album">${song.album}</div>
-            <div class="song-duration">${song.duration}s</div>
+            <div class="song-duration">${formatDuration(song.duration)}</div>
             <div class="song-actions">
                 <img class="add-to-favlist-button" src="/static/add.webp" alt="Add to Favlist">
             </div>
@@ -779,6 +787,13 @@ function showPlaylistContextMenu(event, playlistItem) {
 function showSongContextMenu(event, songItem) {
     closeContextMenus(); // Close any existing context menus
 
+    // 检查是否为搜索结果项
+    const songsList = document.getElementById('songs-list');
+    if (songsList.contains(songItem)) {
+        console.log("Search results cannot be modified.");
+        return; // 直接返回，不显示右键菜单
+    }
+
     const menu = document.createElement('div');
     menu.classList.add('context-menu');
     menu.style.top = `${event.pageY}px`;
@@ -796,6 +811,7 @@ function showSongContextMenu(event, songItem) {
     menu.appendChild(removeOption);
     document.body.appendChild(menu);
 }
+
 
 function closeContextMenus() {
     const existingMenus = document.querySelectorAll('.context-menu');

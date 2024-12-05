@@ -133,8 +133,10 @@ class MusicPlayer {
     }
 
     updateNavigationButtons() {
-        this.prevBtn.disabled = this.currentIndex <= 0;
-        this.nextBtn.disabled = this.currentIndex >= this.playlistItems.length - 1;
+        this.prevBtn.disabled = this.playlistItems.length == 1;
+        this.nextBtn.disabled = this.playlistItems.length == 1;
+        // this.prevBtn.disabled = this.currentIndex <= 0;
+        // this.nextBtn.disabled = this.currentIndex >= this.playlistItems.length - 1;
     }
 
     playNext() {
@@ -142,11 +144,19 @@ class MusicPlayer {
             this.currentIndex += 1;
             this.loadCurrentTrack();
         }
+        else {
+            this.currentIndex = 0;
+            this.loadCurrentTrack();
+        }
     }
     
     playPrevious() {
         if (this.currentIndex > 0) {
             this.currentIndex -= 1;
+            this.loadCurrentTrack();
+        }
+        else {
+            this.currentIndex = this.playlistItems.length - 1;
             this.loadCurrentTrack();
         }
     }

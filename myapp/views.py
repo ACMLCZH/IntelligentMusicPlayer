@@ -51,10 +51,12 @@ def backend_login_process(request):
             username = data.get('username') 
             password = data.get('password')
             confirm_password = data.get('confirm_password')
+            security_code = data.get('security_code')
             print(request_type)
             print(username)
             print(password)
             print(confirm_password)
+            print(security_code)
             
             if request_type == "sign_in":
                 user = authenticate(request, username=username, password=password)
@@ -93,6 +95,8 @@ def backend_login_process(request):
 
                 if not User.objects.filter(username=username).exists(): #
                     return JsonResponse({'response': 'Username not exists!'}, status=200) # 如果用户名不存在，可以继续创建用户的逻辑 
+                if security_code != "0000":
+                    return JsonResponse({'response': 'Wrong security code!!! Please ask administrator!!!'}, status=200)
                 if confirm_password != password:
                     return JsonResponse({'response': 'Passwords are not the same!'}, status=200)
                 user = User.objects.get(username=username)

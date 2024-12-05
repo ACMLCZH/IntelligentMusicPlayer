@@ -1,142 +1,189 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>Music Player</title>
-    <link rel="stylesheet" href="/static/index_style.css">
+    <link rel="stylesheet" href="/static/index_style.css" />
+    <link rel="icon" href="/static/logo.png" type="image/x-icon" />
 
     <!-- Service Worker Registration -->
     <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/static/service-worker.js')
-                    .then(reg => console.log('Service worker registered'))
-                    .catch(err => console.error('Service worker error:', err));
-            });
-        }
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker
+            .register("/static/service-worker.js")
+            .then((reg) => console.log("Service worker registered"))
+            .catch((err) => console.error("Service worker error:", err));
+        });
+      }
     </script>
     <script src="/static/player.js" defer></script>
     <script src="/static/index.js" defer></script>
-</head>
-<body>
+  </head>
+  <body>
     <!-- Navigation Bar -->
     <nav class="navbar">
-        <div class="nav-logo">
-            <img src="/static/logo.png" alt="Logo" id="logo">
-            <a href="/index" id="home-link">Intelli Music</a>
+      <div class="nav-logo">
+        <img src="/static/logo.png" alt="Logo" id="logo" />
+        <a href="/index" id="home-link">Intelli Music</a>
+      </div>
+      <div class="nav-search">
+        <input type="text" id="search-input" placeholder="Search..." />
+        <button id="search-button">
+          <img src="/static/search.png" alt="Search" id="search-img" />
+        </button>
+      </div>
+      <div class="nav-user" id="nav-user">
+        <span class="username" id="username-display">{{ user.username }}</span>
+        <img src="/static/user.png" alt="User Avatar" id="user-avatar" />
+        <div class="dropdown-menu" id="user-dropdown">
+          <!-- <a href="#" id="edit-profile">Edit Profile</a> -->
+          <a href="#" id="logout">Logout</a>
         </div>
-        <div class="nav-search">
-            <input type="text" id="search-input" placeholder="Search...">
-            <button id="search-button">
-                <img src="/static/search.png" alt="Search" id="search-img">
-            </button>
-        </div>
-        <div class="nav-user" id="nav-user">
-            <span class="username" id="username-display">{{ user.username }}</span>
-            <img src="/static/user.png" alt="User Avatar" id="user-avatar">
-            <div class="dropdown-menu" id="user-dropdown">
-                <!-- <a href="#" id="edit-profile">Edit Profile</a> -->
-                <a href="#" id="logout">Logout</a>
-            </div>
-        </div>
+      </div>
     </nav>
 
     <!-- Content Area -->
     <div class="content-area">
-        <!-- Left Sidebar: Playlists -->
-        <div class="sidebar">
-            <div class="playlist-header">
-                <h2>Playlists</h2>
-                <img src="/static/add.webp" alt="Add Playlist" id="add-playlist-button">
-            </div>
-            <!-- Container for the add playlist dropdown -->
-            <div id="add-playlist-dropdown" class="add-playlist-dropdown" style="display: none;">
-                <input type="text" id="new-playlist-name" placeholder="Playlist Name">
-                <button id="create-playlist-button">Add</button>
-            </div>
-            <ul id="playlist-list">
-                <!-- Playlists will be dynamically loaded here -->
-            </ul>
-            
+      <!-- Left Sidebar: Playlists -->
+      <div class="sidebar">
+        <div class="playlist-header">
+          <h2>Playlists</h2>
+          <img
+            src="/static/add.webp"
+            alt="Add Playlist"
+            id="add-playlist-button"
+          />
+        </div>
+        <!-- Container for the add playlist dropdown -->
+        <div
+          id="add-playlist-dropdown"
+          class="add-playlist-dropdown"
+          style="display: none"
+        >
+          <input
+            type="text"
+            id="new-playlist-name"
+            placeholder="Playlist Name"
+          />
+          <button id="create-playlist-button">Add</button>
+        </div>
+        <ul id="playlist-list">
+          <!-- Playlists will be dynamically loaded here -->
+        </ul>
+      </div>
+
+      <!-- Main Content: Song List -->
+      <div class="main-content">
+        <!-- Current Playlist Information -->
+        <div class="playlist-info">
+          <img
+            id="playlist-cover"
+            src="/static/default-cover.jpg"
+            alt="Playlist Cover"
+          />
+          <h2 id="current-playlist-title">
+            Welcome to Intelligent Music Player!
+          </h2>
+          <div class="playlist-buttons">
+            <button id="ai-generate-button">
+              <div id="button-spinner" class="spinner" style="display: none;"></div>
+                <!-- <img src="/static/play.png" alt="AI Generate Songs" id="ai-generate-img"> -->
+              AI
+            </button>
+            <button id="add-to-playqueue">
+              <img
+                src="/static/play.png"
+                alt="Add to Play Queue"
+                id="add-to-playqueue-img"
+              />
+            </button>
+          </div>
         </div>
 
-        <!-- Main Content: Song List -->
-        <div class="main-content">
-            <!-- Current Playlist Information -->
-            <div class="playlist-info">
-                <img id="playlist-cover" src="/static/default-cover.jpg" alt="Playlist Cover">
-                <h2 id="current-playlist-title">Welcome to Intelligent Music Player!</h2>
-                <div class="playlist-buttons">
-                    <button id="ai-generate-button">
-                        <div id="button-spinner" class="spinner" style="display: none;"></div>
-                        <!-- <div class="spinner" id="button-spinner" style="display: none;"></div> -->
-                        <!-- <img src="/static/play.png" alt="AI Generate Songs" id="ai-generate-img"> -->
-                         AI
-                    </button>
-                    <button id="add-to-playqueue">
-                        <img src="/static/play.png" alt="Add to Play Queue" id="add-to-playqueue-img">
-                    </button>
-                    
-                </div>
-            </div>
-
-            <!-- Song List -->
-            <div id="songs-list">
-                <!-- Songs will be dynamically loaded here -->
-            </div>
+        <!-- Song List -->
+        <div id="songs-list">
+          <!-- Songs will be dynamically loaded here -->
         </div>
+      </div>
 
-        <!-- Right Sidebar: Play Queue -->
-        <div class="play-queue">
-            <h3>Play Queue</h3>
-            <ul id="playlist-container" data-current-index="-1">
-                <div class="empty-queue">
-                    <p class="empty-queue-message">No tracks in queue</p>
-                    <p class="empty-queue-subtitle">Select a playlist to get started</p>
-                </div>
-            </ul>
+      <!-- Right Sidebar: Play Queue -->
+      <div class="play-queue">
+        <h3>Play Queue</h3>
+        <ul id="playlist-container" data-current-index="-1">
+          <div class="empty-queue">
+            <p class="empty-queue-message">No tracks in queue</p>
+            <p class="empty-queue-subtitle">Select a playlist to get started</p>
+          </div>
+        </ul>
 
-            <!-- Natural Language Play Queue Management -->
-            <div class="nlp-management">
-                <h3>Manage Play Queue</h3>
-                <form id="playlist-form">
-                    {% csrf_token %}
-                    <textarea id="nlp-input" name="instruction" placeholder="Enter your playlist instruction..." required></textarea>
-                    <button id="nlp-button" type="submit">Update Play Queue</button>
-                </form>
-            </div>
+        <!-- Natural Language Play Queue Management -->
+        <div class="nlp-management">
+          <h3>Manage Play Queue</h3>
+          <form id="playlist-form">
+            {% csrf_token %}
+            <textarea
+              id="nlp-input"
+              name="instruction"
+              placeholder="Enter your playlist instruction..."
+              required
+            ></textarea>
+            <button id="nlp-button" type="submit">Update Play Queue</button>
+          </form>
         </div>
+      </div>
     </div>
 
     <!-- Player Area -->
     <div class="player-area">
-        <div class="player-container">
-            <!-- Left section: Cover art -->
-            <div class="player-left">
-                <img src="/static/default-cover.jpg" alt="No track selected" class="cover-art" id="cover-art">
-            </div>
-            
-            <!-- Center section: Controls and track info -->
-            <div class="player-center">
-                <div class="player-info">
-                    <h2 id="track-title">Select a track to play</h2>
-                    <h3 id="track-artist">No track playing</h3>
-                </div>
-                <div class="controls">
-                    <button id="prev-btn" disabled><img src="/static/previous.png" alt="Previous" style="width: 24px; height: 24px;"></button>
-                    <audio id="audio-player" controls>
-                        <source src="" type="audio/mpeg">
-                        Your browser does not support the audio element.
-                    </audio>
-                    <button id="next-btn" disabled><img src="/static/next.png" alt="Next" style="width: 24px; height: 24px;"></button>
-                    <button id="add-to-playlist-btn" title="Add to Playlist">
-                        <img src="/static/add.webp" alt="Add to Playlist" style="width: 24px; height: 24px;">
-                    </button>
-                </div>
-            </div>
+      <div class="player-container">
+        <!-- Left section: Cover art -->
+        <div class="player-left">
+          <img
+            src="/static/default-cover.jpg"
+            alt="No track selected"
+            class="cover-art"
+            id="cover-art"
+          />
         </div>
+
+        <!-- Center section: Controls and track info -->
+        <div class="player-center">
+          <div class="player-info">
+            <h2 id="track-title">Select a track to play</h2>
+            <h3 id="track-artist">No track playing</h3>
+          </div>
+          <div class="controls">
+            <button id="prev-btn" disabled>
+              <img
+                src="/static/previous.png"
+                alt="Previous"
+                style="width: 24px; height: 24px"
+              />
+            </button>
+            <audio id="audio-player" controls>
+              <source src="" type="audio/mpeg" />
+              Your browser does not support the audio element.
+            </audio>
+            <button id="next-btn" disabled>
+              <img
+                src="/static/next.png"
+                alt="Next"
+                style="width: 24px; height: 24px"
+              />
+            </button>
+            <button id="add-to-playlist-btn" title="Add to Playlist">
+              <img
+                src="/static/add.webp"
+                alt="Add to Playlist"
+                style="width: 24px; height: 24px"
+              />
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <script src="/static/index.js"></script>
-</body>
+  </body>
 </html>
