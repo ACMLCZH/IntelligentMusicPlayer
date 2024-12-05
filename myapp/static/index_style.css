@@ -301,10 +301,7 @@ body {
     background-color: #256bb5;
 }
 
-#add-to-playqueue:disabled,
 #ai-generate-button:disabled {
-/* #add-to-playqueue:hover,
-#ai-generate-button:hover { */
     background-color: gray;
     cursor: not-allowed;
     opacity: 0.6;

@@ -90,6 +90,7 @@ def generate_songs(songs_jsons: List[Dict]) -> List[Dict]:
         'instrumental': False,
     }
     try:
+        # time.sleep(100)
         raise requests.exceptions.RequestException
         suno_response = suno_client.request(suno_data)
     except requests.exceptions.RequestException as e:

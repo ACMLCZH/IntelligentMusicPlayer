@@ -2,6 +2,7 @@ let accessibleFavlists = [];
 let currentPlaylistData = null;
 // Declare a global variable to hold the MusicPlayer instance
 let player = null;
+let currentAIData = null;
 
 document.addEventListener('DOMContentLoaded', function() {
     // Load playlists
@@ -45,22 +46,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (player) {
             player.updatePlaylistItems();
             player.loadCurrentTrack();
-
-            // player.playlistItems = Array.from(playQueue.getElementsByTagName('li'));
-            // player.currentIndex = 0;
-            // player.updateNavigationButtons();
-    
-            // Update the player UI elements with the first song
-            // if (currentPlaylistData.songs_detail.length > 0) {
-            //     const firstSong = currentPlaylistData.songs_detail[0];
-            //     player.coverArt.src = firstSong.cover_url;
-            //     player.titleElement.textContent = firstSong.name;
-            //     player.artistElement.textContent = firstSong.author;
-            //     player.audio.src = firstSong.mp3_url;
-    
-            //     // Play the first song
-            //     player.audio.play();
-            // }
         }
     });
 
@@ -89,7 +74,11 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     document.getElementById('ai-generate-button').addEventListener('click', function() {
-        generateSongsWithAI();
+        if (currentAIData) {
+            displayAIData();
+        } else {
+            generateSongsWithAI();
+        }
     });
 
     // Add event listener for right-click on playlist items
@@ -362,6 +351,8 @@ function displayPlayList(playListData) {
     // Show the playlist-info section
     document.querySelector('.playlist-info').style.display = 'flex';
     document.getElementById('current-playlist-title').textContent = playListData.name;
+    document.getElementById('ai-generate-button').style.display = 'flex';
+    document.getElementById('add-to-playqueue').style.display = 'flex';
     console.log(playListData);
     displaySongs(playListData.songs_detail);
 }
@@ -656,6 +647,18 @@ function logoutUser() {
     });
 }
 
+function displayAIData() {
+    const button = document.getElementById('ai-generate-button');
+    button.textContent = 'AI';
+
+    document.querySelector('.playlist-info').style.display = 'flex';
+    document.getElementById('current-playlist-title').textContent = 'AI Generation';
+    document.getElementById('ai-generate-button').style.display = 'none';
+    document.getElementById('add-to-playqueue').style.display = 'none';
+    displaySongs(currentAIData);
+    currentAIData = null;
+}
+
 function generateSongsWithAI() {
     if (!currentPlaylistData || !currentPlaylistData.id) {
         alert('No playlist selected.');
@@ -675,6 +678,8 @@ function generateSongsWithAI() {
     // Send GET request to the generate-songs API
     const button = document.getElementById('ai-generate-button');
     button.disabled = true;
+    // spinner.style.display = true;
+
     fetch(`/generate-songs/${playlistId}/`, { signal })
         .then(response => {
             if (!response.ok) {
@@ -684,12 +689,12 @@ function generateSongsWithAI() {
         })
         .then(data => {
             button.disabled = false;
+            // button.querySelector("#spinner").style.display = 'none';
 
             // Display generated songs
             if (Array.isArray(data)) {
-                document.querySelector('.playlist-info').style.display = 'flex';
-                document.getElementById('current-playlist-title').textContent = 'AI Generation';
-                displaySongs(data);
+                button.textContent = 'OK';
+                currentAIData = data;
             } else {
                 console.error('Unexpected API response:', data);
                 alert('Error: Unexpected response from the server.');
@@ -703,8 +708,6 @@ function generateSongsWithAI() {
                 alert('An error occurred while generating songs.');
             }
             button.disabled = false;
-
-            // hideLoadingSpinner();
         });
 }
 
