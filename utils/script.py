@@ -23,7 +23,7 @@ async def send_song_data(song, session, auth):
             "album": album,
             "duration": duration,
             "lyrics": '.',
-            "topics": ', '.join(topics),
+            "topics": topics,
             "mp3_url": mp3_url,
             "cover_url": cover_url,
         }
