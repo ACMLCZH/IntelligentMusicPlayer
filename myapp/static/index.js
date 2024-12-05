@@ -222,6 +222,13 @@ function performSearch(query) {
 }
 
 
+function formatDuration(seconds) {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
+}
+
+
 // Function to display search results
 function displaySongs(songs) {
     console.log(songs);
@@ -241,7 +248,7 @@ function displaySongs(songs) {
                 <p class="song-artist">${song.author}</p>
             </div>
             <div class="song-album">${song.album}</div>
-            <div class="song-duration">${song.duration}s</div>
+            <div class="song-duration">${formatDuration(song.duration)}</div>
             <div class="song-actions">
                 <img class="add-to-favlist-button" src="/static/add.webp" alt="Add to Favlist">
             </div>
