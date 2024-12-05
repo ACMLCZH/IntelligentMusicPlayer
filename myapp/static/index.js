@@ -93,6 +93,29 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('ai-generate-button').addEventListener('click', function() {
         generateSongsWithAI();
     });
+
+    // Add event listener for right-click on playlist items
+    document.getElementById('playlist-list').addEventListener('contextmenu', function(e) {
+        e.preventDefault();
+        let target = e.target.closest('li');
+        if (target) {
+            showPlaylistContextMenu(e, target);
+        }
+    });
+
+    // Add event listener for right-click on song items
+    document.getElementById('songs-list').addEventListener('contextmenu', function(e) {
+        e.preventDefault();
+        let target = e.target.closest('.song-item');
+        if (target) {
+            showSongContextMenu(e, target);
+        }
+    });
+
+    // Close context menus when clicking outside
+    document.addEventListener('click', function(e) {
+        closeContextMenus();
+    });
     
 });
 
@@ -749,4 +772,131 @@ function hideLoadingSpinner() {
     if (overlay) {
         document.body.removeChild(overlay);
     }
+}
+
+function showPlaylistContextMenu(event, playlistItem) {
+    closeContextMenus(); // Close any existing context menus
+
+    const menu = document.createElement('div');
+    menu.classList.add('context-menu');
+    menu.style.top = `${event.pageY}px`;
+    menu.style.left = `${event.pageX}px`;
+
+    const deleteOption = document.createElement('div');
+    deleteOption.textContent = 'Delete Playlist';
+    deleteOption.addEventListener('click', function() {
+        const playlistId = playlistItem.dataset.id;
+        deletePlaylist(playlistId);
+        menu.remove();
+    });
+
+    menu.appendChild(deleteOption);
+    document.body.appendChild(menu);
+}
+
+function showSongContextMenu(event, songItem) {
+    closeContextMenus(); // Close any existing context menus
+
+    const menu = document.createElement('div');
+    menu.classList.add('context-menu');
+    menu.style.top = `${event.pageY}px`;
+    menu.style.left = `${event.pageX}px`;
+
+    const removeOption = document.createElement('div');
+    removeOption.textContent = 'Remove Song from Playlist';
+    removeOption.addEventListener('click', function() {
+        const songId = parseInt(songItem.dataset.songId);
+        const playlistId = currentPlaylistData.id;
+        removeSongFromPlaylist(playlistId, songId);
+        menu.remove();
+    });
+
+    menu.appendChild(removeOption);
+    document.body.appendChild(menu);
+}
+
+function closeContextMenus() {
+    const existingMenus = document.querySelectorAll('.context-menu');
+    existingMenus.forEach(menu => menu.remove());
+}
+
+function deletePlaylist(playlistId) {
+    if (!confirm('Are you sure you want to delete this playlist?')) {
+        return;
+    }
+
+    fetch(`/favlist/${playlistId}/`, {
+        method: 'DELETE',
+        headers: {
+            'X-CSRFToken': getCSRFToken(),
+        },
+    })
+    .then(response => {
+        if (response.ok) {
+            // Remove the playlist from the UI
+            const playlistItem = document.querySelector(`#playlist-list li[data-id='${playlistId}']`);
+            if (playlistItem) {
+                playlistItem.remove();
+            }
+            // Optionally, clear the songs list if the deleted playlist was selected
+            if (currentPlaylistData && currentPlaylistData.id == playlistId) {
+                document.getElementById('songs-list').innerHTML = '';
+                document.getElementById('current-playlist-title').textContent = 'Playlist Title';
+            }
+            alert('Playlist deleted successfully.');
+        } else {
+            throw new Error('Failed to delete playlist.');
+        }
+    })
+    .catch(error => {
+        console.error('Error deleting playlist:', error);
+        alert('An error occurred while deleting the playlist.');
+    });
+}
+
+
+function removeSongFromPlaylist(playlistId, songId) {
+    if (!confirm('Are you sure you want to remove this song from the playlist?')) {
+        return;
+    }
+
+    // Fetch the current playlist data to get the existing songs
+    fetch(`/favlist/${playlistId}/`)
+        .then(response => response.json())
+        .then(favlistData => {
+            const existingSongs = favlistData.songs; // Array of song IDs
+
+            // Remove the song ID from the array
+            const updatedSongs = existingSongs.filter(id => id !== songId);
+
+            // Send PATCH request to update the playlist
+            fetch(`/favlist/${playlistId}/`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCSRFToken(),
+                },
+                body: JSON.stringify({ songs: updatedSongs }),
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Remove the song from the UI
+                    const songItem = document.querySelector(`.song-item[data-song-id='${songId}']`);
+                    if (songItem) {
+                        songItem.remove();
+                    }
+                    alert('Song removed from playlist successfully.');
+                } else {
+                    throw new Error('Failed to remove song from playlist.');
+                }
+            })
+            .catch(error => {
+                console.error('Error updating playlist:', error);
+                alert('An error occurred while removing the song from the playlist.');
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching playlist data:', error);
+            alert('An error occurred while removing the song from the playlist.');
+        });
 }

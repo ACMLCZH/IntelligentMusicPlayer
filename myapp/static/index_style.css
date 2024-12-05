@@ -670,3 +670,23 @@ audio::-webkit-media-controls-panel {
 #loading-overlay button:hover {
     background-color: #256bb5;
 }
+
+/* Context Menu Styles */
+.context-menu {
+    position: absolute;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    z-index: 10000;
+    width: 150px;
+}
+
+.context-menu div {
+    padding: 10px;
+    cursor: pointer;
+}
+
+.context-menu div:hover {
+    background-color: #f1f1f1;
+}
