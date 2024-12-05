@@ -188,11 +188,9 @@ function setupNavbar() {
         logoutUser();
     });
 
-    document.getElementById('edit-profile').addEventListener('click', function(e) {
-        e.preventDefault();
-        // Logic to navigate to the edit profile page
-        console.log('Navigate to edit profile page');
-    });
+
+    // Edit profile link
+    // Delated
 }
 
 // Function to perform search
