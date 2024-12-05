@@ -6,7 +6,6 @@ let player = null;
 document.addEventListener('DOMContentLoaded', function() {
     // Load playlists
     fetchPlaylists();
-
     setupNavbar();
 
     // Initialize the MusicPlayer instance
@@ -18,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (target) {
             let playlistId = target.dataset.id;
             console.log(`Fetching details for playlist ID: ${playlistId}`);
-            fetchSongs(playlistId);
+            fetchFavList(playlistId);
 
             let playlistItems = document.querySelectorAll('#playlist-list li');
             playlistItems.forEach(function(item) {
@@ -213,7 +212,7 @@ function performSearch(query) {
         .then(data => {
             console.log('Search API response data:', data);
             if (Array.isArray(data.results)) {
-                displaySearchResults(data.results);
+                displaySongs(data.results);
             } else {
                 console.error('Unexpected API response:', data);
                 // Optionally display an error message to the user
@@ -227,10 +226,9 @@ function performSearch(query) {
 
 
 // Function to display search results
-function displaySearchResults(songs) {
-    const songsList = document.getElementById('songs-list');
+function displaySongs(songs) {
     console.log(songs);
-
+    const songsList = document.getElementById('songs-list');
     songsList.innerHTML = ''; // Clear previous content
 
     songs.forEach((song, index) => {
@@ -268,6 +266,16 @@ function displaySearchResults(songs) {
 
         songsList.appendChild(songItem);
     });
+    
+    const playlistCover = document.getElementById('playlist-cover');
+    if (songs.length > 0) {
+        // Select a random song
+        const randomIndex = Math.floor(Math.random() * songs.length);
+        const randomSong = songs[randomIndex];
+        playlistCover.src = randomSong.cover_url;
+    } else {
+        playlistCover.src = '/static/default-cover.jpg';
+    }
 }
 
 
@@ -306,7 +314,7 @@ function displayPlaylists(playlists) {
 }
 
 // Fetch songs from a specific playlist
-function fetchSongs(playlistId) {
+function fetchFavList(playlistId) {
     // Show the playlist-info section
     document.querySelector('.playlist-info').style.display = 'flex';
 
@@ -319,74 +327,18 @@ function fetchSongs(playlistId) {
         })
         .then(data => {
             currentPlaylistData = data; // Store the data
-
-            // Expose it to the global scope
-            window.currentPlaylistData = currentPlaylistData;
-
-            displaySongs(data);
+            window.currentPlaylistData = currentPlaylistData;   // Expose it to the global scope
+            displayFavList(data);
         })
         .catch(error => {
             console.error('Error fetching playlists:', error);
         });
 }
 
-function displaySongs(favListData) {
-    const songsList = document.getElementById('songs-list');
+function displayFavList(favListData) {
     console.log(favListData);
-
-    songsList.innerHTML = ''; // 清空之前的内容
-
     const songsDetail = favListData.songs_detail; // 提取 songs_detail 数据
-
-    songsDetail.forEach((song, index) => {
-        const songItem = document.createElement('div');
-        songItem.classList.add('song-item');
-        songItem.dataset.songId = song.id;
-
-        songItem.innerHTML = `
-            <div class="song-rank">${index + 1}</div>
-            <img class="song-image" src="${song.cover_url}" alt="Song Cover">
-            <div class="song-details">
-                <p class="song-title">${song.name}</p>
-                <p class="song-artist">${song.author}</p>
-            </div>
-            <div class="song-album">${song.album}</div>
-            <div class="song-duration">${song.duration}s</div>
-            <div class="song-actions">
-                <img class="add-to-favlist-button" src="/static/add.webp" alt="Add to Favlist">
-            </div>
-        `;
-
-        songItem.style.userSelect = 'none';
-
-        // 双击播放
-        songItem.addEventListener('dblclick', () => {
-            playSong(song);
-        });
-
-        // 收藏按钮事件
-        const addButton = songItem.querySelector('.add-to-favlist-button');
-        addButton.addEventListener('click', (e) => {
-            e.stopPropagation(); // Prevent triggering parent events
-            showFavlistDropdown(song.id, addButton);
-        });
-
-        songsList.appendChild(songItem);
-    });
-    // Update player's playlist items
-    if (player) {
-        player.updatePlaylistItems();
-    }
-
-    const playlistCover = document.getElementById('playlist-cover');
-    if (songsDetail.length > 0) {
-        // Select a random song
-        const randomIndex = Math.floor(Math.random() * songsDetail.length);
-        const randomSong = songsDetail[randomIndex];
-        playlistCover.src = randomSong.cover_url;
-    } else {
-        playlistCover.src = '/static/default-cover.jpg';
-    }
+    displaySongs(songsDetail);
 }
 
 // Play a song
@@ -456,6 +408,11 @@ function displayPlayQueue(queue) {
         li.textContent = (index === 0 ? "Now Playing: " : "") + song.title;
         playQueueList.appendChild(li);
     });
+    
+    // Update player's playlist items
+    if (player) {
+        player.updatePlaylistItems();
+    }
 }
 
 
@@ -711,17 +668,18 @@ function generateSongsWithAI() {
     }
 
     const playlistId = currentPlaylistData.id;
-
-    // console.log(`Generating songs for playlist ID: ${playlistId}`);
+    // console.log(`Generating songs for playlist ID: ${playlistId}\n`);
 
     // Create an AbortController to allow canceling the request
     const controller = new AbortController();
     const signal = controller.signal;
 
     // Show loading spinner and disable UI
-    showLoadingSpinner(controller);
+    // showLoadingSpinner(controller);
 
     // Send GET request to the generate-songs API
+    const button = document.getElementById('ai-generate-button');
+    button.disabled = true;
     fetch(`/generate-songs/${playlistId}/`, { signal })
         .then(response => {
             if (!response.ok) {
@@ -730,12 +688,13 @@ function generateSongsWithAI() {
             return response.json();
         })
         .then(data => {
-            // Hide loading spinner and enable UI
-            hideLoadingSpinner();
+            button.disabled = false;
 
             // Display generated songs
             if (Array.isArray(data)) {
-                displaySearchResults(data);
+                document.querySelector('.playlist-info').style.display = 'flex';
+                document.getElementById('current-playlist-title').textContent = 'AI Generation';
+                displaySongs(data);
             } else {
                 console.error('Unexpected API response:', data);
                 alert('Error: Unexpected response from the server.');
@@ -748,8 +707,9 @@ function generateSongsWithAI() {
                 console.error('Error generating songs:', error);
                 alert('An error occurred while generating songs.');
             }
-            // Hide loading spinner and enable UI
-            hideLoadingSpinner();
+            button.disabled = false;
+
+            // hideLoadingSpinner();
         });
 }
 
