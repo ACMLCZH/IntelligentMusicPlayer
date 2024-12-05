@@ -140,7 +140,7 @@ def index(request):
 def get_playlist_from_api(playlist_id):
     """Fetch playlist data from API"""
     try:
-        response = requests.get(f'http://127.0.0.1:8000/favlist/{playlist_id}/')
+        response = requests.get(f'http://127.0.0.1:8000/userfav')
         if response.status_code == 200:
             data = response.json()
             # Transform API data to player format
@@ -208,8 +208,8 @@ async def reorganize_playlist(request):
             # Get playlist from API
             playlist = await sync_to_async(get_playlist_from_api)(playlist_id)
             
-            organizer = PlaylistOrganizer()
-            organizer.playlists = playlist
+            # Pass the playlist to the organizer
+            organizer = PlaylistOrganizer(playlist)
 
             new_playlist = await organizer.reorganize_playlist(instruction)
 

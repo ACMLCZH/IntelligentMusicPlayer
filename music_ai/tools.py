@@ -126,8 +126,8 @@ def generate_songs(songs_jsons: List[Dict]) -> List[Dict]:
 
 
 class PlaylistOrganizer:
-    def __init__(self):
-        self.playlists = []
+    def __init__(self, playlists):
+        self.playlists = playlists
         self.system_prompt = \
             "You are a music playlist organizer. Parse the user's instruction into a structured format."\
             "Return a JSON object with:"\
