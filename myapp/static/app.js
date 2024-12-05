@@ -107,12 +107,14 @@ async function submitForm_reset() {
   const username = document.getElementById("username").value;
   const password = document.getElementById("password").value;
   const confirm_password = document.getElementById("confirm_password").value;
+  const security_code = document.getElementById("security_code").value;
 
   const data = {
     type: "reset",
     username: username,
     password: password,
     confirm_password: confirm_password,
+    security_code: security_code,
   };
   fetch("/sign_in_sign_up_reset_request", {
     method: "POST",
