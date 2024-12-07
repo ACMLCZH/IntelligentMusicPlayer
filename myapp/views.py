@@ -161,20 +161,26 @@ def get_playlist_from_api(playlist_id):
 @csrf_exempt
 async def play_music(request):
     # Get playlist from API
-    playlist = await sync_to_async(get_playlist_from_api)()
-    if not playlist:
-        return JsonResponse({'error': 'Failed to load playlist'}, status=500)
-    
-    # Get current track index from session
-    current_index = request.session.get('current_track', 0)
-    current_track = playlist[current_index].copy()
-    
-    context = {
-        'playlist': playlist,
-        'current_track': current_track,
-        'current_index': current_index
-    }
-    return render(request, 'index.html', context)
+    try:
+        # Get playlist data
+        playlist = await sync_to_async(get_playlist_from_api)()
+        if not playlist:
+            return JsonResponse({'error': 'Failed to load playlist'}, status=500)
+        
+        current_index = request.session.get('current_track', 0)
+        current_track = playlist[current_index].copy()
+        
+        return JsonResponse({
+            'status': 'success',
+            'playlist': playlist,
+            'current_track': current_track,
+            'current_index': current_index
+        })
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error',
+            'message': str(e)
+        }, status=500)
 
 def _create_json_response(data, status=200):
     """Synchronous helper to create JsonResponse"""
