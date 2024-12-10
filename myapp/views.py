@@ -186,21 +186,6 @@ def _create_json_response(data, status=200):
     """Synchronous helper to create JsonResponse"""
     return JsonResponse(data, status=status)
 
-def _update_session_and_respond(request, playlist):
-    """Synchronous helper to update session and return response"""
-    print("=== New Playlist ===")
-    for song in playlist:
-        print(f"Title: {song['title']}, Artist: {song['artist']}")
-    print("=================")
-    
-    request.session['playlist'] = playlist
-    request.session['current_track'] = 0  # Reset to first track
-    return JsonResponse({
-        'status': 'success',
-        'playlist': playlist,
-        'current_track': playlist[0] if playlist else None
-    })
-
 @csrf_exempt
 async def reorganize_playlist(request):
     if request.method == 'POST':
@@ -213,10 +198,9 @@ async def reorganize_playlist(request):
             organizer = PlaylistOrganizer(queue)
             new_queue = await organizer.reorganize_playlist(instruction)
 
-            return await sync_to_async(_create_json_response)({
-                'status': 'success',
-                'playlist': new_queue
-            })
+            return await sync_to_async(_create_json_response)(
+                {'status': 'success', 'playlist': new_queue}
+            )
             
         except json.JSONDecodeError:
             return await sync_to_async(_create_json_response)(
