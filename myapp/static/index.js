@@ -281,10 +281,10 @@ function displaySongs(songs) {
                 cover: song.cover_url,
                 url: song.mp3_url
             }];
-            
-            // Update the play queue with the selected song
+
+            // Update the play queue UI
             const playQueue = document.getElementById('playlist-container');
-            const songElement = `
+            playQueue.innerHTML = `
                 <li class="queue-item active" data-song-id="${song.id}" data-url="${song.mp3_url}">
                     <img class="queue-image" src="${song.cover_url}" alt="Song Cover">
                     <div class="queue-details">
@@ -293,7 +293,6 @@ function displaySongs(songs) {
                     </div>
                 </li>
             `;
-            playQueue.innerHTML = songElement;
             
             // Use the existing player instance
             if (player) {

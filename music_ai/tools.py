@@ -158,8 +158,6 @@ class PlaylistOrganizer:
         return [id_to_song[id] for id in ids if id in id_to_song]
     
     async def search_songs_by_name(self, name: str) -> List[Dict]:
-        # Stub - will be replaced with actual API call
-        # TODO: Use aiohttp
         local_response = requests.get(
             local_search_url.format(search=name, field='name'),
             headers=local_headers
@@ -247,14 +245,16 @@ class PlaylistOrganizer:
             if not song_to_add:
                 # search the song in the local database
                 song_to_add = await self.search_songs_by_name(parsed["song_name"])
+                # the retrieved song is a list, so take the first song
+                song_to_add = song_to_add[0] if song_to_add else None
                 if not song_to_add:
                     raise ValueError(f"Song '{parsed['song_name']}' not found")
-            
+            print(f"Song to add: {song_to_add}")
             new_playlist = self.playlists.copy()
             
             # Insert the song at the specified position
             new_playlist.insert(position, song_to_add)
-                    
+            print(f"New playlist after adding: {new_playlist}")
             return new_playlist
         elif parsed["type"] == "remove":
             print(f"Remove song: {parsed['song_name']}")

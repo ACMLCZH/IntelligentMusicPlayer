@@ -165,15 +165,25 @@ class MusicPlayer {
         e.preventDefault();
         const instruction = e.target.instruction.value;
     
-        // Use current play queue if available, otherwise use playlist data
-        const queueData = currentPlayQueue || currentPlaylistData.songs_detail.map(song => ({
-            id: song.id,
-            title: song.name,
-            artist: song.author,
-            cover: song.cover_url,
-            url: song.mp3_url
-        }));
-    
+        // Validation check for empty queue
+        if (!currentPlayQueue || currentPlayQueue.length === 0) {
+            if (!currentPlaylistData || !currentPlaylistData.songs_detail) {
+                alert('No songs available. Please add songs to the queue or select a playlist.');
+                return;
+            }
+            // Fall back to current playlist data
+            currentPlayQueue = currentPlaylistData.songs_detail.map(song => ({
+                id: song.id,
+                title: song.name,
+                artist: song.author,
+                cover: song.cover_url,
+                url: song.mp3_url
+            }));
+        }
+        const queueData = currentPlayQueue;
+        // console.log('currentPlayQueue:', currentPlayQueue);
+        // console.log('currentPlaylistData:', currentPlaylistData);
+        // console.log('Queue data:', queueData);
         try {
             const response = await fetch('/reorganize-playlist/', {
                 method: 'POST',
@@ -196,7 +206,9 @@ class MusicPlayer {
                 // Update both UI and state
                 currentPlayQueue = data.playlist;
                 this.updatePlaylistUI(data.playlist);
+                this.loadCurrentTrack();
             } else {
+                // console.log('data playlist is:', data.playlist);
                 throw new Error('Invalid playlist data received');
             }
         } catch (error) {
