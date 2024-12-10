@@ -290,7 +290,7 @@ class SongSearchView(DocumentViewSet):
             if field in self.search_fields:
                 return queryset.query("match", **{field: search})
             else:
-                raise ValueError(f"Field '{field}' is not a valid search field.")
+                raise ValidationError(f"Field '{field}' is not a valid search field.")
         return super().filter_queryset(queryset)
 
 
