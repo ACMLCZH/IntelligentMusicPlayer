@@ -12,7 +12,7 @@
 
 ## Usage:
 
-### Step 0: (Optional)
+### Step 0: Configuration (Optional)
 - To run your server in your device, you should install and configure all the requirements below.
 
 #### MySQL Database:
@@ -74,21 +74,17 @@ export SUNOAI_TOKEN=your_api_key_here
 setx SUNOAI_TOKEN "your_api_key_here"
 ```
 
-# STEP1: run backend server
+### Step 1: Run Backend Server
 
 ```bash
 
 python manage.py runserver
 ```
 
-# STEP2: For Normal User, Open Login URL
-```bash
-# Open your browser with following link:
-http://127.0.0.1:8000/login
-# you will also see this url in your backend terminal
-```
+### Step 2: For Normal User, Open Login URL
+- Open your browser with the url `http://127.0.0.1:8000/login` you will also see this url in your backend terminal.
 
-# STEP3: For Administator, Sign Up A Super Account(Administrator)
+### Step 3: For Administator, Sign Up A Super Account (Administrator)
 ```bash
 python manage.py createsuperuser
 # enter your username, password, email
@@ -98,14 +94,14 @@ Username: 23687
 Password: 520project
 ```
 
-# STEP4: For Administator, Open Database Management URL
+### STEP4: For Administator, Open Database Management URL
 ```bash
 # Open your broser with following link:
 http://127.0.0.1:8000/admin
 # You may manage all accounts
 ```
 
-# Add Song Source data to database
+### Add Song Source data to database
 ```bash
 
 # Scraping Song Information from Web Pages, save it to ./utils/songs.json
