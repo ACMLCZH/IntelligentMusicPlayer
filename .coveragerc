@@ -1,0 +1,12 @@
+[run]
+source = myapp
+
+[report]
+omit =
+    myapp/migrations/*
+    myapp/tests/*
+    myapp/static/*
+    myapp/templates/*
+
+[html]
+directory = htmlcov
