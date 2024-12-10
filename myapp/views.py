@@ -207,31 +207,27 @@ async def reorganize_playlist(request):
         try:
             data = json.loads(request.body)
             instruction = data.get('instruction')
-            playlist_id = data.get('playlist_id')
+            queue = data.get('queue')  # Get queue instead of playlist_id
             
-            # Get playlist from API
-            playlist = await sync_to_async(get_playlist_from_api)(playlist_id)
-            
-            # Pass the playlist to the organizer
-            organizer = PlaylistOrganizer(playlist)
+            # Create organizer with current queue
+            organizer = PlaylistOrganizer(queue)
+            new_queue = await organizer.reorganize_playlist(instruction)
 
-            new_playlist = await organizer.reorganize_playlist(instruction)
-
-            # Wrap the entire session update and response in sync_to_async
-            return await sync_to_async(_update_session_and_respond)(request, new_playlist)
+            return await sync_to_async(_create_json_response)({
+                'status': 'success',
+                'playlist': new_queue
+            })
             
         except json.JSONDecodeError:
             return await sync_to_async(_create_json_response)(
                 {'status': 'error', 'message': 'Invalid JSON data'},
                 400
             )
-
         except Exception as e:
             return await sync_to_async(_create_json_response)(
                 {'status': 'error', 'message': str(e)},
                 500
             )
-    
     return await sync_to_async(_create_json_response)(
         {'status': 'error', 'message': 'Method not allowed'},
         405

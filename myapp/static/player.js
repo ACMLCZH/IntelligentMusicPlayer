@@ -164,7 +164,15 @@ class MusicPlayer {
     async reorganizePlaylist(e) {
         e.preventDefault();
         const instruction = e.target.instruction.value;
-        const playlistId = currentPlaylistData.id; // Get the current playlist ID
+    
+        // Use current play queue if available, otherwise use playlist data
+        const queueData = currentPlayQueue || currentPlaylistData.songs_detail.map(song => ({
+            id: song.id,
+            title: song.name,
+            artist: song.author,
+            cover: song.cover_url,
+            url: song.mp3_url
+        }));
     
         try {
             const response = await fetch('/reorganize-playlist/', {
@@ -173,17 +181,20 @@ class MusicPlayer {
                     'Content-Type': 'application/json',
                     'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
                 },
-                body: JSON.stringify({ instruction, playlist_id: playlistId })
+                body: JSON.stringify({ 
+                    instruction,
+                    queue: queueData // Send current queue instead of playlist_id
+                })
             });
     
             const data = await response.json();
-            // Check HTTP status first
             if (!response.ok) {
                 throw new Error(data.message || 'Server error occurred');
             }
     
-            // Only update UI if we have valid playlist data
             if (data.playlist && Array.isArray(data.playlist)) {
+                // Update both UI and state
+                currentPlayQueue = data.playlist;
                 this.updatePlaylistUI(data.playlist);
             } else {
                 throw new Error('Invalid playlist data received');

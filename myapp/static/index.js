@@ -1,5 +1,6 @@
 let accessibleFavlists = [];
 let currentPlaylistData = null;
+let currentPlayQueue = null;
 // Declare a global variable to hold the MusicPlayer instance
 let player = null;
 let currentAIData = null;
@@ -32,23 +33,30 @@ document.addEventListener('DOMContentLoaded', function() {
     // Add to play queue button
     document.getElementById('add-to-playqueue').addEventListener('click', function() {
         const playQueue = document.getElementById('playlist-container');
-        playQueue.innerHTML = currentPlaylistData.songs_detail.map((song, index) => `
-            <li class="queue-item ${index === 0 ? 'active' : ''}" data-song-id="${song.id}" data-url="${song.mp3_url}">
-                <img class="queue-image" src="${song.cover_url}" alt="Song Cover">
+        currentPlayQueue = currentPlaylistData.songs_detail.map(song => ({
+            id: song.id,
+            title: song.name,
+            artist: song.author,
+            cover: song.cover_url,
+            url: song.mp3_url
+        }));
+    
+        playQueue.innerHTML = currentPlayQueue.map((song, index) => `
+            <li class="queue-item ${index === 0 ? 'active' : ''}" data-song-id="${song.id}" data-url="${song.url}">
+                <img class="queue-image" src="${song.cover}" alt="Song Cover">
                 <div class="queue-details">
-                    <p class="queue-title">${song.name}</p>
-                    <p class="queue-artist">${song.author}</p>
+                    <p class="queue-title">${song.title}</p>
+                    <p class="queue-artist">${song.artist}</p>
                 </div>
             </li>
         `).join('');
     
-        // Use the existing player instance
         if (player) {
             player.updatePlaylistItems();
             player.loadCurrentTrack();
         }
     });
-
+    
     // Natural language play queue management
     document.getElementById('nlp-input').addEventListener('input', function () {
         this.style.height = 'auto'; 
@@ -265,6 +273,15 @@ function displaySongs(songs) {
 
         // Double-click to play
         songItem.addEventListener('dblclick', () => {
+            // Create a new queue with just this song
+            currentPlayQueue = [{
+                id: song.id,
+                title: song.name,
+                artist: song.author,
+                cover: song.cover_url,
+                url: song.mp3_url
+            }];
+            
             // Update the play queue with the selected song
             const playQueue = document.getElementById('playlist-container');
             const songElement = `

@@ -142,8 +142,8 @@ class PlaylistOrganizer:
             "'other' type is used when the instruction is not pattern-based or genre-based. It deals with reordering the playlist based on a specific order of song IDs.\n"\
             "Example for 'other' type:\n"\
             "Input: 'shuffle the playlist'\n"\
-            "Current playlist: [{\"id\": 1, \"name\": \"Song A\"}, {\"id\": 2, \"name\": \"Song B\"}]\n"\
-            "Output: {\"type\": \"other\", \"song_ids\": [2, 1]}\n"\
+            "Current playlist: [{\"id\": 1, \"name\": \"Song A\"}, {\"id\": 2, \"name\": \"Song B\"}, {\"id\": 2, \"name\": \"Song B\"}, {\"id\": 3, \"name\": \"Song C\"}]\n"\
+            "Output: {\"type\": \"other\", \"song_ids\": [2, 1, 3, 2]}\n"\
             "Examples for 'add' type:\n"\
             "Input: 'Add Shooting Star at the end'\n"\
             "Current playlist: [{\"id\": 1, \"name\": \"Song A\"}, {\"id\": 2, \"name\": \"Song B\"}, {\"id\": 3, \"name\": \"Song C\"}]\n"\
@@ -249,7 +249,7 @@ class PlaylistOrganizer:
                 song_to_add = await self.search_songs_by_name(parsed["song_name"])
                 if not song_to_add:
                     raise ValueError(f"Song '{parsed['song_name']}' not found")
-
+            
             new_playlist = self.playlists.copy()
             
             # Insert the song at the specified position
