@@ -6,14 +6,14 @@ let player = null;
 let currentAIData = null;
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Load playlists
+    // Load user playlists and set up the navigation bar
     fetchPlayLists();
     setupNavbar();
 
-    // Initialize the MusicPlayer instance
+    // Initialize the music player instance
     player = new MusicPlayer();
 
-    // Click on a playlist to load its songs
+    // Click event for playlist items
     document.getElementById('playlist-list').addEventListener('click', function(e) {
         let target = e.target.closest('li');
         if (target) {
@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Add to play queue button
+    // "Add to play queue" button event
     document.getElementById('add-to-playqueue').addEventListener('click', function() {
         const playQueue = document.getElementById('playlist-container');
         currentPlayQueue = currentPlaylistData.songs_detail.map(song => ({
@@ -57,12 +57,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Natural language play queue management
+    // Adjust the NLP input box height based on input
     document.getElementById('nlp-input').addEventListener('input', function () {
         this.style.height = 'auto'; 
         this.style.height = this.scrollHeight + 'px';
     });
 
+    // Set placeholder examples for NLP commands
     const nlpExamples = [
         "Shuffle my queue",
         "Play Summer Rain every two songs",
@@ -71,26 +72,27 @@ document.addEventListener('DOMContentLoaded', function() {
     
     const nlpInput = document.getElementById('nlp-input');
     
-    // Set initial random example
+    // Set a random initial example as a placeholder
     let currentIndex = Math.floor(Math.random() * nlpExamples.length);
     nlpInput.placeholder = `You can say "${nlpExamples[currentIndex]}"`;
     
-    // Rotate examples every 3 seconds
+    // Cycle through the examples every 3 seconds
     setInterval(() => {
         currentIndex = (currentIndex + 1) % nlpExamples.length;
         nlpInput.placeholder = `You can say "${nlpExamples[currentIndex]}"`;
     }, 3000);
 
+    // Event listener for the "Add Playlist" button
     document.getElementById('add-playlist-button').addEventListener('click', function() {
         toggleAddPlaylistDropdown();
     });
 
-    // Add event listener to the create playlist button
+    // Event listener for "Create Playlist" button
     document.getElementById('create-playlist-button').addEventListener('click', function() {
         createNewPlaylist();
     });
 
-    // Close the dropdown when clicking outside
+    // Close dropdown when clicking outside of it
     document.addEventListener('click', function(e) {
         const dropdown = document.getElementById('add-playlist-dropdown');
         const addButton = document.getElementById('add-playlist-button');
@@ -99,6 +101,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    // AI generate button event
     document.getElementById('ai-generate-button').addEventListener('click', function() {
         if (currentAIData) {
             displayAIData();
@@ -107,7 +110,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Add event listener for right-click on playlist items
+    // Right-click event on playlists to show context menu
     document.getElementById('playlist-list').addEventListener('contextmenu', function(e) {
         e.preventDefault();
         let target = e.target.closest('li');
@@ -116,7 +119,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Add event listener for right-click on song items
+    // Right-click event on songs to show context menu
     document.getElementById('songs-list').addEventListener('contextmenu', function(e) {
         e.preventDefault();
         let target = e.target.closest('.song-item');
@@ -130,9 +133,9 @@ document.addEventListener('DOMContentLoaded', function() {
         closeContextMenus();
     });
 
+    // "Add to favlist" button in the player area
     document.getElementById('add-to-playlist-btn').addEventListener('click', function(e) {
-
-        e.stopPropagation(); // 防止事件冒泡
+        e.stopPropagation();
         const currentSong = getCurrentPlayingSong();
         if (currentSong) {
             showFavlistDropdownInPlayer(currentSong.id, this);
@@ -140,7 +143,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Close the dropdown when clicking outside
+    // Close the favlist dropdown when clicking outside
     document.addEventListener('click', function(e) {
         const dropdown = document.querySelector('.favlist-dropdown');
         if (dropdown && !dropdown.contains(e.target)) {
@@ -150,18 +153,18 @@ document.addEventListener('DOMContentLoaded', function() {
     
 });
 
-// Function to set up navigation bar interactions
+/**
+ * Sets up the navigation bar with event listeners for search and user menu.
+ */
 function setupNavbar() {
-
     console.log('Setting up navbar');
-    // Home link click event
+    // "Home" link click event to navigate to homepage
     document.getElementById('home-link').addEventListener('click', function(e) {
         e.preventDefault();
-        // Logic to reload or navigate to the homepage
         window.location.href = '/index';
     });
 
-    // Search functionality
+    // Click event on search button
     document.getElementById('search-button').addEventListener('click', function() {
         let query = document.getElementById('search-input').value.trim();
         if (query) {
@@ -179,7 +182,7 @@ function setupNavbar() {
         }
     });
 
-    // User avatar click event to toggle dropdown menu
+    // Toggle user menu when avatar is clicked
     const userAvatar = document.getElementById('user-avatar');
     const navUser = document.querySelector('.nav-user');
 
@@ -187,30 +190,30 @@ function setupNavbar() {
         navUser.classList.toggle('active');
     });
 
-    // Click outside to close the dropdown menu
+    // Close user menu when clicking outside
     document.addEventListener('click', function(e) {
         if (!navUser.contains(e.target)) {
             navUser.classList.remove('active');
         }
     });
 
-    // Logout and Edit Profile actions
+    // Logout event
     document.getElementById('logout').addEventListener('click', function(e) {
         e.preventDefault();
-        // Logic to log out the user
         logoutUser();
     });
 
-
-    // Edit profile link
-    // Delated
+    // Edit profile link is deleted, no action required here
 }
 
-// Function to perform search
+/**
+ * Performs a search request for songs matching the given query.
+ * @param {string} query - The search query.
+ */
 function performSearch(query) {
     console.log('Searching for:', query);
 
-    // Hide the playlist-info section
+    // Hide the playlist info section during search results
     document.querySelector('.playlist-info').style.display = 'none';
 
     fetch(`/song/search/?search=${encodeURIComponent(query)}&limit=20`)
@@ -224,10 +227,8 @@ function performSearch(query) {
             console.log('Search API response data:', data);
             if (Array.isArray(data.results)) {
                 displaySongs(data.results);
-
             } else {
                 console.error('Unexpected API response:', data);
-                // Optionally display an error message to the user
                 displayNoResults();
             }
         })
@@ -236,15 +237,21 @@ function performSearch(query) {
         });
 }
 
-
+/**
+ * Formats song duration from seconds to MM:SS.
+ * @param {number} seconds - The song duration in seconds.
+ * @returns {string} The formatted duration as MM:SS.
+ */
 function formatDuration(seconds) {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
     return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
 }
 
-
-// Function to display search results
+/**
+ * Displays a list of songs (either from a playlist or search results).
+ * @param {Array} songs - An array of song objects.
+ */
 function displaySongs(songs) {
     console.log(songs);
     const songsList = document.getElementById('songs-list');
@@ -271,9 +278,8 @@ function displaySongs(songs) {
 
         songItem.style.userSelect = 'none';
 
-        // Double-click to play
+        // Double-click to play a single song
         songItem.addEventListener('dblclick', () => {
-            // Create a new queue with just this song
             currentPlayQueue = [{
                 id: song.id,
                 title: song.name,
@@ -294,17 +300,16 @@ function displaySongs(songs) {
                 </li>
             `;
             
-            // Use the existing player instance
             if (player) {
                 player.updatePlaylistItems();
                 player.loadCurrentTrack();
             }
         });
 
-        // Add to favlist button event
+        // "Add to favlist" button event
         const addButton = songItem.querySelector('.add-to-favlist-button');
         addButton.addEventListener('click', (e) => {
-            e.stopPropagation(); // Prevent triggering parent events
+            e.stopPropagation(); 
             showFavlistDropdown(song.id, addButton);
         });
 
@@ -313,7 +318,6 @@ function displaySongs(songs) {
     
     const playlistCover = document.getElementById('playlist-cover');
     if (songs.length > 0) {
-        // Select a random song
         const randomIndex = Math.floor(Math.random() * songs.length);
         const randomSong = songs[randomIndex];
         playlistCover.src = randomSong.cover_url;
@@ -322,8 +326,10 @@ function displaySongs(songs) {
     }
 }
 
-
-// Fetch playlists from the server
+/**
+ * Fetches the user's playlists from the server.
+ * @param {number|null} selectedPlaylistId - Optional playlist ID to be selected after fetch.
+ */
 function fetchPlayLists(selectedPlaylistId = null) {
     console.log(`selectedPlaylistId: ${selectedPlaylistId}`);
     fetch('/userfav/')
@@ -334,7 +340,7 @@ function fetchPlayLists(selectedPlaylistId = null) {
             return response.json();
         })
         .then(data => {
-            accessibleFavlists = data.favlists_detail; // Store the playlists data
+            accessibleFavlists = data.favlists_detail; 
             displayPlayLists(data.favlists_detail, selectedPlaylistId);
         })
         .catch(error => {
@@ -342,20 +348,25 @@ function fetchPlayLists(selectedPlaylistId = null) {
         });
 }
 
+/**
+ * Displays the fetched playlists in the UI.
+ * @param {Array} playlists - Array of playlist objects.
+ * @param {number|null} selectedPlaylistId - Playlist ID to select automatically.
+ */
 function displayPlayLists(playlists, selectedPlaylistId = null) {
     let playlistList = document.getElementById('playlist-list');
-    playlistList.innerHTML = ''; // 清空现有的播放列表
+    playlistList.innerHTML = ''; // Clear existing playlists
 
     playlists.forEach(function(playlist) {
         let li = document.createElement('li');
-        li.textContent = playlist.name; // 使用 Favlist 模型中的 `name`
+        li.textContent = playlist.name; 
         li.dataset.id = playlist.id;
         playlistList.appendChild(li);
 
         playlistList.style.userSelect = 'none';
     });
 
-    // 自动选择并加载指定的播放列表，若未指定则选择第一个
+    // Automatically select and load a specified playlist, or the first one if none specified
     if (selectedPlaylistId && playlistList) {
         const selectedItem = playlistList.querySelector(`li[data-id="${selectedPlaylistId.toString()}"]`);
         console.log(`Selected playlist ID: ${selectedPlaylistId}`);
@@ -369,7 +380,10 @@ function displayPlayLists(playlists, selectedPlaylistId = null) {
     }
 }
 
-// Fetch songs from a specific playlist
+/**
+ * Fetches details (songs) of the specified playlist by ID.
+ * @param {number} playlistId - The ID of the playlist to fetch.
+ */
 function fetchPlayList(playlistId) {
     fetch(`/favlist/${playlistId}`)
         .then(response => {
@@ -379,8 +393,8 @@ function fetchPlayList(playlistId) {
             return response.json();
         })
         .then(data => {
-            currentPlaylistData = data; // Store the data
-            window.currentPlaylistData = currentPlaylistData;   // Expose it to the global scope
+            currentPlaylistData = data; 
+            window.currentPlaylistData = currentPlaylistData;
             displayPlayList(data);
         })
         .catch(error => {
@@ -388,8 +402,11 @@ function fetchPlayList(playlistId) {
         });
 }
 
+/**
+ * Displays a playlist (title, songs, AI generate button).
+ * @param {Object} playListData - Playlist data object.
+ */
 function displayPlayList(playListData) {
-    // Show the playlist-info section
     document.querySelector('.playlist-info').style.display = 'flex';
     document.getElementById('current-playlist-title').textContent = playListData.name;
     document.getElementById('ai-generate-button').style.display = 'flex';
@@ -398,21 +415,26 @@ function displayPlayList(playListData) {
     displaySongs(playListData.songs_detail);
 }
 
-// Toggle favorite status of a song
+/**
+ * Toggles the collection (favorite) status of a song.
+ * @param {number} songId - Song ID.
+ * @param {HTMLElement} buttonElement - The button element clicked.
+ */
 function toggleCollection(songId, buttonElement) {
-    // Logic to favorite/unfavorite a song
     console.log("Toggled favorite status for song ID:", songId);
 
-    // Example: Update the button text (in a real app, you'd update the backend)
+    // Example: Update the button text to show toggled state
     let isFavorited = buttonElement.textContent === 'F';
     buttonElement.textContent = isFavorited ? 'U' : 'F';
 }
 
-// Update the play queue based on a natural language command
+/**
+ * Updates the play queue based on a natural language command.
+ * (This is a placeholder simulation.)
+ * @param {string} command - Natural language command.
+ */
 function updatePlayQueue(command) {
-    // Send the command to the server and update the play queue
     console.log("Updating play queue with command:", command);
-    // Simulate server response with a new play queue
     let newPlayQueue = [
         {"id": 8, "title": "New Song 1"},
         {"id": 9, "title": "New Song 2"}
@@ -420,7 +442,10 @@ function updatePlayQueue(command) {
     displayPlayQueue(newPlayQueue);
 }
 
-// Display the play queue
+/**
+ * Displays the play queue items.
+ * @param {Array} queue - Array of song objects in the queue.
+ */
 function displayPlayQueue(queue) {
     let playQueueList = document.getElementById('play-queue-list');
     playQueueList.innerHTML = ''; // Clear previous queue
@@ -431,13 +456,16 @@ function displayPlayQueue(queue) {
         playQueueList.appendChild(li);
     });
     
-    // Update player's playlist items
     if (player) {
         player.updatePlaylistItems();
     }
 }
 
-
+/**
+ * Shows a dropdown of user's favorite playlists (favlists) to add a song into.
+ * @param {number} songId - ID of the song to add.
+ * @param {HTMLElement} addButtonElement - The clicked button element.
+ */
 function showFavlistDropdown(songId, addButtonElement) {
     // Remove any existing dropdowns
     const existingDropdown = document.querySelector('.favlist-dropdown');
@@ -445,11 +473,9 @@ function showFavlistDropdown(songId, addButtonElement) {
         existingDropdown.parentNode.removeChild(existingDropdown);
     }
 
-    // Create a dropdown menu element
     const dropdown = document.createElement('div');
     dropdown.classList.add('favlist-dropdown');
 
-    // Get the position of the addButtonElement
     const rect = addButtonElement.getBoundingClientRect();
     dropdown.style.position = 'absolute';
     dropdown.style.left = `${rect.left + window.scrollX}px`;
@@ -463,7 +489,6 @@ function showFavlistDropdown(songId, addButtonElement) {
     dropdown.style.overflowY = 'auto';
     dropdown.style.width = '150px';
 
-    // Create list items for each favlist
     accessibleFavlists.forEach(favlist => {
         const item = document.createElement('div');
         item.textContent = favlist.name;
@@ -478,10 +503,8 @@ function showFavlistDropdown(songId, addButtonElement) {
         dropdown.appendChild(item);
     });
 
-    // Append the dropdown to the body
     document.body.appendChild(dropdown);
 
-    // Close the dropdown when clicking outside
     document.addEventListener('click', function onClickOutside(event) {
         if (!dropdown.contains(event.target) && event.target !== addButtonElement) {
             if (dropdown.parentNode) {
@@ -492,13 +515,17 @@ function showFavlistDropdown(songId, addButtonElement) {
     });
 }
 
+/**
+ * Adds a song to the specified favlist (playlist).
+ * @param {number} favlistId - The ID of the favlist.
+ * @param {number|null} songId - The ID of the song to add.
+ */
 function addSongToFavlist(favlistId, songId) {
-
     if (songId === null) {
         alert('Cannot add current song to favlist.');
         return;
     }
-    // Fetch the existing songs in the favlist
+
     fetch(`/favlist/${favlistId}/`)
         .then(response => {
             if (!response.ok) {
@@ -507,10 +534,7 @@ function addSongToFavlist(favlistId, songId) {
             return response.json();
         })
         .then(favlistData => {
-            // Get existing song IDs
-            let existingSongs = favlistData.songs; // Assuming 'songs' is an array of song IDs
-
-            // Add the new song ID if not already in the list
+            let existingSongs = favlistData.songs; 
             if (!existingSongs.includes(songId)) {
                 existingSongs.push(songId);
             } else {
@@ -518,12 +542,11 @@ function addSongToFavlist(favlistId, songId) {
                 return;
             }
 
-            // Send PATCH request to update the favlist
             fetch(`/favlist/${favlistId}/`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRFToken': getCSRFToken() // Include CSRF token
+                    'X-CSRFToken': getCSRFToken() 
                 },
                 body: JSON.stringify({ songs: existingSongs })
             })
@@ -535,11 +558,9 @@ function addSongToFavlist(favlistId, songId) {
             })
             .then(updatedFavlist => {
                 console.log('Song added to favlist:', updatedFavlist);
-                // Optionally, show a success message to the user
             })
             .catch(error => {
                 console.error('Error adding song to favlist:', error);
-                // Optionally, show an error message to the user
             });
         })
         .catch(error => {
@@ -547,12 +568,17 @@ function addSongToFavlist(favlistId, songId) {
         });
 }
 
-
+/**
+ * Toggles the "Add Playlist" dropdown visibility.
+ */
 function toggleAddPlaylistDropdown() {
     const dropdown = document.getElementById('add-playlist-dropdown');
     dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
 }
 
+/**
+ * Creates a new playlist from the user input.
+ */
 function createNewPlaylist() {
     const playlistNameInput = document.getElementById('new-playlist-name');
     const playlistName = playlistNameInput.value.trim();
@@ -561,19 +587,23 @@ function createNewPlaylist() {
         return;
     }
 
-    // Call function to create the playlist
     postNewFavlist(playlistName);
 }
+
+/**
+ * Sends a POST request to create a new favlist with the given name.
+ * @param {string} playlistName - The name of the new playlist.
+ */
 function postNewFavlist(playlistName) {
     fetch('/favlist/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRFToken': getCSRFToken() // Include CSRF token
+            'X-CSRFToken': getCSRFToken() 
         },
         body: JSON.stringify({
             name: playlistName,
-            songs: [] // Start with an empty list of songs
+            songs: [] 
         })
     })
     .then(response => {
@@ -584,15 +614,9 @@ function postNewFavlist(playlistName) {
     })
     .then(newFavlist => {
         console.log('New favlist created:', newFavlist);
-        // Update the user's favlists and auto-select the new playlist
         updateUserFavlists(newFavlist.id);
-        // Clear the input field and hide the dropdown
         document.getElementById('new-playlist-name').value = '';
         document.getElementById('add-playlist-dropdown').style.display = 'none';
-        // Automatically select the newly created playlist
-
-
-        // fetchPlaylists(newFavlist.id);
     })
     .catch(error => {
         console.error('Error creating new favlist:', error);
@@ -600,10 +624,11 @@ function postNewFavlist(playlistName) {
     });
 }
 
-
-
+/**
+ * Updates the user's favlists after creating a new one.
+ * @param {number} newFavlistId - The ID of the newly created favlist.
+ */
 function updateUserFavlists(newFavlistId) {
-    // First, fetch the current favlists of the user
     fetch('/userfav/')
         .then(response => {
             if (!response.ok) {
@@ -612,15 +637,11 @@ function updateUserFavlists(newFavlistId) {
             return response.json();
         })
         .then(userFavData => {
-            // Get existing favlist IDs
             let existingFavlists = userFavData.favlists;
-
-            // Add the new favlist ID if not already in the list
             if (!existingFavlists.includes(newFavlistId)) {
                 existingFavlists.push(newFavlistId);
             }
 
-            // Send PATCH request to update the user's favlists
             fetch('/userfav/', {
                 method: 'PATCH',
                 headers: {
@@ -637,7 +658,6 @@ function updateUserFavlists(newFavlistId) {
             })
             .then(updatedUserFav => {
                 console.log('User favlists updated:', updatedUserFav);
-                // Refresh the playlists display
                 fetchPlayLists(newFavlistId);
             })
             .catch(error => {
@@ -651,6 +671,10 @@ function updateUserFavlists(newFavlistId) {
         });
 }
 
+/**
+ * Retrieves the CSRF token from cookies.
+ * @returns {string|null} The CSRF token.
+ */
 function getCSRFToken() {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
@@ -666,18 +690,20 @@ function getCSRFToken() {
     return cookieValue;
 }
 
+/**
+ * Logs out the user by sending a logout request.
+ */
 function logoutUser() {
     fetch('/logout/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRFToken': getCSRFToken() // Use your existing getCSRFToken function
+            'X-CSRFToken': getCSRFToken()
         }
     })
     .then(response => {
         if (response.ok) {
-            // Logout was successful
-            window.location.href = '/login/'; // Redirect to the login page
+            window.location.href = '/login/';
         } else {
             throw new Error('Logout failed.');
         }
@@ -688,6 +714,9 @@ function logoutUser() {
     });
 }
 
+/**
+ * Displays AI-generated songs in the playlist view.
+ */
 function displayAIData() {
     const button = document.getElementById('ai-generate-button');
     button.textContent = 'AI';
@@ -700,6 +729,9 @@ function displayAIData() {
     currentAIData = null;
 }
 
+/**
+ * Initiates the AI song generation process for the currently selected playlist.
+ */
 function generateSongsWithAI() {
     if (!currentPlaylistData || !currentPlaylistData.id) {
         alert('No playlist selected.');
@@ -707,19 +739,12 @@ function generateSongsWithAI() {
     }
 
     const playlistId = currentPlaylistData.id;
-    // console.log(`Generating songs for playlist ID: ${playlistId}\n`);
 
-    // Create an AbortController to allow canceling the request
     const controller = new AbortController();
     const signal = controller.signal;
 
-    // Show loading spinner and disable UI
-    // showLoadingSpinner(controller);
-
-    // Send GET request to the generate-songs API
     const button = document.getElementById('ai-generate-button');
     button.disabled = true;
-    // spinner.style.display = true;
 
     fetch(`/generate-songs/${playlistId}/`, { signal })
         .then(response => {
@@ -730,9 +755,6 @@ function generateSongsWithAI() {
         })
         .then(data => {
             button.disabled = false;
-            // button.querySelector("#spinner").style.display = 'none';
-
-            // Display generated songs
             if (Array.isArray(data)) {
                 button.textContent = 'OK';
                 currentAIData = data;
@@ -752,8 +774,11 @@ function generateSongsWithAI() {
         });
 }
 
+/**
+ * Shows a loading spinner overlay with a cancel button.
+ * @param {AbortController} controller - The abort controller to cancel the request.
+ */
 function showLoadingSpinner(controller) {
-    // Create overlay
     const overlay = document.createElement('div');
     overlay.id = 'loading-overlay';
     overlay.style.position = 'fixed';
@@ -768,11 +793,9 @@ function showLoadingSpinner(controller) {
     overlay.style.alignItems = 'center';
     overlay.style.justifyContent = 'center';
 
-    // Create spinner
     const spinner = document.createElement('div');
     spinner.classList.add('spinner');
 
-    // Create cancel button
     const cancelButton = document.createElement('button');
     cancelButton.textContent = 'Cancel';
     cancelButton.style.marginTop = '20px';
@@ -780,7 +803,7 @@ function showLoadingSpinner(controller) {
     cancelButton.style.fontSize = '16px';
     cancelButton.style.cursor = 'pointer';
     cancelButton.addEventListener('click', function() {
-        controller.abort(); // Abort the fetch request
+        controller.abort(); 
         hideLoadingSpinner();
     });
 
@@ -790,6 +813,9 @@ function showLoadingSpinner(controller) {
     document.body.appendChild(overlay);
 }
 
+/**
+ * Hides the loading spinner overlay if present.
+ */
 function hideLoadingSpinner() {
     const overlay = document.getElementById('loading-overlay');
     if (overlay) {
@@ -797,8 +823,13 @@ function hideLoadingSpinner() {
     }
 }
 
+/**
+ * Displays a context menu for a playlist (e.g., delete option).
+ * @param {MouseEvent} event - The contextmenu event.
+ * @param {HTMLElement} playlistItem - The clicked playlist element.
+ */
 function showPlaylistContextMenu(event, playlistItem) {
-    closeContextMenus(); // Close any existing context menus
+    closeContextMenus();
 
     const menu = document.createElement('div');
     menu.classList.add('context-menu');
@@ -817,15 +848,13 @@ function showPlaylistContextMenu(event, playlistItem) {
     document.body.appendChild(menu);
 }
 
+/**
+ * Displays a context menu for a song (e.g., remove from playlist).
+ * @param {MouseEvent} event - The contextmenu event.
+ * @param {HTMLElement} songItem - The clicked song element.
+ */
 function showSongContextMenu(event, songItem) {
-    closeContextMenus(); // Close any existing context menus
-
-    // // 检查是否为搜索结果项
-    // const songsList = document.getElementById('songs-list');
-    // if (songsList.contains(songItem)) {
-    //     console.log("Search results cannot be modified.");
-    //     return; // 直接返回，不显示右键菜单
-    // }
+    closeContextMenus();
 
     const menu = document.createElement('div');
     menu.classList.add('context-menu');
@@ -845,12 +874,18 @@ function showSongContextMenu(event, songItem) {
     document.body.appendChild(menu);
 }
 
-
+/**
+ * Closes all open context menus.
+ */
 function closeContextMenus() {
     const existingMenus = document.querySelectorAll('.context-menu');
     existingMenus.forEach(menu => menu.remove());
 }
 
+/**
+ * Deletes a playlist by its ID.
+ * @param {number} playlistId - The ID of the playlist to delete.
+ */
 function deletePlaylist(playlistId) {
     if (!confirm('Are you sure you want to delete this playlist?')) {
         return;
@@ -864,12 +899,10 @@ function deletePlaylist(playlistId) {
     })
     .then(response => {
         if (response.ok) {
-            // Remove the playlist from the UI
             const playlistItem = document.querySelector(`#playlist-list li[data-id='${playlistId}']`);
             if (playlistItem) {
                 playlistItem.remove();
             }
-            // Optionally, clear the songs list if the deleted playlist was selected
             if (currentPlaylistData && currentPlaylistData.id == playlistId) {
                 document.getElementById('songs-list').innerHTML = '';
                 document.getElementById('current-playlist-title').textContent = 'Playlist Title';
@@ -885,22 +918,22 @@ function deletePlaylist(playlistId) {
     });
 }
 
-
+/**
+ * Removes a song from a playlist.
+ * @param {number} playlistId - The ID of the playlist.
+ * @param {number} songId - The ID of the song to remove.
+ */
 function removeSongFromPlaylist(playlistId, songId) {
     if (!confirm('Are you sure you want to remove this song from the playlist?')) {
         return;
     }
 
-    // Fetch the current playlist data to get the existing songs
     fetch(`/favlist/${playlistId}/`)
         .then(response => response.json())
         .then(favlistData => {
-            const existingSongs = favlistData.songs; // Array of song IDs
-
-            // Remove the song ID from the array
+            const existingSongs = favlistData.songs; 
             const updatedSongs = existingSongs.filter(id => id !== songId);
 
-            // Send PATCH request to update the playlist
             fetch(`/favlist/${playlistId}/`, {
                 method: 'PATCH',
                 headers: {
@@ -911,7 +944,6 @@ function removeSongFromPlaylist(playlistId, songId) {
             })
             .then(response => {
                 if (response.ok) {
-                    // Remove the song from the UI
                     const songItem = document.querySelector(`.song-item[data-song-id='${songId}']`);
                     if (songItem) {
                         songItem.remove();
@@ -931,21 +963,23 @@ function removeSongFromPlaylist(playlistId, songId) {
             alert('An error occurred while removing the song from the playlist.');
         });
 }
+
+/**
+ * Shows the favlist dropdown in the player area, allowing the user to add the currently playing song to a favlist.
+ * @param {number|null} songId - The ID of the currently playing song.
+ * @param {HTMLElement} buttonElement - The button element clicked.
+ */
 function showFavlistDropdownInPlayer(songId, buttonElement) {
-    // 移除任何现有的下拉菜单
     const existingDropdown = document.querySelector('.favlist-dropdown');
     if (existingDropdown) {
         existingDropdown.remove();
     }
 
-    // 创建下拉菜单元素
     const dropdown = document.createElement('div');
     dropdown.classList.add('favlist-dropdown');
 
-    // 先将下拉菜单添加到文档中，以便计算尺寸
     document.body.appendChild(dropdown);
 
-    // 创建每个收藏列表的选项
     accessibleFavlists.forEach(favlist => {
         const item = document.createElement('div');
         item.textContent = favlist.name;
@@ -960,40 +994,32 @@ function showFavlistDropdownInPlayer(songId, buttonElement) {
         dropdown.appendChild(item);
     });
 
-    // 获取按钮和下拉菜单的位置和尺寸
     const rect = buttonElement.getBoundingClientRect();
     const dropdownRect = dropdown.getBoundingClientRect();
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
 
-    // 首选位置（向左上方延展）
     let left = rect.right - dropdownRect.width + window.scrollX;
     let top = rect.top - dropdownRect.height + window.scrollY;
 
-    // 如果下拉菜单超出顶部，则向下显示
     if (top < window.scrollY) {
         top = rect.bottom + window.scrollY;
-        // 确保不会超出底部
         if (top + dropdownRect.height > viewportHeight + window.scrollY) {
             top = viewportHeight + window.scrollY - dropdownRect.height;
         }
     }
 
-    // 如果下拉菜单超出左侧，则向右显示
     if (left < 0) {
         left = rect.left + window.scrollX;
-        // 确保不会超出右侧
         if (left + dropdownRect.width > viewportWidth + window.scrollX) {
             left = viewportWidth + window.scrollX - dropdownRect.width;
         }
     }
 
-    // 设置下拉菜单的位置
     dropdown.style.position = 'absolute';
     dropdown.style.left = `${left}px`;
     dropdown.style.top = `${top}px`;
 
-    // 当点击其他地方时，关闭下拉菜单
     document.addEventListener('click', function onClickOutside(event) {
         if (!dropdown.contains(event.target) && event.target !== buttonElement) {
             if (dropdown.parentNode) {
@@ -1004,20 +1030,21 @@ function showFavlistDropdownInPlayer(songId, buttonElement) {
     });
 }
 
-
+/**
+ * Gets the currently playing song's data from the player or queue.
+ * @returns {Object|null} The currently playing song object or null if not found.
+ */
 function getCurrentPlayingSong() {
     const audioPlayer = document.getElementById('audio-player');
     const titleElement = document.getElementById('track-title');
     const artistElement = document.getElementById('track-artist');
     const coverArt = document.getElementById('cover-art');
 
-    // 获取当前播放的歌曲 URL
     const songUrl = audioPlayer.src;
     if (!songUrl) {
         return null;
     }
 
-    // 从播放队列中查找匹配的歌曲信息
     const playlistItems = document.querySelectorAll('#playlist-container .queue-item');
     for (const item of playlistItems) {
         if (item.dataset.url === songUrl) {
@@ -1036,13 +1063,12 @@ function getCurrentPlayingSong() {
         }
     }
 
-    // 如果未在播放队列中找到匹配项，使用播放器区域的信息
     const songName = titleElement.textContent;
     const songArtist = artistElement.textContent;
     const songCover = coverArt.src;
 
     return {
-        id: null, // 如果无法获取歌曲 ID，可以设置为 null
+        id: null, 
         name: songName,
         author: songArtist,
         cover_url: songCover,
