@@ -7,7 +7,6 @@ from django.contrib import messages
 from .models import Song
 from .documents import SongDocument
 from django_elasticsearch_dsl.registries import registry
-from elastic_search.methods import *
 import requests
 import aiohttp
 from rest_framework.authtoken.models import Token
