@@ -133,15 +133,24 @@ class PlaylistOrganizer:
         self.system_prompt = \
             "You are a music playlist organizer. Parse the user's instruction into a structured format.\n"\
             "Return a JSON object with:\n"\
-            "- type: \"pattern\", \"genre\", or \"other\"\n"\
-            "- song_name: (if pattern type)\n"\
+            "- type: \"pattern\", \"genre\", \"add\", \"remove\" or \"other\"\n"\
+            "- song_name: (if pattern type or add/remove type)\n"\
             "- interval: (if pattern type, integer)\n"\
             "- genre: (if genre type)\n"\
+            "- position: (if add type, 0 based, interger number of position to add)\n"\
             "- song_ids: (if other type) Return list of song IDs in desired order\n\n"\
+            "'other' type is used when the instruction is not pattern-based or genre-based. It deals with reordering the playlist based on a specific order of song IDs.\n"\
             "Example for 'other' type:\n"\
             "Input: 'shuffle the playlist'\n"\
             "Current playlist: [{\"id\": 1, \"name\": \"Song A\"}, {\"id\": 2, \"name\": \"Song B\"}]\n"\
-            "Output: {\"type\": \"other\", \"song_ids\": [2, 1]}"
+            "Output: {\"type\": \"other\", \"song_ids\": [2, 1]}\n"\
+            "Examples for 'add' type:\n"\
+            "Input: 'Add Shooting Star at the end'\n"\
+            "Current playlist: [{\"id\": 1, \"name\": \"Song A\"}, {\"id\": 2, \"name\": \"Song B\"}, {\"id\": 3, \"name\": \"Song C\"}]\n"\
+            "Output: {\"type\": \"add\", \"song_name\": \"Shooting Star\", \"position\": 3}\n"\
+            "Input: 'I want to listen to Shooting Star after Song B'\n"\
+            "Current playlist: [{\"id\": 1, \"name\": \"Song A\"}, {\"id\": 2, \"name\": \"Song B\"}, {\"id\": 3, \"name\": \"Song C\"}]\n"\
+            "Output: {\"type\": \"add\", \"song_name\": \"Shooting Star\", \"position\": 2}\n"\
     
     def _ids_to_playlist(self, ids: List[int]) -> List[Dict]:
         """Convert list of IDs back to full playlist items"""
@@ -213,11 +222,8 @@ class PlaylistOrganizer:
         }
         content = openai_client.request(organize_data)
         print('content', content)
-        # if content has error, raise ValueError
-        # if 'error' in content:
-        #     raise ValueError(content['error'])
-        # try json.loads(content), it seems to fail?
         try:
+            # clean up the response
             content = content.replace('```json', '').replace('```', '').strip()
             json_content = json.loads(content)
         # catch error
@@ -226,8 +232,6 @@ class PlaylistOrganizer:
             raise ValueError(f"Failed to parse instruction: {content}, error: {e}")
         
         return json_content
-        # return json.loads(content)
-        # return content
 
     async def reorganize_playlist(self, instruction: str) -> List[Dict]:
         """Main method to reorganize playlist based on instruction"""
@@ -235,12 +239,41 @@ class PlaylistOrganizer:
         parsed = await self.parse_instruction(instruction)
         print(f"Parsed instruction: {parsed}")
         
-        if parsed['type'] == 'pattern':
+        if parsed["type"] == "add":
+            print(f"Add song: {parsed['song_name']} at position {parsed['position']}")
+            position = parsed.get("position", len(self.playlists))
+            # Find the song in the playlist
+            song_to_add = next((song for song in self.playlists if song["title"] == parsed["song_name"]), None)
+            if not song_to_add:
+                # search the song in the local database
+                song_to_add = await self.search_songs_by_name(parsed["song_name"])
+                if not song_to_add:
+                    raise ValueError(f"Song '{parsed['song_name']}' not found")
+
+            new_playlist = self.playlists.copy()
+            
+            # Insert the song at the specified position
+            new_playlist.insert(position, song_to_add)
+                    
+            return new_playlist
+        elif parsed["type"] == "remove":
+            print(f"Remove song: {parsed['song_name']}")
+            new_playlist = [song for song in self.playlists if song["title"] != parsed["song_name"]]
+            if len(new_playlist) == len(self.playlists):
+                raise ValueError(f"Song '{parsed['song_name']}' not found in playlist")
+            return new_playlist
+        elif parsed['type'] == 'pattern':
             print(f"Pattern-based reorganization: {parsed['song_name']} every {parsed['interval']} songs")
             # Handle pattern-based organization (e.g. "OMG every 2 songs")
-            song = await self.search_songs_by_name(parsed['song_name'])
+            # find the song in the playlist
+            song = next((s for s in self.playlists if s['title'] == parsed['song_name']), None)
+            # put song in the list form 
+            song = [song] if song else None
+            # if song not found, search the song in the local database
             if not song:
-                raise ValueError(f"Song {parsed['song_name']} not found")
+                song = await self.search_songs_by_name(parsed['song_name'])
+                if not song:
+                    raise ValueError(f"Song {parsed['song_name']} not found")
                 
             interval = int(parsed['interval'])
             new_playlist = []
@@ -270,7 +303,7 @@ class PlaylistOrganizer:
             # Simply convert IDs back to full playlist items
             return self._ids_to_playlist(parsed['song_ids'])
         
-        print(f"New playlist: {[s['title'] for s in new_playlist]}")
+        print(f"Instruction type not recognized: {parsed['type']}")
         return self.playlists   
 
 
