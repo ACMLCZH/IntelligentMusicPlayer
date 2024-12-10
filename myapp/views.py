@@ -325,12 +325,6 @@ class UserFavView(generics.GenericAPIView):
 
     def get_object(self):
         user = self.request.user
-        if not user.is_authenticated:
-            # If for some reason this check is needed, though permission_classes
-            # should handle it. Otherwise, you can raise a permission error:
-            raise PermissionDenied("You must be logged in to access your favorites.")
-        
-        # Now we know user is authenticated, safe to get_or_create.
         user_fav, created = UserFav.objects.get_or_create(user=user)
         return user_fav
 

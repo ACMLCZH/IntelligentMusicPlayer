@@ -16,9 +16,6 @@ class Song(models.Model):
 
     def __str__(self):
         return self.name
-    # class Meta:
-    #     verbose_name = 'Song'
-    #     verbose_name_plural = verbose_name
 
 class Favlist(models.Model):
     name = models.CharField(max_length=100)
