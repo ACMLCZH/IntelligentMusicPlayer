@@ -55,6 +55,24 @@ document.addEventListener('DOMContentLoaded', function() {
         this.style.height = this.scrollHeight + 'px';
     });
 
+    const nlpExamples = [
+        "Shuffle my queue",
+        "Play Summer Rain every two songs",
+        "Play Jazz music",
+    ];
+    
+    const nlpInput = document.getElementById('nlp-input');
+    
+    // Set initial random example
+    let currentIndex = Math.floor(Math.random() * nlpExamples.length);
+    nlpInput.placeholder = `You can say "${nlpExamples[currentIndex]}"`;
+    
+    // Rotate examples every 3 seconds
+    setInterval(() => {
+        currentIndex = (currentIndex + 1) % nlpExamples.length;
+        nlpInput.placeholder = `You can say "${nlpExamples[currentIndex]}"`;
+    }, 3000);
+
     document.getElementById('add-playlist-button').addEventListener('click', function() {
         toggleAddPlaylistDropdown();
     });
