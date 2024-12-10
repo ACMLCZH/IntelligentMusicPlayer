@@ -1,3 +1,5 @@
+# myapp/views.py
+
 import json
 import requests
 from asgiref.sync import sync_to_async
@@ -319,15 +321,18 @@ class FavlistRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
 class UserFavView(generics.GenericAPIView):
     queryset = UserFav.objects.all()
     serializer_class = UserFavSerializer
+    permission_classes = [IsAuthenticated]
 
     def get_object(self):
         user = self.request.user
+        if not user.is_authenticated:
+            # If for some reason this check is needed, though permission_classes
+            # should handle it. Otherwise, you can raise a permission error:
+            raise PermissionDenied("You must be logged in to access your favorites.")
+        
+        # Now we know user is authenticated, safe to get_or_create.
         user_fav, created = UserFav.objects.get_or_create(user=user)
         return user_fav
-        # try:
-        #     return UserFav.objects.get(user=self.request.user)
-        # except UserFav.DoesNotExist:
-        #     raise Http404("UserFav object does not exist for this user.")
 
     def get(self, request, *args, **kwargs):
         # Retrieve the UserFav object for the current user
