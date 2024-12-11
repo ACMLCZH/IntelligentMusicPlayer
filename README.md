@@ -38,6 +38,7 @@ python manage.py migrate
 
 #### Elasticsearch
 To run search engine in this application, you should have **Elasticsearch** correctly installed in your device.
+- Insatll [Elasticsearch](https://www.elastic.co/downloads/elasticsearch)
 - Run your Elasticsearch
 
 #### Python package requirements
@@ -107,7 +108,15 @@ http://127.0.0.1:8000/admin
 - You can manage all accounts, playlists and songs.
 
 
-### useful commands
+### Run Test Cases
+
+```bash
+coverage run manage.py test --settings=myproject.settings_test
+
+coverage html
+```
+
+### Useful Commands
 
 - Operating Elasticsearch database
 ```bash
