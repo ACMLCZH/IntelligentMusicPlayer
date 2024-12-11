@@ -2,6 +2,8 @@
 
 from django.db import models
 from django.contrib.auth.models import User
+
+
 # Create your models here.
 class Song(models.Model):
     id = models.AutoField(primary_key=True)
@@ -17,10 +19,11 @@ class Song(models.Model):
     def __str__(self):
         return self.name
 
+
 class Favlist(models.Model):
     name = models.CharField(max_length=100)
-    songs = models.ManyToManyField(Song, related_name='favlists')
-    owner = models.ForeignKey(User, related_name='favlists', on_delete=models.CASCADE)
+    songs = models.ManyToManyField(Song, related_name="favlists")
+    owner = models.ForeignKey(User, related_name="favlists", on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name
@@ -28,12 +31,9 @@ class Favlist(models.Model):
 
 class UserFav(models.Model):
     user = models.OneToOneField(
-        User,
-        on_delete=models.CASCADE,
-        primary_key=True,
-        related_name='user_favs'
+        User, on_delete=models.CASCADE, primary_key=True, related_name="user_favs"
     )
-    favlists = models.ManyToManyField(Favlist, related_name='user_favs')
+    favlists = models.ManyToManyField(Favlist, related_name="user_favs")
 
     def __str__(self):
         return f"{self.user.username}'s Favorites"

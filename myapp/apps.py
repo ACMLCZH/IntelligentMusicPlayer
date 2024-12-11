@@ -2,9 +2,9 @@ from django.apps import AppConfig
 
 
 class MyappConfig(AppConfig):
-    default_auto_field = 'django.db.models.BigAutoField'
-    name = 'Music Database'
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "Music Database"
 
 
 class MusicDatabaseConfig(AppConfig):
-    name = 'Song'
+    name = "Song"
