@@ -68,14 +68,38 @@ class PlaylistOrganizerTest(TestCase):
             },
             {
                 'instruction': 'shuffle the playlist',
-                'expected': {'type': 'other', 'song_ids': [2, 1, 3]}
+                'expected': {
+                'type': 'other',
+                'song_ids': lambda ids: (
+                    set(ids) == {1, 2, 3} and
+                    ids != [1, 2, 3]           
+                ) # Same ids but in different order
+            }
             },
+            {
+                'instruction': 'remove OMG from the playlist',
+                'expected': {'type': 'remove', 'song_name': 'OMG'}
+            },
+            {
+                'instruction': 'play How Sweet every 2 songs',
+                'expected': {'type': 'pattern', 'song_name': 'How Sweet', 'interval': 2}
+            }
         ]
 
         async def run_test():
             for test in test_cases:
                 result = await self.organizer.parse_instruction(test['instruction'])
                 self.assertEqual(result['type'], test['expected']['type'])
+                if result['type'] == 'add':
+                    self.assertEqual(result['song_name'], test['expected']['song_name'])
+                    self.assertEqual(result['position'], test['expected']['position'])
+                elif result['type'] == 'other':
+                    self.assertTrue(test['expected']['song_ids'](result['song_ids']))
+                elif result['type'] == 'remove':
+                    self.assertEqual(result['song_name'], test['expected']['song_name'])
+                elif result['type'] == 'pattern':
+                    self.assertEqual(result['song_name'], test['expected']['song_name'])
+                    self.assertEqual(result['interval'], test['expected']['interval'])
 
         asyncio.run(run_test())
 
