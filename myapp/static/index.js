@@ -42,21 +42,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }));
     
         displayPlayQueue();
-        // const playQueue = document.getElementById('playlist-container');
-        // playQueue.innerHTML = currentPlayQueue.map((song, index) => `
-        //     <li class="queue-item ${index === 0 ? 'active' : ''}" data-song-id="${song.id}" data-url="${song.url}">
-        //         <img class="queue-image" src="${song.cover}" alt="Song Cover">
-        //         <div class="queue-details">
-        //             <p class="queue-title">${song.title}</p>
-        //             <p class="queue-artist">${song.artist}</p>
-        //         </div>
-        //     </li>
-        // `).join('');
-    
-        // if (player) {
-        //     player.updatePlaylistItems();
-        //     player.loadCurrentTrack();
-        // }
     });
     
     // Adjust the NLP input box height based on input
@@ -309,22 +294,6 @@ function displaySongs(songs) {
             }];
 
             displayPlayQueue();
-            // Update the play queue UI
-            // const playQueue = document.getElementById('playlist-container');
-            // playQueue.innerHTML = `
-            //     <li class="queue-item active" data-song-id="${song.id}" data-url="${song.mp3_url}">
-            //         <img class="queue-image" src="${song.cover_url}" alt="Song Cover">
-            //         <div class="queue-details">
-            //             <p class="queue-title">${song.name}</p>
-            //             <p class="queue-artist">${song.author}</p>
-            //         </div>
-            //     </li>
-            // `;
-            
-            // if (player) {
-            //     player.updatePlaylistItems();
-            //     player.loadCurrentTrack();
-            // }
         });
 
         // "Add to favlist" button event
@@ -468,9 +437,6 @@ function updatePlayQueue(command) {
  * Displays the current play queue items.
  */
 function displayPlayQueue() {
-    // let playQueueList = document.getElementById('play-queue-list');
-    // playQueueList.innerHTML = ''; // Clear previous queue
-
     const playQueue = document.getElementById('playlist-container');
     playQueue.innerHTML = currentPlayQueue.map((song, index) => `
         <li class="queue-item ${index === 0 ? 'active' : ''}" data-song-id="${song.id}" data-url="${song.url}">
@@ -481,15 +447,6 @@ function displayPlayQueue() {
             </div>
         </li>
     `).join('');
-
-    // currentPlayQueue.forEach(function(song, index) {
-    //     let li = document.createElement('li');
-    //     li.textContent = (index === 0 ? "Now Playing: " : "") + song.title;
-    //     playQueueList.appendChild(li);
-    // });
-    // if (player) {
-    //     player.updatePlaylistItems();
-    // }
     
     if (player) {
         player.updatePlaylistItems();
