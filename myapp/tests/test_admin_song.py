@@ -63,3 +63,45 @@ class SongAdminTest(TestCase):
         queryset = Song.objects.filter(id__in=[song1.id, song2.id])
         self.song_admin.delete_queryset(request, queryset)
         self.assertEqual(mock_delete.call_count, 2)
+
+        # Test case when sessionid or csrftoken is missing 
+        request.COOKIES.pop('sessionid') 
+        result = self.song_admin.delete_queryset(request, queryset) 
+        self.assertIsNone(result) 
+        self.assertEqual(mock_delete.call_count, 2)
+
+        # Reset cookies for the next test case
+        request.COOKIES['sessionid'] = 'fake-sessionid'
+
+        # Test case when both sessionid and csrftoken are present
+        result = self.song_admin.delete_queryset(request, queryset)
+        self.assertIsNone(result)
+        self.assertEqual(mock_delete.call_count, 4)
+
+        # Test case when delete request fails
+        mock_delete.return_value.status_code = 400
+        result = self.song_admin.delete_queryset(request, queryset)
+        self.assertIsNone(result)
+        self.assertEqual(mock_delete.call_count, 6)  # 2 more calls from this test case
+    
+# from unittest.mock import patch, MagicMock
+
+# @patch('requests.delete')
+# def test_delete_queryset(self, mock_delete):
+#     request = self.factory.post('/admin/app/song/')
+#     request.user = self.user
+#     request.COOKIES['sessionid'] = 'fake-sessionid'
+#     request.COOKIES['csrftoken'] = 'fake-csrftoken'
+
+#     song1 = Song.objects.create(name='Test Song 1', author='Test Author', album='Test Album', duration='220', lyrics='Test Lyrics', topics='Test Topics', mp3_url='http://example.com/test1.mp3', cover_url='http://example.com/test1.jpg')
+#     song2 = Song.objects.create(name='Test Song 2', author='Test Author', album='Test Album', duration='220', lyrics='Test Lyrics', topics='Test Topics', mp3_url='http://example.com/test2.mp3', cover_url='http://example.com/test2.jpg')
+
+#     queryset = Song.objects.filter(id__in=[song1.id, song2.id])
+
+#     # Test case when sessionid or csrftoken is missing
+#     request.COOKIES.pop('sessionid')
+#     result = self.song_admin.delete_queryset(request, queryset)
+#     self.assertIsNone(result)
+#     self.assertEqual(mock_delete.call_count, 0)
+
+    

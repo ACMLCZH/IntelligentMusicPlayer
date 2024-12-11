@@ -82,7 +82,7 @@ class SongAdmin(admin.ModelAdmin):
 
         if not sessionid or not csrftoken:
             # messages.error(request, 'Session or CSRF token missing. Cannot delete via API.')
-            return
+            return None
 
         cookies = {'sessionid': sessionid, 'csrftoken': csrftoken}
         headers = {'X-CSRFToken': csrftoken}

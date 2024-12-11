@@ -119,13 +119,6 @@ def backend_login_process(request):
 
     # render(request,'login.html')
     # return JsonResponse({'error': 'Invalid Username or Password'}, status=200)
-    
-
-@login_required(login_url='login')
-def home(request):
-    return render(request, 'templates/home.html')
-
-from django.contrib.auth.decorators import login_required
 
 @login_required
 def index(request):
