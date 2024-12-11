@@ -30,6 +30,9 @@ DATABASES = {
 }
 ```
 
+**Your user should looks like this**
+![](./images/MySQL.jpg)
+
 - Then perform `makemigrations` and `migrate`
 ```python
 python manage.py makemigrations
@@ -110,6 +113,7 @@ http://127.0.0.1:8000/admin
 ```
 - You can manage all accounts, playlists and songs.
 
+![](./images/admin_UI.png)
 
 ### Run Test Cases
 
