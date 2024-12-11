@@ -13,6 +13,9 @@
 
 - For the API reference, please refer to [API](api.md).
 
+## Demo Video:
+- https://drive.google.com/file/d/1CpqbEs5qz_RZKe1YgGcLYd2Vn4zEUxtY/view?usp=sharing
+
 ## Usage:
 
 ### Step 0: Configuration
@@ -33,10 +36,48 @@ DATABASES = {
 }
 ```
 
-**Your user should looks like this**
+### Step 0: Configuration
+- To run your server in your device, you should install and configure all the requirements below.
+
+#### MySQL Database:
+You should have **MySQL** (MYSQL Workbench tool is recommend) correctly installed in your device. And then create **correponding** user and database below in **MySQL**.
+```python
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": "cs520_project_user",
+        "USER": "django_user",
+        "PASSWORD": "cs520_project",
+        "HOST": "localhost",
+        "PORT": "3306",
+    }
+}
+```
+**Create new user with all authorization:**
+> Enter your root connection.
+> In the top menu, select `Server`, then choose `Users and Privileges`.
+> Select `Add Acount`, use the configuration above.
+> After create the user, select `Administrative Role`, select all privileges.
+> Back to the main page, create a new connection, using the settings below.
+
+Your connection should looks like this.
 ![](./images/MySQL.jpg)
 
-- Then perform `makemigrations` and `migrate`
+**Using new connection to create database**
+> Open the new connection
+> Enter the following commond
+```sql
+CREATE DATABASE cs520_project_user;
+FLUSH PRIVILEGES;
+```
+> If the database already created and you want to recreate a new one
+```sql
+DROP DATABASE cs520_project_user;
+CREATE DATABASE cs520_project_user;
+FLUSH PRIVILEGES;
+```
+Now you successfully create the MySQL database.
+Then perform `makemigrations` and `migrate`
 ```python
 python manage.py makemigrations
 python manage.py migrate
@@ -55,7 +96,7 @@ pip install -r requirements.txt
 
 #### AI Support
 To use natural language-guided playlist management and AI music generation, you should configure your API key correctly:
-- For OpenAI: Access [Azure OpenAI Service](https://github.com/marketplace/models/azure-openai/gpt-4o) in Github Marketplace to get your OpenAI GPT-4o API key. Then set your environment value `OPENAI_API_KEY` as your API key. You can use commands like:
+- For OpenAI: Access [Azure OpenAI Service](https://github.com/marketplace/models/azure-openai/gpt-4o) in Github Marketplace to get your OpenAI key (we used GPT-4o-mini). Then set your environment value `OPENAI_API_KEY` as your API key. You can use commands like:
 ```bash
 # For Linux
 export OPENAI_API_KEY=your_api_key_here
