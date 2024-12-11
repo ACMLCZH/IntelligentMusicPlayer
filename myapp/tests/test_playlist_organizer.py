@@ -69,12 +69,12 @@ class PlaylistOrganizerTest(TestCase):
             {
                 'instruction': 'shuffle the playlist',
                 'expected': {
-                'type': 'other',
-                'song_ids': lambda ids: (
-                    set(ids) == {1, 2, 3} and
-                    ids != [1, 2, 3]           
-                ) # Same ids but in different order
-            }
+                    'type': 'other',
+                    'song_ids': lambda ids: (
+                        set(ids) == {1, 2, 3} and
+                        ids != [1, 2, 3]           
+                    ) # Same ids but in different order
+                }
             },
             {
                 'instruction': 'remove OMG from the playlist',
