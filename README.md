@@ -39,9 +39,9 @@ python manage.py migrate
 #### Elasticsearch
 To run search engine in this application, you should have **Elasticsearch** correctly installed in your device.
 - Insatll [Elasticsearch](https://www.elastic.co/downloads/elasticsearch)
-- Run your Elasticsearch
 
 #### Python package requirements
+- Install Python 3.10
 ```bash
 pip install -r requirements.txt
 ```
@@ -77,10 +77,13 @@ python ./utils/script.py
 ```
 
 ### Step 1: Start Server Backend
+- Run your Elasticsearch
+
 - Start your local server:
 ```bash
 python manage.py runserver
 ```
+
 
 ### Step 2: Create Accounts and Login
 - For normal users, open your browser with the url `http://127.0.0.1:8000/login`, you will also see this url in your backend terminal. Then create accounts and login on the webpage.
