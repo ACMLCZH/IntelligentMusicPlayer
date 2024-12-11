@@ -1,3 +1,5 @@
+# myapp/views.py
+
 import json
 import requests
 from asgiref.sync import sync_to_async
@@ -117,13 +119,6 @@ def backend_login_process(request):
 
     # render(request,'login.html')
     # return JsonResponse({'error': 'Invalid Username or Password'}, status=200)
-    
-
-@login_required(login_url='login')
-def home(request):
-    return render(request, 'templates/home.html')
-
-from django.contrib.auth.decorators import login_required
 
 @login_required
 def index(request):
@@ -319,15 +314,12 @@ class FavlistRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
 class UserFavView(generics.GenericAPIView):
     queryset = UserFav.objects.all()
     serializer_class = UserFavSerializer
+    permission_classes = [IsAuthenticated]
 
     def get_object(self):
         user = self.request.user
         user_fav, created = UserFav.objects.get_or_create(user=user)
         return user_fav
-        # try:
-        #     return UserFav.objects.get(user=self.request.user)
-        # except UserFav.DoesNotExist:
-        #     raise Http404("UserFav object does not exist for this user.")
 
     def get(self, request, *args, **kwargs):
         # Retrieve the UserFav object for the current user

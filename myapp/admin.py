@@ -42,13 +42,11 @@ class SongAdmin(admin.ModelAdmin):
         csrftoken = request.COOKIES.get('csrftoken')
 
         if not sessionid or not csrftoken:
-            messages.error(request, 'Session or CSRF token missing. Cannot delete via API.')
+            # messages.error(request, 'Session or CSRF token missing. Cannot delete via API.')
             return
 
         cookies = {'sessionid': sessionid, 'csrftoken': csrftoken}
         headers = {'X-CSRFToken': csrftoken}
-        print(change)
-        print(song.id)
         data = dict(
             id=song.id,
             name=song.name,
@@ -83,8 +81,8 @@ class SongAdmin(admin.ModelAdmin):
         csrftoken = request.COOKIES.get('csrftoken')
 
         if not sessionid or not csrftoken:
-            messages.error(request, 'Session or CSRF token missing. Cannot delete via API.')
-            return
+            # messages.error(request, 'Session or CSRF token missing. Cannot delete via API.')
+            return None
 
         cookies = {'sessionid': sessionid, 'csrftoken': csrftoken}
         headers = {'X-CSRFToken': csrftoken}
@@ -94,9 +92,9 @@ class SongAdmin(admin.ModelAdmin):
             url = f'http://localhost:8000/song/{del_id}/'
             response = requests.delete(url, cookies=cookies, headers=headers)
 
-            if response.status_code == 204:
-                messages.success(request, f'Successfully deleted Song with id {del_id} via API.')
-            else:
-                messages.error(request, f'Failed to delete Song with id {del_id} via API.')
+            # if response.status_code == 204:
+            #     messages.success(request, f'Successfully deleted Song with id {del_id} via API.')
+            # else:
+            #     messages.error(request, f'Failed to delete Song with id {del_id} via API.')
 admin.site.register(Song, SongAdmin)
 
