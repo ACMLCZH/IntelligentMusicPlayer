@@ -9,6 +9,9 @@
 
 - By combining dynamic playlist management and AI-driven music creation, our music player offers a novel and interactive experience, empowering users to personalize and enjoy their music in ways traditional players cannot.
 
+- We have added numerous test cases for both the front-end and back-end. The back-end test coverage has reached 90%. For detailed information about the test cases, please refer to [Test](test.md).
+
+- For the API reference, please refer to [API](api.md).
 
 ## Usage:
 
