@@ -42,7 +42,7 @@ python manage.py migrate
 To run search engine in this application, you should have **Elasticsearch** correctly installed in your device.
 - Run your Elasticsearch
 ```bash
-.\elasticsearch.bat
+/path/to/elasticsearch.bat
 pip install -r requirements.txt
 ```
 - Operating Elasticsearch database
