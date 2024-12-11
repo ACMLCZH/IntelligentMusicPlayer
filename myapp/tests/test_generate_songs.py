@@ -1,6 +1,7 @@
 from django.urls import reverse
-from rest_framework.test import APIClient, APITestCase
 from django.contrib.auth.models import User
+from rest_framework.test import APIClient, APITestCase
+from rest_framework import status
 from myapp.models import Song, Favlist
 
 class GenerateSongsViewTest(APITestCase):

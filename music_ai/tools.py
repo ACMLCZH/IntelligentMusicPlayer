@@ -80,6 +80,7 @@ def generate_songs(songs_jsons: List[Dict]) -> List[Dict]:
 
     suno_prompt = "Make a song of " + generate_answer[23:]
     suno_prompt = suno_prompt[:200]
+    print(suno_prompt)
 
     suno_data = {
         'action': 'generate',
