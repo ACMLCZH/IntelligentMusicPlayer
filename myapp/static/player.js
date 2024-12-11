@@ -135,8 +135,6 @@ class MusicPlayer {
     updateNavigationButtons() {
         this.prevBtn.disabled = this.playlistItems.length <= 1;
         this.nextBtn.disabled = this.playlistItems.length <= 1;
-        // this.prevBtn.disabled = this.currentIndex <= 0;
-        // this.nextBtn.disabled = this.currentIndex >= this.playlistItems.length - 1;
     }
 
     playNext() {
