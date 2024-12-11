@@ -1,5 +1,6 @@
 import requests
 
+
 # Function to save audio to memory
 def save_audio_to_local_file(audio_url, audio_path):
     response = requests.get(audio_url)
@@ -8,7 +9,8 @@ def save_audio_to_local_file(audio_url, audio_path):
             audio_file.write(response.content)
     else:
         raise Exception("Failed to retrieve audio data.")
-    
+
+
 # Function to save image to memory
 def save_image_to_local_file(image_url, image_path):
     response = requests.get(image_url)

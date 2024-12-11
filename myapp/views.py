@@ -28,106 +28,130 @@ from django_elasticsearch_dsl_drf.filter_backends import (
 from django_elasticsearch_dsl_drf.pagination import LimitOffsetPagination
 
 from .models import Song, Favlist, UserFav
-from .serializers import SongSerializer, SongDocumentSerializer, FavlistSerializer, UserFavSerializer, FavlistBasicSerializer
+from .serializers import (
+    SongSerializer,
+    SongDocumentSerializer,
+    FavlistSerializer,
+    UserFavSerializer,
+    FavlistBasicSerializer,
+)
 from .documents import SongDocument
 from music_ai.tools import generate_songs, PlaylistOrganizer
 
+
 @csrf_exempt
 def login(request):
-    return render(request, 'login.html')
+    return render(request, "login.html")
+
 
 @csrf_exempt
 def sign_up(request):
-    return render(request, 'sign_up.html')
+    return render(request, "sign_up.html")
+
 
 @csrf_exempt
 def reset_password(request):
-    return render(request, 'reset_password.html')
+    return render(request, "reset_password.html")
+
 
 @csrf_exempt
 def backend_login_process(request):
-    if request.method == 'POST':
-        try: 
-            data = json.loads(request.body) 
-            request_type = data.get('type') 
-            username = data.get('username') 
-            password = data.get('password')
-            confirm_password = data.get('confirm_password')
-            security_code = data.get('security_code')
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            request_type = data.get("type")
+            username = data.get("username")
+            password = data.get("password")
+            confirm_password = data.get("confirm_password")
+            security_code = data.get("security_code")
 
             if request_type == "sign_in":
                 user = authenticate(request, username=username, password=password)
-                
+
                 if user is not None:
                     auth_login(request, user)
                     response = {
-                        'response': 'Log In Successful!',
-                        'redirect': True,
-                        'redirect_url': reverse("index")
+                        "response": "Log In Successful!",
+                        "redirect": True,
+                        "redirect_url": reverse("index"),
                     }
-                    return JsonResponse(response,status=200)
+                    return JsonResponse(response, status=200)
                 else:
-                    messages.error(request, '用户名或密码错误')
-                    return JsonResponse({'response': 'Invalid Username or Password'}, status=200)
+                    messages.error(request, "Invalid Username or Password")
+                    return JsonResponse(
+                        {"response": "Invalid Username or Password"}, status=200
+                    )
 
-            if request_type == "sign_up":                
+            if request_type == "sign_up":
                 if confirm_password != password:
-                    return JsonResponse({'response': 'Passwords are not the same!'}, status=200)
-                
-                if User.objects.filter(username=username).exists(): #
-                    return JsonResponse({'response': 'Username already exists!'}, status=200) # 如果用户名不存在，可以继续创建用户的逻辑 
-                
-                user = User.objects.create_user(username=username, password=password) 
+                    return JsonResponse(
+                        {"response": "Passwords are not the same!"}, status=200
+                    )
+
+                if User.objects.filter(username=username).exists():
+                    return JsonResponse(
+                        {"response": "Username already exists!"}, status=200
+                    )
+
+                user = User.objects.create_user(username=username, password=password)
                 response = {
-                    'response': 'Sign Up Successful!',
-                    'redirect': True,
-                    'redirect_url': reverse("login")
+                    "response": "Sign Up Successful!",
+                    "redirect": True,
+                    "redirect_url": reverse("login"),
                 }
                 return JsonResponse(response, status=200)
-            
-            if request_type == "reset":
-                confirm_password = data.get('confirm_password')
 
-                if not User.objects.filter(username=username).exists(): #
-                    return JsonResponse({'response': 'Username not exists!'}, status=200) # 如果用户名不存在，可以继续创建用户的逻辑 
+            if request_type == "reset":
+                confirm_password = data.get("confirm_password")
+
+                if not User.objects.filter(username=username).exists():  #
+                    return JsonResponse(
+                        {"response": "Username not exists!"}, status=200
+                    )
                 if security_code != "0000":
-                    return JsonResponse({'response': 'Wrong security code!!! Please ask administrator!!!'}, status=200)
+                    return JsonResponse(
+                        {
+                            "response": "Wrong security code!!! Please ask administrator!!!"
+                        },
+                        status=200,
+                    )
                 if confirm_password != password:
-                    return JsonResponse({'response': 'Passwords are not the same!'}, status=200)
+                    return JsonResponse(
+                        {"response": "Passwords are not the same!"}, status=200
+                    )
                 user = User.objects.get(username=username)
-                user.set_password(password) 
+                user.set_password(password)
                 user.save()
                 response = {
-                    'response': 'Reset Successful!',
-                    'redirect': True,
-                    'redirect_url': reverse("login")
+                    "response": "Reset Successful!",
+                    "redirect": True,
+                    "redirect_url": reverse("login"),
                 }
                 return JsonResponse(response, status=200)
-        
-        except json.JSONDecodeError: 
-            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON"}, status=400)
     else:
         redirect("sign_up")
-    return JsonResponse({'error': 'Invalid request'}, status=400)
+    return JsonResponse({"error": "Invalid request"}, status=400)
 
-    # render(request,'login.html')
-    # return JsonResponse({'error': 'Invalid Username or Password'}, status=200)
 
 @login_required
 def index(request):
     # Set empty initial state
     context = {
-        'playlist': [],
-        'current_track': {
-            'id': 0,
-            'title': 'Select a track to play',
-            'artist': 'No track playing',
-            'cover': '/static/default-cover.jpg',
-            'url': ''
+        "playlist": [],
+        "current_track": {
+            "id": 0,
+            "title": "Select a track to play",
+            "artist": "No track playing",
+            "cover": "/static/default-cover.jpg",
+            "url": "",
         },
-        'current_index': -1
+        "current_index": -1,
     }
-    return render(request, 'index.html', context)
+    return render(request, "index.html", context)
+
 
 def get_playlist_from_api(playlist_id):
     """Fetch playlist data from API"""
@@ -137,14 +161,17 @@ def get_playlist_from_api(playlist_id):
     song_serializer = SongSerializer(songs, many=True)
     playlist = []
     for song in song_serializer.data:
-        playlist.append({
-            'id': song['id'],
-            'title': song['name'],
-            'artist': song['author'],
-            'cover': song['cover_url'],
-            'url': song['mp3_url']
-        })
+        playlist.append(
+            {
+                "id": song["id"],
+                "title": song["name"],
+                "artist": song["author"],
+                "cover": song["cover_url"],
+                "url": song["mp3_url"],
+            }
+        )
     return playlist
+
 
 @csrf_exempt
 async def play_music(request):
@@ -153,63 +180,61 @@ async def play_music(request):
         # Get playlist data
         playlist = await sync_to_async(get_playlist_from_api)()
         if not playlist:
-            return JsonResponse({'error': 'Failed to load playlist'}, status=500)
-        
-        current_index = request.session.get('current_track', 0)
+            return JsonResponse({"error": "Failed to load playlist"}, status=500)
+
+        current_index = request.session.get("current_track", 0)
         current_track = playlist[current_index].copy()
-        
-        return JsonResponse({
-            'status': 'success',
-            'playlist': playlist,
-            'current_track': current_track,
-            'current_index': current_index
-        })
+
+        return JsonResponse(
+            {
+                "status": "success",
+                "playlist": playlist,
+                "current_track": current_track,
+                "current_index": current_index,
+            }
+        )
     except Exception as e:
-        return JsonResponse({
-            'status': 'error',
-            'message': str(e)
-        }, status=500)
+        return JsonResponse({"status": "error", "message": str(e)}, status=500)
+
 
 def _create_json_response(data, status=200):
     """Synchronous helper to create JsonResponse"""
     return JsonResponse(data, status=status)
 
+
 @csrf_exempt
 async def reorganize_playlist(request):
-    if request.method == 'POST':
+    if request.method == "POST":
         try:
             data = json.loads(request.body)
-            instruction = data.get('instruction')
-            queue = data.get('queue')  # Get queue instead of playlist_id
-            
+            instruction = data.get("instruction")
+            queue = data.get("queue")  # Get queue instead of playlist_id
+
             # Create organizer with current queue
             organizer = PlaylistOrganizer(queue)
             new_queue = await organizer.reorganize_playlist(instruction)
 
             return await sync_to_async(_create_json_response)(
-                {'status': 'success', 'playlist': new_queue}
+                {"status": "success", "playlist": new_queue}
             )
-            
+
         except json.JSONDecodeError:
             return await sync_to_async(_create_json_response)(
-                {'status': 'error', 'message': 'Invalid JSON data'},
-                400
+                {"status": "error", "message": "Invalid JSON data"}, 400
             )
         except Exception as e:
             return await sync_to_async(_create_json_response)(
-                {'status': 'error', 'message': str(e)},
-                500
+                {"status": "error", "message": str(e)}, 500
             )
     return await sync_to_async(_create_json_response)(
-        {'status': 'error', 'message': 'Method not allowed'},
-        405
+        {"status": "error", "message": "Method not allowed"}, 405
     )
 
 
 class IsSuperUserOrReadOnly(IsAuthenticated):
     def has_permission(self, request, view):
         # Allow read-only methods for any authenticated user
-        if request.method in ['GET', 'HEAD', 'OPTIONS']:
+        if request.method in ["GET", "HEAD", "OPTIONS"]:
             return True
         # Only superuser can create, update, or destroy
         if request.user and request.user.is_superuser:
@@ -235,28 +260,28 @@ class SongSearchView(DocumentViewSet):
     pagination_class = LimitOffsetPagination
 
     filter_backends = [
-        # FilteringFilterBackend,
-        # OrderingFilterBackend,
         CompoundSearchFilterBackend,
     ]
 
     search_fields = {
-        'name': {'boost': 5},
-        'author': {'boost': 4},
-        'album': {'boost': 3},
-        'topics': {'boost': 2},
-        'lyrics': {'boost': 1},
+        "name": {"boost": 5},
+        "author": {"boost": 4},
+        "album": {"boost": 3},
+        "topics": {"boost": 2},
+        "lyrics": {"boost": 1},
     }
-    ordering = ('_score',)
+    ordering = ("_score",)
 
     def filter_queryset(self, queryset):
-        field = self.request.query_params.get('field', None)
-        search = self.request.query_params.get('search', None)
-        ai = self.request.query_params.get('ai', None)
+        field = self.request.query_params.get("field", None)
+        search = self.request.query_params.get("search", None)
+        ai = self.request.query_params.get("ai", None)
 
         # Exclude results where author is "SunoAI"
-        if ai != 'True':
-            queryset = queryset.query("bool", must_not=[{"match": {"author": "SunoAI"}}])
+        if ai != "True":
+            queryset = queryset.query(
+                "bool", must_not=[{"match": {"author": "SunoAI"}}]
+            )
 
         if field and search:
             if field in self.search_fields:
@@ -280,7 +305,6 @@ class FavlistRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = FavlistSerializer
     permission_classes = [IsAuthenticated]
 
-
     def perform_update(self, serializer):
         if self.get_object().owner != self.request.user:
             raise PermissionDenied("You do not have permission to edit this Favlist.")
@@ -299,7 +323,7 @@ class FavlistRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
         song_serializer = SongSerializer(songs, many=True)
 
         response_data = serializer.data
-        response_data['songs_detail'] = song_serializer.data
+        response_data["songs_detail"] = song_serializer.data
 
         return Response(response_data)
 
@@ -321,7 +345,9 @@ class UserFavView(generics.GenericAPIView):
 
         if not instance.favlists.exists():
             # Create a new Favlist with default name
-            default_favlist = Favlist.objects.create(name="My favorites", owner=request.user)
+            default_favlist = Favlist.objects.create(
+                name="My favorites", owner=request.user
+            )
             # Add the new Favlist to user's favlists
             instance.favlists.add(default_favlist)
 
@@ -329,10 +355,9 @@ class UserFavView(generics.GenericAPIView):
         favlist_serializer = FavlistBasicSerializer(favlists, many=True)
 
         response_data = serializer.data
-        response_data['favlists_detail'] = favlist_serializer.data
+        response_data["favlists_detail"] = favlist_serializer.data
 
         return Response(response_data)
-
 
     def post(self, request, *args, **kwargs):
         # Check if UserFav already exists for this user
@@ -365,8 +390,8 @@ class UserFavView(generics.GenericAPIView):
         instance = self.get_object()
         instance.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-    
-    
+
+
 class GenerateSongsView(generics.GenericAPIView):
     queryset = Favlist.objects.all()
     serializer_class = UserFavSerializer
@@ -387,8 +412,8 @@ class GenerateSongsView(generics.GenericAPIView):
 
 @csrf_exempt
 def custom_logout(request):
-    if request.method == 'POST':
+    if request.method == "POST":
         logout(request)
-        return JsonResponse({'message': 'Logged out successfully.'})
+        return JsonResponse({"message": "Logged out successfully."})
     else:
-        return JsonResponse({'error': 'Invalid request method.'}, status=400)
+        return JsonResponse({"error": "Invalid request method."}, status=400)
