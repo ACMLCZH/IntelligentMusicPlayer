@@ -14,7 +14,7 @@
 - For the API reference, please refer to [API](api.md).
 
 ## Demo Video:
-- https://drive.google.com/file/d/1CpqbEs5qz_RZKe1YgGcLYd2Vn4zEUxtY/view?usp=sharing
+- https://drive.google.com/file/d/16xJlviZ15xpg41hARcESGUuFTTeAWsVB/view?usp=sharing
 
 ## Usage:
 
