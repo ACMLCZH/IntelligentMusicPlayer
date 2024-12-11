@@ -3,6 +3,7 @@ from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
+from django.contrib.auth import get_user_model
 
 class LoginTestCase(TestCase):
     def setUp(self):
@@ -241,3 +242,26 @@ class ViewsTestCase(TestCase):
         response = self.client.get(reverse('sign_in_sign_up_reset_request'))
         self.assertEqual(response.status_code, 400)
         self.assertJSONEqual(response.content, {'error': 'Invalid request'})
+
+    def test_index_view_redirect_if_not_logged_in(self):
+        response = self.client.get(reverse('index'))
+        self.assertRedirects(response, '/login/?next=/index/')
+
+    def test_index_view_logged_in(self):
+        self.client.login(username='testuser', password='testpassword')
+        response = self.client.get(reverse('index'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'index.html')
+        self.assertIn('playlist', response.context)
+        self.assertIn('current_track', response.context)
+        self.assertIn('current_index', response.context)
+        self.assertEqual(response.context['playlist'], [])
+        self.assertEqual(response.context['current_track'], {
+            'id': 0,
+            'title': 'Select a track to play',
+            'artist': 'No track playing',
+            'cover': '/static/default-cover.jpg',
+            'url': ''
+        })
+        self.assertEqual(response.context['current_index'], -1)
+

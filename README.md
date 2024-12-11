@@ -12,7 +12,7 @@
 
 ## Usage:
 
-### Step 0: Configuration (Optional)
+### Step 0: Configuration
 - To run your server in your device, you should install and configure all the requirements below.
 
 #### MySQL Database:
@@ -29,8 +29,6 @@ DATABASES = {
     }
 }
 ```
-- Your user should looks like this:
-![](images/MySQL.jpg)
 
 - Then perform `makemigrations` and `migrate`
 ```python
@@ -40,19 +38,14 @@ python manage.py migrate
 
 #### Elasticsearch
 To run search engine in this application, you should have **Elasticsearch** correctly installed in your device.
-- Run your Elasticsearch
+- Insatll [Elasticsearch](https://www.elastic.co/downloads/elasticsearch)
+
+#### Python package requirements
+- Install Python 3.10
 ```bash
-/path/to/elasticsearch.bat
 pip install -r requirements.txt
 ```
-- Operating Elasticsearch database
-```bash
-# delete Elasticsearch database:
-curl -X GET "http://localhost:9200/_cat/indices?v"
 
-# replace index with index name in elasticsearch
-curl -X DELETE "http://localhost:9200/index"
-```
 
 #### AI Support
 To use natural language-guided playlist management and AI music generation, you should configure your API key correctly:
@@ -84,10 +77,13 @@ python ./utils/script.py
 ```
 
 ### Step 1: Start Server Backend
+- Run your Elasticsearch
+
 - Start your local server:
 ```bash
 python manage.py runserver
 ```
+
 
 ### Step 2: Create Accounts and Login
 - For normal users, open your browser with the url `http://127.0.0.1:8000/login`, you will also see this url in your backend terminal. Then create accounts and login on the webpage.
@@ -113,3 +109,23 @@ Password: 520project
 http://127.0.0.1:8000/admin
 ```
 - You can manage all accounts, playlists and songs.
+
+
+### Run Test Cases
+
+```bash
+coverage run manage.py test --settings=myproject.settings_test
+
+coverage html
+```
+
+### Useful Commands
+
+- Operating Elasticsearch database
+```bash
+# delete Elasticsearch database:
+curl -X GET "http://localhost:9200/_cat/indices?v"
+
+# replace index with index name in elasticsearch
+curl -X DELETE "http://localhost:9200/index"
+```

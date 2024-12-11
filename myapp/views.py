@@ -54,12 +54,7 @@ def backend_login_process(request):
             password = data.get('password')
             confirm_password = data.get('confirm_password')
             security_code = data.get('security_code')
-            print(request_type)
-            print(username)
-            print(password)
-            print(confirm_password)
-            print(security_code)
-            
+
             if request_type == "sign_in":
                 user = authenticate(request, username=username, password=password)
                 
@@ -83,13 +78,11 @@ def backend_login_process(request):
                     return JsonResponse({'response': 'Username already exists!'}, status=200) # 如果用户名不存在，可以继续创建用户的逻辑 
                 
                 user = User.objects.create_user(username=username, password=password) 
-                print("create success!")
                 response = {
                     'response': 'Sign Up Successful!',
                     'redirect': True,
                     'redirect_url': reverse("login")
                 }
-                print(response)
                 return JsonResponse(response, status=200)
             
             if request_type == "reset":
