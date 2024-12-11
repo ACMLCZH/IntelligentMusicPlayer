@@ -36,4 +36,12 @@
 ### Back-End Test
 Our backend tests use Django TestCase, achieving 93% code coverage. The detailed coverage report can be found [here](coverage_report/index.html).
 
+#### Run Test Cases
+
+```bash
+coverage run manage.py test --settings=myproject.settings_test
+
+coverage html
+```
+
 ![](./images/coverage.png)

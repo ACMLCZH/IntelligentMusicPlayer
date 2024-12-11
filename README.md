@@ -158,22 +158,3 @@ http://127.0.0.1:8000/admin
 - You can manage all accounts, playlists and songs.
 
 ![](./images/admin_UI.png)
-
-### Run Test Cases
-
-```bash
-coverage run manage.py test --settings=myproject.settings_test
-
-coverage html
-```
-
-### Useful Commands
-
-- Operating Elasticsearch database
-```bash
-# delete Elasticsearch database:
-curl -X GET "http://localhost:9200/_cat/indices?v"
-
-# replace index with index name in elasticsearch
-curl -X DELETE "http://localhost:9200/index"
-```
