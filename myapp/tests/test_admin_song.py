@@ -2,7 +2,7 @@ from django.test import TestCase, RequestFactory
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth.models import User
 from unittest.mock import patch, MagicMock
-from ..models import Song
+from ..models import *
 from ..admin import SongAdmin
 
 class SongAdminTest(TestCase):
@@ -84,24 +84,51 @@ class SongAdminTest(TestCase):
         self.assertIsNone(result)
         self.assertEqual(mock_delete.call_count, 6)  # 2 more calls from this test case
     
-# from unittest.mock import patch, MagicMock
+class ModelsTestCase(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser', password='testpassword')
+        self.song1 = Song.objects.create(
+            name='Test Song 1',
+            author='Test Author 1',
+            album='Test Album 1',
+            duration=220,
+            lyrics='Test Lyrics 1',
+            topics='Test Topics 1',
+            mp3_url='http://example.com/test1.mp3',
+            cover_url='http://example.com/test1.jpg'
+        )
+        self.song2 = Song.objects.create(
+            name='Test Song 2',
+            author='Test Author 2',
+            album='Test Album 2',
+            duration=180,
+            lyrics='Test Lyrics 2',
+            topics='Test Topics 2',
+            mp3_url='http://example.com/test2.mp3',
+            cover_url='http://example.com/test2.jpg'
+        )
+        self.favlist = Favlist.objects.create(name='Test Favlist', owner=self.user)
+        self.favlist.songs.add(self.song1, self.song2)
+        self.user_fav = UserFav.objects.create(user=self.user)
+        self.user_fav.favlists.add(self.favlist)
 
-# @patch('requests.delete')
-# def test_delete_queryset(self, mock_delete):
-#     request = self.factory.post('/admin/app/song/')
-#     request.user = self.user
-#     request.COOKIES['sessionid'] = 'fake-sessionid'
-#     request.COOKIES['csrftoken'] = 'fake-csrftoken'
+    def test_song_str(self):
+        self.assertEqual(str(self.song1), 'Test Song 1')
+        self.assertEqual(str(self.song2), 'Test Song 2')
 
-#     song1 = Song.objects.create(name='Test Song 1', author='Test Author', album='Test Album', duration='220', lyrics='Test Lyrics', topics='Test Topics', mp3_url='http://example.com/test1.mp3', cover_url='http://example.com/test1.jpg')
-#     song2 = Song.objects.create(name='Test Song 2', author='Test Author', album='Test Album', duration='220', lyrics='Test Lyrics', topics='Test Topics', mp3_url='http://example.com/test2.mp3', cover_url='http://example.com/test2.jpg')
+    def test_favlist_str(self):
+        self.assertEqual(str(self.favlist), 'Test Favlist')
 
-#     queryset = Song.objects.filter(id__in=[song1.id, song2.id])
+    def test_userfav_str(self):
+        self.assertEqual(str(self.user_fav), "testuser's Favorites")
 
-#     # Test case when sessionid or csrftoken is missing
-#     request.COOKIES.pop('sessionid')
-#     result = self.song_admin.delete_queryset(request, queryset)
-#     self.assertIsNone(result)
-#     self.assertEqual(mock_delete.call_count, 0)
+    def test_favlist_songs(self):
+        self.assertEqual(self.favlist.songs.count(), 2)
+        self.assertIn(self.song1, self.favlist.songs.all())
+        self.assertIn(self.song2, self.favlist.songs.all())
+
+    def test_userfav_favlists(self):
+        self.assertEqual(self.user_fav.favlists.count(), 1)
+        self.assertIn(self.favlist, self.user_fav.favlists.all())
 
     
