@@ -113,7 +113,18 @@ class PlaylistOrganizerTest(TestCase):
             # Test shuffling
             result = await self.organizer.reorganize_playlist("shuffle the playlist")
             self.assertEqual(len(result), len(self.sample_queue))
-
+            
+            # Test removing a song
+            result = await self.organizer.reorganize_playlist("remove Supernatural from the playlist")
+            self.assertEqual(len(result), len(self.sample_queue) - 1)
+            self.assertNotIn('Supernatural', [song['title'] for song in result])
+            
+            # Test playing a song every 2 songs
+            result = await self.organizer.reorganize_playlist("play How Sweet every 2 songs")
+            self.assertEqual(len(result), len(self.sample_queue) + 1)
+            self.assertEqual(result[0]['title'], 'How Sweet')
+            self.assertEqual(result[3]['title'], 'How Sweet')
+            
         asyncio.run(run_test())
 
     def test_ids_to_playlist(self):
