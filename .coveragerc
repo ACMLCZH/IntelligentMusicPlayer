@@ -1,5 +1,5 @@
 [run]
-source = myapp
+source = myapp, music_ai
 
 [report]
 omit =
