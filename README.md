@@ -12,7 +12,7 @@
 
 ## Usage:
 
-### Step 0: Configuration (Optional)
+### Step 0: Configuration
 - To run your server in your device, you should install and configure all the requirements below.
 
 #### MySQL Database:
@@ -29,8 +29,6 @@ DATABASES = {
     }
 }
 ```
-- Your user should looks like this:
-![](images/MySQL.jpg)
 
 - Then perform `makemigrations` and `migrate`
 ```python
@@ -41,18 +39,12 @@ python manage.py migrate
 #### Elasticsearch
 To run search engine in this application, you should have **Elasticsearch** correctly installed in your device.
 - Run your Elasticsearch
+
+#### Python package requirements
 ```bash
-.\elasticsearch.bat
 pip install -r requirements.txt
 ```
-- Operating Elasticsearch database
-```bash
-# delete Elasticsearch database:
-curl -X GET "http://localhost:9200/_cat/indices?v"
 
-# replace index with index name in elasticsearch
-curl -X DELETE "http://localhost:9200/index"
-```
 
 #### AI Support
 To use natural language-guided playlist management and AI music generation, you should configure your API key correctly:
@@ -113,3 +105,15 @@ Password: 520project
 http://127.0.0.1:8000/admin
 ```
 - You can manage all accounts, playlists and songs.
+
+
+### useful commands
+
+- Operating Elasticsearch database
+```bash
+# delete Elasticsearch database:
+curl -X GET "http://localhost:9200/_cat/indices?v"
+
+# replace index with index name in elasticsearch
+curl -X DELETE "http://localhost:9200/index"
+```
