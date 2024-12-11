@@ -82,8 +82,6 @@ OpenAI
 
 class OpenAIClient:
     def __init__(self, api_key=None, endpoint=None):
-        # endpoint = "https://models.inference.ai.azure.com"
-        # model_name = "gpt-4o-mini"
         if api_key is None:
             api_key = os.environ['OPENAI_API_KEY']
 

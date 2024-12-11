@@ -1,9 +1,8 @@
 import requests
 import json
+import random
 from typing import List, Dict
 from .ai_clients import suno_client, openai_client
-import time
-import random
 
 local_song_url = "http://localhost:8000/song/"
 local_search_url = "http://localhost:8000/song/search/?search={search}&field={field}"
@@ -60,7 +59,6 @@ def generate_songs(songs_jsons: List[Dict]) -> List[Dict]:
         f"{songs_info}\n"\
         "Based on these songs, summarize the music styles and properties that the user likely enjoys in one sentence. "\
         "Your answer should be recapitulatory and begin with \"The user likely enjoys...\"."
-    print(generate_user_prompt)
 
     generate_data = {
         "model": "gpt-4o-mini",
@@ -81,9 +79,7 @@ def generate_songs(songs_jsons: List[Dict]) -> List[Dict]:
         generate_answer = openai_client.request(generate_data)
 
     suno_prompt = "Make a song of " + generate_answer[23:]
-    print(suno_prompt)
     suno_prompt = suno_prompt[:200]
-    print(suno_prompt)
 
     suno_data = {
         'action': 'generate',
@@ -99,17 +95,7 @@ def generate_songs(songs_jsons: List[Dict]) -> List[Dict]:
         print("Failed to generate songs. Just enjoy the default AI music!")
         suno_response = default_response
 
-    # while True:
-    #     time.sleep(60)
-    #     response = requests.get(f"{callback_url}/{task_id}", headers=local_headers)
-    #     if response.status_code == 200:
-    #         suno_response = response.json()
-    #         break
-    #     else:
-    #         print(response.text)
-
     music_jsons = suno_response['data']
-    # print(music_jsons)
     music_list = list()
     for music_json in music_jsons:
         music_data = {
@@ -162,7 +148,6 @@ class PlaylistOrganizer:
             local_search_url.format(search=name, field='name'),
             headers=local_headers
         )
-        # print([song for song in self.playlists if song['title'].lower() == name.lower()])
         # print(local_response.json())
         
         retrieved_song = local_response.json()
@@ -178,7 +163,6 @@ class PlaylistOrganizer:
     
     async def search_songs_by_genre(self, genre: str) -> List[Dict]:
         # Stub - will be replaced with actual API call 
-        # TODO: Use aiohttp
         local_response = requests.get(
             local_search_url.format(search=genre, field='topics') + "&limit={20}", # Limit to 20 results
             headers=local_headers
