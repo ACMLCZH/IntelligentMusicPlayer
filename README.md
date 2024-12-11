@@ -30,7 +30,7 @@ DATABASES = {
 }
 ```
 - Your user should looks like this:
-![](./images/1.jpg)
+![](images/MySQL.jpg)
 
 - Then perform `makemigrations` and `migrate`
 ```python
@@ -90,7 +90,8 @@ python manage.py runserver
 ```
 
 ### Step 2: Create Accounts and Login
-- For normal users, open your browser with the url `http://127.0.0.1:8000/login`, you will also see this url in your backend terminal.
+- For normal users, open your browser with the url `http://127.0.0.1:8000/login`, you will also see this url in your backend terminal. Then create accounts and login on the webpage.
+![](images/login_UI.png)
 
 - For administators, use commands to sign up a super account (Administrator).
 ```bash
