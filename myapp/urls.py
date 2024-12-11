@@ -32,7 +32,10 @@ urlpatterns = [
     ),
     path("userfav/", views.UserFavView.as_view(), name="userfav"),
     path("index/", views.index, name="index"),
+    path('play-music/', views.play_music, name='play_music'),
     path("reorganize-playlist/", views.reorganize_playlist, name="reorganize-playlist"),
+    path('api/play-music/', views.play_music, name='play_music'),
+    path('api/reorganize-playlist/', views.reorganize_playlist, name='reorganize_playlist'),
     path(
         "generate-songs/<int:pk>/",
         views.GenerateSongsView.as_view(),

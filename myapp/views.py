@@ -175,26 +175,33 @@ def get_playlist_from_api(playlist_id):
 
 @csrf_exempt
 async def play_music(request):
-    # Get playlist from API
-    try:
-        # Get playlist data
-        playlist = await sync_to_async(get_playlist_from_api)()
-        if not playlist:
-            return JsonResponse({"error": "Failed to load playlist"}, status=500)
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            playlist_id = data.get('playlist_id')
+            track_index = data.get('track_index', 0)
 
-        current_index = request.session.get("current_track", 0)
-        current_track = playlist[current_index].copy()
+            if not playlist_id:
+                return JsonResponse({"status": "error", "message": "Missing playlist_id"}, status=400)
 
-        return JsonResponse(
-            {
+            # Get playlist using the provided ID
+            playlist = await sync_to_async(get_playlist_from_api)(playlist_id)
+            
+            if not playlist:
+                return JsonResponse({"status": "error", "message": "Playlist not found"}, status=404)
+
+            return JsonResponse({
                 "status": "success",
                 "playlist": playlist,
-                "current_track": current_track,
-                "current_index": current_index,
-            }
-        )
-    except Exception as e:
-        return JsonResponse({"status": "error", "message": str(e)}, status=500)
+                "current_index": track_index
+            })
+
+        except json.JSONDecodeError:
+            return JsonResponse({"status": "error", "message": "Invalid JSON"}, status=400)
+        except Exception as e:
+            return JsonResponse({"status": "error", "message": str(e)}, status=500)
+    
+    return JsonResponse({"status": "error", "message": "Method not allowed"}, status=405)
 
 
 def _create_json_response(data, status=200):
